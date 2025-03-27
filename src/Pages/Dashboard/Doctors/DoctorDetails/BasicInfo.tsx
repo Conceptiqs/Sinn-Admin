@@ -1,0 +1,114 @@
+import React from "react";
+import { Avatar, Grid, Typography, Box, Chip, useMediaQuery, Theme } from "@mui/material";
+
+const BasicInfo = ({ doctor }: { doctor: any }) => {
+  const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm")); // Check if the screen size is small
+
+  return (
+    <Box sx={{ padding: 4 }}>
+      {/* Profile Section */}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          background: "linear-gradient(1deg, #e0e5ec, #ffffff)",
+        }}
+      >
+        <Avatar
+          src={doctor.avatarUrl || "https://via.placeholder.com/100"}
+          sx={{ width: 100, height: 100, mb: 1 }}
+        />
+        <Typography variant="h6">
+          Assistants: <span style={{ color: "green" }}>{doctor.assistants}</span>
+        </Typography>
+        <Typography variant="h6" sx={{ mt: 1 }}>
+          Credit: <span style={{ color: "green" }}>{doctor.credit}</span>
+        </Typography>
+        <Box sx={{ padding: 2, display: "flex", alignItems: "center", justifyContent: "center", gap: 2, mt: 1 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            {doctor.active && <Box sx={{ width: 20, height: 20, borderRadius: "50%", backgroundColor: "green" }} />}
+            <Typography>Active</Typography>
+          </Box>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            {!doctor.active && <Box sx={{ width: 20, height: 20, borderRadius: "50%", backgroundColor: "red" }} />}
+            <Typography>Inactive</Typography>
+          </Box>
+        </Box>
+      </Box>
+
+      {/* Details Section */}
+      <Box sx={{ padding: 2, marginTop: 3 }}>
+        <Grid
+          container
+          spacing={2}
+          sx={{
+            display: "flex",
+            flexDirection: isMobile ? "column" : "row", // Stack columns on small screens
+            flexWrap: "nowrap",
+            alignItems: "center",
+            gap: 3,
+          }}
+        >
+          {/* Name & Date of Birth */}
+          <Grid item sx={{ flex: 1 }}>
+            <Typography sx={{ fontWeight: 500, textAlign: "center" }}>Name</Typography>
+            <Typography sx={{ fontWeight: 50, textAlign: "center" }}>{doctor.name || "N/A"}</Typography>
+            <Typography sx={{ fontWeight: 500, textAlign: "center", mt: 2 }}>Date of Birth</Typography>
+            <Typography sx={{ fontWeight: 50, textAlign: "center" }}>{doctor.dob || "N/A"}</Typography>
+          </Grid>
+
+          {/* Mobile & Gender */}
+          <Grid item sx={{ flex: 1 }}>
+            <Typography sx={{ fontWeight: 500, textAlign: "center" }}>Mobile</Typography>
+            <Typography sx={{ fontWeight: 50, textAlign: "center" }}>{doctor.mobile || "N/A"}</Typography>
+            <Typography sx={{ fontWeight: 500, textAlign: "center", mt: 2 }}>Gender</Typography>
+            <Typography sx={{ fontWeight: 50, textAlign: "center" }}>{doctor.gender || "N/A"}</Typography>
+          </Grid>
+
+          {/* Email & Location */}
+          <Grid item sx={{ flex: 1 }}>
+            <Typography sx={{ fontWeight: 500, textAlign: "center" }}>Email</Typography>
+            <Typography sx={{ fontWeight: 50, textAlign: "center" }}>{doctor.email || "N/A"}</Typography>
+            <Typography sx={{ fontWeight: 500, textAlign: "center", mt: 2 }}>Location</Typography>
+            <Typography sx={{ fontWeight: 50, textAlign: "center" }}>{doctor.location || "N/A"}</Typography>
+          </Grid>
+
+          {/* National ID */}
+          <Grid item sx={{ flex: 1 }}>
+            <Typography sx={{ fontWeight: 500, textAlign: "center" }}>National ID</Typography>
+            <img
+              src={doctor.nationalId || "https://admin.expatica.com/sa/wp-content/uploads/sites/14/2023/11/saudi-id-card.jpg"}
+              alt="National ID"
+              width="100%"
+              style={{ borderRadius: 8 }}
+            />
+          </Grid>
+
+          {/* License */}
+          <Grid item sx={{ flex: 1 }}>
+            <Typography sx={{ fontWeight: 500, textAlign: "center" }}>License</Typography>
+            <img
+              src={doctor.license || "https://admin.expatica.com/sa/wp-content/uploads/sites/14/2023/11/saudi-id-card.jpg"}
+              alt="License"
+              width="100%"
+              style={{ borderRadius: 8 }}
+            />
+          </Grid>
+        </Grid>
+      </Box>
+
+      {/* Selected Services */}
+      <Typography variant="h6" sx={{ marginTop: 3, fontWeight: 500, }}>
+        Selected Services
+      </Typography>
+      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, marginTop: 1 }}>
+        {doctor.selectedServices?.map((service: string, index: number) => (
+          <Chip key={index} label={service} sx={{ fontSize: "0.9rem", padding: "10px 15px" }} />
+        ))}
+      </Box>
+    </Box>
+  );
+};
+
+export default BasicInfo;
