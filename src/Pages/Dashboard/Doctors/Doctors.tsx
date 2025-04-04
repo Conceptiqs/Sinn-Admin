@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
 import {
   Box,
   Typography,
@@ -25,42 +24,32 @@ import PaginationComponent from "../components/Pagination/PaginationComponent";
 import FilterButton from "../components/FilterButton/FilterButton";
 import SendNotificationButton from "../components/SendNotificationButton/SendNotificationButton";
 import ExportButton from "../components/ExportButton/ExportButton";
-import { doctorsData } from "../../../assets/Data/doctorsData";
-
-
-// interface Doctor {
-//   id: number;
-//   name: string;
-//   mobile: string;
-//   email: string;
-//   dob: string;
-//   gender: string;
-//   location: string;
-//   avatarUrl: string; // Changed from profilePic
-//   credit: string; // Changed from creditLimit and totalCredit
-//   assistants: number;
-//   active: boolean;
-//   selectedServices?: string[];
-//   nationalId: string;
-//   license: string;
-//   inactive: boolean; // Added to match data
-// }
-
+import { getDoctors } from "../../../apis/doctors";
 
 const Doctors: React.FC = () => {
-
   const [currentPage, setCurrentPage] = useState(1);
+  const [doctors, setDoctors] = useState<any[]>([]);
   const itemsPerPage = 10;
   const navigate = useNavigate();
 
-  const handlePageChange = (e: React.ChangeEvent<unknown>, value: number) => setCurrentPage(value);
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        const response = await getDoctors();
+        if (response.success) {
+          setDoctors(response.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch doctors:", error);
+      }
+    };
+    fetchDoctors();
+  }, []);
 
-  const handleViewDoctor = (id: number) => {
-    navigate(`/doctor/${id}`);// Correct URL format
-  };
-  
-
-  const paginatedDoctors = doctorsData.slice(
+  const handlePageChange = (e: React.ChangeEvent<unknown>, value: number) =>
+    setCurrentPage(value);
+  const handleViewDoctor = (id: number) => navigate(`/doctor/${id}`);
+  const paginatedDoctors = doctors.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -76,19 +65,15 @@ const Doctors: React.FC = () => {
           gap: "8px",
           flexWrap: "wrap",
           mb: 2,
-          "@media (max-width: 600px)": { flexDirection: "column", alignItems: "flex-start" },
         }}
       >
-        <Typography variant="h5" sx={{ fontSize: { xs: "16px", sm: "18px" }, fontWeight: "bold" }}>
+        <Typography
+          variant="h5"
+          sx={{ fontSize: { xs: "16px", sm: "18px" }, fontWeight: "bold" }}
+        >
           Doctors
         </Typography>
-        <Box
-          sx={{
-            display: "flex",
-            gap: "8px",
-            "@media (max-width: 600px)": { flexDirection: "column", width: "100%" },
-          }}
-        >
+        <Box sx={{ display: "flex", gap: "8px" }}>
           <FilterButton />
           <SendNotificationButton />
           <ExportButton />
@@ -116,13 +101,20 @@ const Doctors: React.FC = () => {
         <Table>
           <TableHead>
             <TableRow>
-              {["", "Name", "Mobile", "Email", "DOB", "Gender", "Credit", "Actions"].map(
-                (header, i) => (
-                  <TableCell key={i} sx={{ fontSize: "14px" }}>
-                    {i === 0 ? <Checkbox /> : header}
-                  </TableCell>
-                )
-              )}
+              {[
+                "",
+                "Name",
+                "Mobile",
+                "Email",
+                "DOB",
+                "Gender",
+                "Credit",
+                "Actions",
+              ].map((header, i) => (
+                <TableCell key={i} sx={{ fontSize: "14px" }}>
+                  {i === 0 ? <Checkbox /> : header}
+                </TableCell>
+              ))}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -133,21 +125,35 @@ const Doctors: React.FC = () => {
                 </TableCell>
                 <TableCell>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <Avatar src={doctor.avatarUrl} alt={doctor.name} />
-                    <Typography sx={{ fontSize: "14px" }}>{doctor.name}</Typography>
+                    <Avatar src={doctor.avatarUrl || ""} alt={doctor.name} />
+                    <Typography sx={{ fontSize: "14px" }}>
+                      {doctor.name}
+                    </Typography>
                   </Box>
                 </TableCell>
                 <TableCell sx={{ fontSize: "14px" }}>{doctor.mobile}</TableCell>
-                <TableCell sx={{ fontSize: "14px" }}>{doctor.email}</TableCell>
-                <TableCell sx={{ fontSize: "14px" }}>{doctor.dob}</TableCell>
-                <TableCell sx={{ fontSize: "14px" }}>{doctor.gender}</TableCell>
+                <TableCell sx={{ fontSize: "14px" }}>
+                  {doctor.email || "N/A"}
+                </TableCell>
+                <TableCell sx={{ fontSize: "14px" }}>
+                  {doctor.dob || "N/A"}
+                </TableCell>
+                <TableCell sx={{ fontSize: "14px" }}>
+                  {doctor.gender || "N/A"}
+                </TableCell>
                 <TableCell>
-                  <Typography sx={{ color: "green", fontWeight: "bold", fontSize: "14px" }}>
-                    {doctor.credit}
+                  <Typography
+                    sx={{
+                      color: "green",
+                      fontWeight: "bold",
+                      fontSize: "14px",
+                    }}
+                  >
+                    {doctor.credit || "N/A"}
                   </Typography>
                 </TableCell>
                 <TableCell align="center">
-                <IconButton onClick={() => handleViewDoctor(doctor.id)}>
+                  <IconButton onClick={() => handleViewDoctor(doctor.id)}>
                     <ViewIcon />
                   </IconButton>
                   <IconButton>
@@ -163,7 +169,7 @@ const Doctors: React.FC = () => {
       {/* Pagination */}
       <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
         <PaginationComponent
-          totalCount={doctorsData.length}
+          totalCount={doctors.length}
           page={currentPage}
           onPageChange={handlePageChange}
         />

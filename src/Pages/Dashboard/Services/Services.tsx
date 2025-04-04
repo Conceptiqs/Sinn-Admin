@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -10,25 +10,44 @@ import {
   CardMedia,
 } from "@mui/material";
 import DashboardIcon from "@mui/icons-material/Dashboard";
-import AddServiceButton from "../components/AddServiceButton/AddServiceButton"; // Import the AddServiceButton component
-import { ServiceIcons } from "../../../assets"; 
+import AddServiceButton from "../components/AddServiceButton/AddServiceButton";
+import { getServices } from "../../../apis/service";
 
-const services = [
-  { id: 1, name: "Orthodontics", icon: ServiceIcons.Orthodontics },
-  { id: 2, name: "Preventive Care", icon: ServiceIcons.Preventivecare },
-  { id: 3, name: "Periodontics", icon: ServiceIcons.Periodontics },
-  { id: 4, name: "Orthodontics", icon: ServiceIcons.Orthodontics },
-  { id: 5, name: "Preventive Care", icon: ServiceIcons.Preventivecare },
-  { id: 6, name: "Periodontics", icon: ServiceIcons.Periodontics },
-  { id: 7, name: "Orthodontics", icon: ServiceIcons.Orthodontics },
-  { id: 8, name: "Preventive Care", icon: ServiceIcons.Preventivecare },
-  { id: 9, name: "Periodontics", icon: ServiceIcons.Periodontics },
-  { id: 10, name: "Orthodontics", icon: ServiceIcons.Orthodontics },
-  { id: 11, name: "Preventive Care", icon: ServiceIcons.Preventivecare },
-  { id: 12, name: "Periodontics", icon: ServiceIcons.Periodontics },
-];
+interface Service {
+  id: number;
+  name: string;
+  icon: string;
+}
 
 const Services: React.FC = () => {
+  const [services, setServices] = useState<Service[]>([]);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const response = await getServices();
+        if (response.success) {
+          const formattedServices: Service[] = response.data.map(
+            (service: any) => ({
+              id: service.id,
+              name: service.title,
+              icon:
+                service.service_images?.original_url ||
+                (service.media.length > 0
+                  ? service.media[0].original_url
+                  : "https://via.placeholder.com/60"),
+            })
+          );
+          setServices(formattedServices);
+        }
+      } catch (error) {
+        console.error("Error fetching services:", error);
+      }
+    };
+
+    fetchServices();
+  }, []);
+
   return (
     <Box sx={{ padding: "24px", fontSize: "14px" }}>
       {/* Header Section */}
@@ -48,8 +67,14 @@ const Services: React.FC = () => {
 
       {/* Breadcrumbs Section */}
       <Breadcrumbs sx={{ fontSize: "0.9rem", marginBottom: "16px" }}>
-        <Link underline="hover" color="inherit" href="/dashboard">
-          <DashboardIcon sx={{ fontSize: "1rem", marginRight: "4px" }} /> Dashboard
+        <Link
+          underline="hover"
+          color="inherit"
+          href="/dashboard"
+          sx={{ display: "flex", alignItems: "center" }}
+        >
+          <DashboardIcon sx={{ fontSize: "1rem", marginRight: "4px" }} />{" "}
+          Dashboard
         </Link>
         <Typography color="text.primary">Services</Typography>
       </Breadcrumbs>
@@ -58,36 +83,35 @@ const Services: React.FC = () => {
       <Grid container spacing={3}>
         {services.map((service) => (
           <Grid item xs={12} sm={6} md={4} lg={2} key={service.id}>
-        <Card
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            padding: "16px",
-            textAlign: "center",
-            borderRadius: "12px",
-            background: "linear-gradient(160deg, #e0e5ec, #ffffff)",
-            border: "3px solid white", // Add a 3px white border
-            boxShadow: "0px 6px 18px rgba(0, 0, 0, 0.3)", // Reduce shadow intensity
-            transition: "transform 0.2s ease-in-out", // Optional hover effect
-            "&:hover": {
-              transform: "scale(1.09)", // Slight scale-up on hover
-            },
-          }}
-        >
-          <CardMedia
-            component="img"
-            src={service.icon} // Dynamic icon path
-            alt={`${service.name} Icon`}
-            sx={{ width: "60px", height: "60px", marginBottom: "8px" }}
-          />
-          <CardContent>
-            <Typography variant="body2" sx={{ fontSize: "14px" }}>
-              {service.name}
-            </Typography>
-          </CardContent>
-        </Card>
-
+            <Card
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                padding: "16px",
+                textAlign: "center",
+                borderRadius: "12px",
+                background: "linear-gradient(160deg, #e0e5ec, #ffffff)",
+                border: "3px solid white",
+                boxShadow: "0px 6px 18px rgba(0, 0, 0, 0.3)",
+                transition: "transform 0.2s ease-in-out",
+                "&:hover": {
+                  transform: "scale(1.09)",
+                },
+              }}
+            >
+              <CardMedia
+                component="img"
+                src={service.icon}
+                alt={`${service.name} Icon`}
+                sx={{ width: "60px", height: "60px", marginBottom: "8px" }}
+              />
+              <CardContent>
+                <Typography variant="body2" sx={{ fontSize: "14px" }}>
+                  {service.name}
+                </Typography>
+              </CardContent>
+            </Card>
           </Grid>
         ))}
       </Grid>
