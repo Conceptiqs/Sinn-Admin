@@ -15,3 +15,35 @@ export async function getNotifications(): Promise<any> {
     method: "GET",
   });
 }
+
+interface CreateNotificationPayload {
+  title: string;
+  short_description: string;
+  type: string;
+}
+
+/**
+ * Creates a new service by calling the `notifications/create` endpoint.
+ *
+ * @param payload - An object containing the title, short_description, and service_image.
+ * @returns The parsed JSON response from the API.
+ * @throws An error if the response is not OK.
+ */
+export async function createNotification(
+  payload: CreateNotificationPayload
+): Promise<any> {
+  const path = `notifications/create`;
+
+  // Convert payload into FormData
+  const formData = new FormData();
+  formData.append("title", payload.title);
+  formData.append("short_description", payload.short_description);
+  formData.append("type", payload.type);
+
+  // Call the API without setting Content-Type header manually.
+  return await callAuthApi({
+    path,
+    method: "POST",
+    data: formData,
+  });
+}

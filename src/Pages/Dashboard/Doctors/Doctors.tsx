@@ -22,9 +22,9 @@ import {
 } from "@mui/icons-material";
 import PaginationComponent from "../components/Pagination/PaginationComponent";
 import FilterButton from "../components/FilterButton/FilterButton";
-import SendNotificationButton from "../components/SendNotificationButton/SendNotificationButton";
 import ExportButton from "../components/ExportButton/ExportButton";
 import { getDoctors } from "../../../apis/doctors";
+import SendNotificationModal from "../components/SendNotificationButton/SendNotificationModal";
 
 const Doctors: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -75,7 +75,7 @@ const Doctors: React.FC = () => {
         </Typography>
         <Box sx={{ display: "flex", gap: "8px" }}>
           <FilterButton />
-          <SendNotificationButton />
+          <SendNotificationModal type="doctor" />
           <ExportButton />
         </Box>
       </Box>

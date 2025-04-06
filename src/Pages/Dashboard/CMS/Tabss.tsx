@@ -41,14 +41,6 @@ const Tabss: React.FC = () => {
   // pick the right dataset
   const data = activeTab === "customer" ? customerData : doctorData;
 
-  const handleEdit = (id: number) => {
-    console.log(`Edit clicked for item with id: ${id}`);
-  };
-
-  const handleDelete = (id: number) => {
-    console.log(`Delete clicked for item with id: ${id}`);
-  };
-
   // --- Fetchers ---
   const fetchCustomerBanner = useCallback(async () => {
     try {
