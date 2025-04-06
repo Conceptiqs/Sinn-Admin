@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
   Button,
   Modal,
@@ -10,22 +10,39 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { toast } from "react-toastify";
-import { createService } from "../../../../apis/service";
+import { updateService } from "../../../../apis/service";
+import { Edit } from "@mui/icons-material";
+
+interface Service {
+  id: number;
+  name: string;
+  short_description: string;
+  icon?: string;
+}
 
 interface Props {
+  service: Service;
   fetchServices: () => Promise<void>;
 }
 
-const AddServiceButton = ({ fetchServices }: Props) => {
-  const fileRef = useRef<any | null>(null);
+const EditServiceButton: React.FC<Props> = ({ service, fetchServices }) => {
+  const fileRef = useRef<HTMLInputElement | null>(null);
   const [open, setOpen] = useState(false);
-  const [title, setTitle] = useState("");
-  const [shortDescription, setShortDescription] = useState("");
+  const [title, setTitle] = useState(service.name);
+  const [shortDescription, setShortDescription] = useState(
+    service.short_description
+  );
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState("");
+  const [imagePreview, setImagePreview] = useState(service.icon || "");
+
+  // Update state when service prop changes
+  useEffect(() => {
+    setTitle(service.name);
+    setShortDescription(service.short_description);
+    setImagePreview(service.icon || "");
+  }, [service]);
 
   const handleOpen = () => setOpen(true);
-
   const handleClose = () => {
     setOpen(false);
     handleReset();
@@ -41,47 +58,54 @@ const AddServiceButton = ({ fetchServices }: Props) => {
   };
 
   const handleSubmit = async () => {
-    if (!title || !shortDescription || !imageFile) {
-      toast.error("Please fill in all required fields, including an image.");
+    if (!title || !shortDescription) {
+      toast.error("Please fill in all required fields.");
       return;
     }
 
     try {
-      const response = await createService({
+      const response = await updateService(service.id, {
         title,
         short_description: shortDescription,
         service_image: imageFile,
       });
-      toast.success("Service created successfully!");
-      console.log("Service created successfully:", response);
-      fetchServices()
+      toast.success("Service updated successfully!");
+      console.log("Service updated successfully:", response);
+      fetchServices();
       handleClose();
     } catch (error) {
-      console.error("Error creating service:", error);
-      toast.error("Error creating service. Please try again.");
+      console.error("Error updating service:", error);
+      toast.error("Error updating service. Please try again.");
     }
   };
 
   const handleReset = () => {
-    setTitle("");
-    setShortDescription("");
+    setTitle(service.name);
+    setShortDescription(service.short_description);
     setImageFile(null);
-    setImagePreview("");
+    setImagePreview(service.icon || "");
   };
 
   return (
     <>
       <Button
-        variant="contained"
-        sx={{
-          backgroundColor: "#1A2338",
-          color: "#fff",
-          textTransform: "none",
-          fontSize: "14px",
-        }}
+        variant="text"
         onClick={handleOpen}
+        sx={{
+          position: "absolute",
+          right: "5px",
+          top: "5px",
+          padding: "0",
+          width: "max-content !important",
+          display: "none",
+          minWidth: "0",
+          "&:hover": {
+            backgroundColor: "transparent",
+          },
+        }}
+        className="edit"
       >
-        Add Service
+        <Edit sx={{ width: "20px", height: "20px", color: "black" }} />
       </Button>
 
       <Modal open={open} onClose={handleClose}>
@@ -122,7 +146,7 @@ const AddServiceButton = ({ fetchServices }: Props) => {
               fontSize: "16px",
             }}
           >
-            Add Services
+            Edit Service
           </Typography>
 
           {/* Image Upload Area */}
@@ -174,12 +198,9 @@ const AddServiceButton = ({ fetchServices }: Props) => {
               <CloudUploadIcon fontSize="large" color="action" />
               <Typography
                 variant="body2"
-                sx={{
-                  color: "#888",
-                  fontWeight: "normal",
-                }}
+                sx={{ color: "#888", fontWeight: "normal" }}
               >
-                Upload Image
+                Upload New Image
               </Typography>
               <input
                 ref={fileRef}
@@ -263,7 +284,7 @@ const AddServiceButton = ({ fetchServices }: Props) => {
               }}
               onClick={handleSubmit}
             >
-              Submit
+              Save Changes
             </Button>
             <Button
               variant="outlined"
@@ -279,4 +300,4 @@ const AddServiceButton = ({ fetchServices }: Props) => {
   );
 };
 
-export default AddServiceButton;
+export default EditServiceButton;

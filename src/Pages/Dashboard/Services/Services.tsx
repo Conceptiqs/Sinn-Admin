@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -12,39 +12,42 @@ import {
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import AddServiceButton from "../components/AddServiceButton/AddServiceButton";
 import { getServices } from "../../../apis/service";
+import EditServiceButton from "../components/AddServiceButton/EditServiceButton";
+import DeleteServiceButton from "../components/AddServiceButton/DeleteServiceButton";
 
 interface Service {
   id: number;
   name: string;
+  short_description: string;
   icon: string;
 }
 
 const Services: React.FC = () => {
   const [services, setServices] = useState<Service[]>([]);
 
-  useEffect(() => {
-    const fetchServices = async () => {
-      try {
-        const response = await getServices();
-        if (response.success) {
-          const formattedServices: Service[] = response.data.map(
-            (service: any) => ({
-              id: service.id,
-              name: service.title,
-              icon:
-                service.service_images?.original_url ||
-                (service.media.length > 0
-                  ? service.media[0].original_url
-                  : "https://via.placeholder.com/60"),
-            })
-          );
-          setServices(formattedServices);
-        }
-      } catch (error) {
-        console.error("Error fetching services:", error);
+  const fetchServices = useCallback(async () => {
+    try {
+      const response = await getServices();
+      if (response.success) {
+        const formattedServices: Service[] = response.data.map(
+          (service: any) => ({
+            id: service.id,
+            name: service.title,
+            short_description: service.short_description,
+            icon:
+              service.media.length > 0
+                ? service.media[0].original_url
+                : "https://via.placeholder.com/60",
+          })
+        );
+        setServices(formattedServices);
       }
-    };
+    } catch (error) {
+      console.error("Error fetching services:", error);
+    }
+  }, []);
 
+  useEffect(() => {
     fetchServices();
   }, []);
 
@@ -62,7 +65,7 @@ const Services: React.FC = () => {
         <Typography variant="h5" fontWeight="bold" sx={{ fontSize: "18px" }}>
           Services
         </Typography>
-        <AddServiceButton />
+        <AddServiceButton fetchServices={fetchServices} />
       </Box>
 
       {/* Breadcrumbs Section */}
@@ -85,6 +88,7 @@ const Services: React.FC = () => {
           <Grid item xs={12} sm={6} md={4} lg={2} key={service.id}>
             <Card
               sx={{
+                position: "relative",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
@@ -97,14 +101,33 @@ const Services: React.FC = () => {
                 transition: "transform 0.2s ease-in-out",
                 "&:hover": {
                   transform: "scale(1.09)",
+                  "& .edit": {
+                    display: "block !important",
+                  },
+                  "& .delete": {
+                    display: "block !important",
+                  },
                 },
               }}
             >
+              <DeleteServiceButton
+                service={service}
+                fetchServices={fetchServices}
+              />
+              <EditServiceButton
+                service={service}
+                fetchServices={fetchServices}
+              />
               <CardMedia
                 component="img"
                 src={service.icon}
                 alt={`${service.name} Icon`}
-                sx={{ width: "60px", height: "60px", marginBottom: "8px" }}
+                sx={{
+                  width: "60px",
+                  height: "60px",
+                  marginBottom: "8px",
+                  borderRadius: "100%",
+                }}
               />
               <CardContent>
                 <Typography variant="body2" sx={{ fontSize: "14px" }}>

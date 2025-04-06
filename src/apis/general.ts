@@ -11,6 +11,8 @@ interface ApiRequestParams {
 /**
  * Makes an API call using multipart/form-data and attaches the bearer token.
  *
+ * If the server returns 401 Unauthorized, removes the token cookie and redirects to /login.
+ *
  * @param params - Object containing path, method, headers, and data.
  * @returns The parsed JSON response.
  * @throws An error if the response is not ok.
@@ -21,7 +23,7 @@ export async function callAuthApi<T>({
   headers = {},
   data,
 }: ApiRequestParams): Promise<T> {
-  // Retrieve the token from cookies and ensure it's a string.
+  // Retrieve the token from cookies
   const token = Cookies.get("token");
 
   // Always return an object for the auth header.
@@ -32,7 +34,7 @@ export async function callAuthApi<T>({
   // Merge custom headers with the auth header.
   const finalHeaders: Record<string, string> = { ...headers, ...authHeader };
 
-  // Remove any Content-Type header so the browser can set it correctly.
+  // Let the browser set Content-Type for FormData
   if (finalHeaders["Content-Type"]) {
     delete finalHeaders["Content-Type"];
   }
@@ -40,13 +42,21 @@ export async function callAuthApi<T>({
   const options: RequestInit = {
     method,
     headers: finalHeaders,
-    body: data, // data is expected to be a FormData instance.
+    body: data,
   };
 
   const response = await fetch(`${baseUrl}${path}`, options);
+
+  if (response.status === 401) {
+    Cookies.remove("token");
+    window.location.href = "/login";
+    throw new Error("Unauthorized");
+  }
+
   if (!response.ok) {
-    console.log(response)
+    console.error("API error:", response);
     throw new Error(`HTTP error! status: ${response.status}`);
   }
+
   return await response.json();
 }

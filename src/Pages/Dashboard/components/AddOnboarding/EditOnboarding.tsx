@@ -13,22 +13,35 @@ import {
   CloudUpload as CloudUploadIcon,
 } from "@mui/icons-material";
 import { toast } from "react-toastify";
-import { createCmsOnboarding } from "../../../../apis/cms";
+import { updateCmsOnboarding } from "../../../../apis/cms";
+import EditIcon from "@mui/icons-material/Edit";
 
 type TabKey = "customer" | "doctor";
 
 interface Props {
   fetchOnboardings: () => Promise<void>;
   activeTab: TabKey;
+  onboarding: CmsItem;
 }
 
-const AddOnboarding: React.FC<Props> = ({ fetchOnboardings, activeTab }) => {
+interface CmsItem {
+  id: number;
+  title: string;
+  description: string;
+  image: string;
+}
+
+const EditOnboarding: React.FC<Props> = ({
+  fetchOnboardings,
+  activeTab,
+  onboarding,
+}) => {
   const fileRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState("");
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [imagePreview, setImagePreview] = useState(onboarding.image || "");
+  const [title, setTitle] = useState(onboarding.title || "");
+  const [description, setDescription] = useState(onboarding.description || "");
 
   const isSmallScreen = useMediaQuery((theme: any) =>
     theme.breakpoints.down("sm")
@@ -36,9 +49,9 @@ const AddOnboarding: React.FC<Props> = ({ fetchOnboardings, activeTab }) => {
 
   const resetForm = () => {
     setImageFile(null);
-    setImagePreview("");
-    setTitle("");
-    setDescription("");
+    setImagePreview(onboarding.image || "");
+    setTitle(onboarding.title || "");
+    setDescription(onboarding.description || "");
   };
 
   const handleOpen = () => setOpen(true);
@@ -62,7 +75,7 @@ const AddOnboarding: React.FC<Props> = ({ fetchOnboardings, activeTab }) => {
     }
 
     try {
-      await createCmsOnboarding({
+      await updateCmsOnboarding(onboarding.id, {
         type: activeTab,
         title,
         description,
@@ -79,17 +92,16 @@ const AddOnboarding: React.FC<Props> = ({ fetchOnboardings, activeTab }) => {
 
   return (
     <>
-      <Button
-        variant="contained"
+      <IconButton
+        size="small"
         sx={{
-          backgroundColor: "#1A2338",
-          color: "#fff",
-          textTransform: "none",
+          bgcolor: "rgba(255,255,255,0.8)",
+          "&:hover": { bgcolor: "rgba(255,255,255,1)" },
         }}
         onClick={handleOpen}
       >
-        Add Onboarding
-      </Button>
+        <EditIcon fontSize="small" />
+      </IconButton>
 
       <Modal open={open} onClose={handleClose}>
         <Box
@@ -113,7 +125,7 @@ const AddOnboarding: React.FC<Props> = ({ fetchOnboardings, activeTab }) => {
           </IconButton>
 
           <Typography variant="h6" sx={{ mb: 2 }}>
-            Add Onboarding
+            Edit Onboarding
           </Typography>
 
           {imagePreview ? (
@@ -223,4 +235,4 @@ const AddOnboarding: React.FC<Props> = ({ fetchOnboardings, activeTab }) => {
   );
 };
 
-export default AddOnboarding;
+export default EditOnboarding;

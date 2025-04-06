@@ -13,33 +13,34 @@ import {
   CloudUpload as CloudUploadIcon,
 } from "@mui/icons-material";
 import { toast } from "react-toastify";
-import { createCmsOnboarding } from "../../../../apis/cms";
+import { updateCmsBanner } from "../../../../apis/cms";
+import EditIcon from "@mui/icons-material/Edit";
 
 type TabKey = "customer" | "doctor";
 
 interface Props {
-  fetchOnboardings: () => Promise<void>;
+  fetchBanners: () => Promise<void>;
   activeTab: TabKey;
+  banner: CmsItem;
 }
 
-const AddOnboarding: React.FC<Props> = ({ fetchOnboardings, activeTab }) => {
+interface CmsItem {
+  id: number;
+  title: string;
+  description: string;
+  image: string;
+}
+
+const EditBanner: React.FC<Props> = ({ fetchBanners, activeTab, banner }) => {
   const fileRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
+  const [title, setTitle] = useState(banner.title || "");
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState("");
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [imagePreview, setImagePreview] = useState(banner.image || "");
 
   const isSmallScreen = useMediaQuery((theme: any) =>
     theme.breakpoints.down("sm")
   );
-
-  const resetForm = () => {
-    setImageFile(null);
-    setImagePreview("");
-    setTitle("");
-    setDescription("");
-  };
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
@@ -50,48 +51,48 @@ const AddOnboarding: React.FC<Props> = ({ fetchOnboardings, activeTab }) => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] ?? null;
     setImageFile(file);
-    if (file) {
-      setImagePreview(URL.createObjectURL(file));
-    }
+    if (file) setImagePreview(URL.createObjectURL(file));
+  };
+
+  const resetForm = () => {
+    setTitle(banner.title || "");
+    setImageFile(null);
+    setImagePreview(banner.image || "");
   };
 
   const handleSubmit = async () => {
-    if (!imageFile || !title || !description) {
-      toast.error("Please fill in all required fields.");
+    if (!title || !imageFile) {
+      toast.error("Please fill in title and select an image.");
       return;
     }
 
     try {
-      await createCmsOnboarding({
-        type: activeTab,
-        title,
-        description,
-        boarding_image: imageFile,
-      });
-      toast.success("Onboarding step created!");
-      await fetchOnboardings();
+      const payload: any = { title, type: activeTab };
+      payload.banner_image = imageFile;
+      await updateCmsBanner(banner.id, payload);
+      toast.success("Banner created successfully!");
+      await fetchBanners();
       handleClose();
     } catch (err) {
-      console.error("Error creating onboarding:", err);
-      toast.error("Failed to create onboarding. Try again.");
+      console.error("Error creating banner:", err);
+      toast.error("Error creating banner. Please try again.");
     }
   };
 
   return (
     <>
-      <Button
-        variant="contained"
+      <IconButton
+        size="small"
         sx={{
-          backgroundColor: "#1A2338",
-          color: "#fff",
-          textTransform: "none",
+          bgcolor: "rgba(255,255,255,0.8)",
+          "&:hover": { bgcolor: "rgba(255,255,255,1)" },
         }}
         onClick={handleOpen}
       >
-        Add Onboarding
-      </Button>
+        <EditIcon fontSize="small" />
+      </IconButton>
 
-      <Modal open={open} onClose={handleClose}>
+      <Modal open={open} onClose={handleClose} keepMounted>
         <Box
           sx={{
             position: "absolute" as const,
@@ -113,7 +114,7 @@ const AddOnboarding: React.FC<Props> = ({ fetchOnboardings, activeTab }) => {
           </IconButton>
 
           <Typography variant="h6" sx={{ mb: 2 }}>
-            Add Onboarding
+            Edit Banner
           </Typography>
 
           {imagePreview ? (
@@ -160,7 +161,7 @@ const AddOnboarding: React.FC<Props> = ({ fetchOnboardings, activeTab }) => {
             >
               <CloudUploadIcon fontSize="large" color="action" />
               <Typography variant="body2" sx={{ mt: 1, color: "#888" }}>
-                Upload Image
+                Upload Banner Image
               </Typography>
               <input
                 ref={fileRef}
@@ -172,48 +173,37 @@ const AddOnboarding: React.FC<Props> = ({ fetchOnboardings, activeTab }) => {
             </Box>
           )}
 
-          <Box sx={{ mb: 2 }}>
-            <Typography variant="body2" sx={{ mb: 0.5 }}>
-              Enter Title <span style={{ color: "red" }}>*</span>
+          <Typography variant="body2" sx={{ textAlign: "left" }}>
+            Enter Banner Title{" "}
+            <Typography component="span" sx={{ color: "red" }}>
+              *
             </Typography>
-            <TextField
-              fullWidth
-              size="small"
-              placeholder="Enter here"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-          </Box>
-
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="body2" sx={{ mb: 0.5 }}>
-              Enter Description <span style={{ color: "red" }}>*</span>
-            </Typography>
-            <TextField
-              fullWidth
-              size="small"
-              placeholder="Enter here"
-              multiline
-              minRows={3}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </Box>
+          </Typography>
+          <TextField
+            fullWidth
+            size="small"
+            variant="outlined"
+            placeholder="Enter here"
+            sx={{ mb: 2 }}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
 
           <Box sx={{ display: "flex", gap: 2 }}>
             <Button
               fullWidth
               variant="contained"
-              sx={{
-                backgroundColor: "#1A2338",
-                color: "#fff",
-                textTransform: "none",
-              }}
+              sx={{ bgcolor: "#1A2338", color: "#fff", textTransform: "none" }}
               onClick={handleSubmit}
             >
               Submit
             </Button>
-            <Button fullWidth variant="outlined" onClick={resetForm}>
+            <Button
+              fullWidth
+              variant="outlined"
+              sx={{ textTransform: "none" }}
+              onClick={resetForm}
+            >
               Reset
             </Button>
           </Box>
@@ -223,4 +213,4 @@ const AddOnboarding: React.FC<Props> = ({ fetchOnboardings, activeTab }) => {
   );
 };
 
-export default AddOnboarding;
+export default EditBanner;
