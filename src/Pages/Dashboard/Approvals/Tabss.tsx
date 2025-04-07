@@ -18,16 +18,12 @@ import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import PaginationComponent from "../components/Pagination/PaginationComponent";
 import { getApprovals } from "../../../apis/approvals";
+import { useNavigate } from "react-router-dom";
 
-interface TabsComponentProps {
-  approvalData: any[];
-  rejectedData: any[];
-}
+interface TabsComponentProps {}
 
-const Tabss: React.FC<TabsComponentProps> = ({
-  approvalData,
-  rejectedData,
-}) => {
+const Tabss: React.FC<TabsComponentProps> = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<1 | 2>(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [approvals, setApprovals] = useState<any[]>();
@@ -130,12 +126,18 @@ const Tabss: React.FC<TabsComponentProps> = ({
                     <TableCell>{approval.dob}</TableCell>
                     <TableCell>{approval.gender}</TableCell>
                     <TableCell align="center">
-                      <IconButton>
+                      <IconButton
+                        onClick={() =>
+                          navigate(`/doctor/${approval.id}`, {
+                            state: { isApproval: true },
+                          })
+                        }
+                      >
                         <VisibilityOutlinedIcon />
                       </IconButton>
-                      <IconButton>
+                      {/* <IconButton>
                         <DeleteOutlineOutlinedIcon />
-                      </IconButton>
+                      </IconButton> */}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -154,7 +156,7 @@ const Tabss: React.FC<TabsComponentProps> = ({
           >
             {/* Use the PaginationComponent here */}
             <PaginationComponent
-              totalCount={approvalData.length}
+              totalCount={approvals?.length || 0}
               page={currentPage}
               onPageChange={handlePageChange}
             />
@@ -215,12 +217,18 @@ const Tabss: React.FC<TabsComponentProps> = ({
                     <TableCell>{rejected.dob}</TableCell>
                     <TableCell>{rejected.gender}</TableCell>
                     <TableCell align="center">
-                      <IconButton>
+                      <IconButton
+                        onClick={() =>
+                          navigate(`/doctor/${rejected.id}`, {
+                            state: { isApproval: true },
+                          })
+                        }
+                      >
                         <VisibilityOutlinedIcon />
                       </IconButton>
-                      <IconButton>
+                      {/* <IconButton>
                         <DeleteOutlineOutlinedIcon />
-                      </IconButton>
+                      </IconButton> */}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -239,7 +247,7 @@ const Tabss: React.FC<TabsComponentProps> = ({
           >
             {/* Use the PaginationComponent here */}
             <PaginationComponent
-              totalCount={rejectedData.length}
+              totalCount={approvals?.length || 0}
               page={currentPage}
               onPageChange={handlePageChange}
             />

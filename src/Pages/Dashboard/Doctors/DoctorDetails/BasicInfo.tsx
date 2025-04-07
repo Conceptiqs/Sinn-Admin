@@ -7,9 +7,15 @@ import {
   Chip,
   useMediaQuery,
   Theme,
+  Button,
 } from "@mui/material";
+import { useLocation, useNavigate, useNavigation } from "react-router-dom";
+import { updateApprovals } from "../../../../apis/approvals";
+import { toast } from "react-toastify";
 
 const BasicInfo = ({ doctor }: { doctor: any }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const isMobile = useMediaQuery((theme: Theme) =>
     theme.breakpoints.down("sm")
   ); // Check if the screen size is small
@@ -22,6 +28,19 @@ const BasicInfo = ({ doctor }: { doctor: any }) => {
   const license = doctor.media?.find(
     (item: { collection_name: string }) => item.collection_name === "licenses"
   );
+
+  const handleUpdate = async (type: 1 | 2) => {
+    try {
+      await updateApprovals(doctor.id, type);
+      toast.success(
+        `Doctor ${type === 1 ? "accepted" : "rejected"} successfully!`
+      );
+      navigate(`/approvals`);
+    } catch (error) {
+      console.error("Error updating approval:", error);
+      toast.error("Failed to update approval. Please try again.");
+    }
+  };
 
   return (
     <Box sx={{ padding: 4 }}>
@@ -205,6 +224,34 @@ const BasicInfo = ({ doctor }: { doctor: any }) => {
             )
         )}
       </Box>
+      {location.state?.isApproval && (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "20px",
+            marginTop: "40px",
+          }}
+        >
+          <Button
+            sx={{ borderRadius: "50px" }}
+            variant="contained"
+            color="success"
+            onClick={() => handleUpdate(1)}
+          >
+            Accept
+          </Button>
+          <Button
+            sx={{ borderRadius: "50px" }}
+            variant="contained"
+            color="error"
+            onClick={() => handleUpdate(2)}
+          >
+            Reject
+          </Button>
+        </Box>
+      )}
     </Box>
   );
 };

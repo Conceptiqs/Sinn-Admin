@@ -15,3 +15,16 @@ export async function getApprovals(id: 1 | 2): Promise<any> {
     method: "GET",
   });
 }
+
+export async function updateApprovals(
+  doctorId: number,
+  id: 1 | 2
+): Promise<any> {
+  const path = `doctors/approve-reject/${doctorId}?type=${id}`; // Adjust the endpoint path as needed.
+
+  // Call the API with the GET method. Note: No data is required.
+  return await callAuthApi({
+    path,
+    method: "POST",
+  });
+}
