@@ -10,8 +10,10 @@ import {
   ListItemText,
 } from "@mui/material";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
+import { useNavigate } from "react-router-dom";
 
 const RecentActivities: React.FC<{ activities: any }> = ({ activities }) => {
+  const navigate = useNavigate();
   return (
     <Box
       sx={{
@@ -48,6 +50,9 @@ const RecentActivities: React.FC<{ activities: any }> = ({ activities }) => {
             color: "#5c85f4",
             textTransform: "none",
             fontSize: "14px",
+          }}
+          onClick={() => {
+            navigate(`/notification`);
           }}
         >
           View all →

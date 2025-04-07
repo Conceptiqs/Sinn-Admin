@@ -1,5 +1,6 @@
 import React from "react";
 import { Box, Typography, Button, Avatar } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 interface Doctor {
   id: number;
@@ -30,6 +31,7 @@ const doctors: Doctor[] = [
 ];
 
 const RecentlyJoinedDoctors: React.FC<{ doctors: any }> = ({ doctors }) => {
+  const navigate = useNavigate();
   return (
     <Box
       sx={{
@@ -58,6 +60,9 @@ const RecentlyJoinedDoctors: React.FC<{ doctors: any }> = ({ doctors }) => {
             color: "#5c85f4",
             textTransform: "none",
             fontSize: "14px",
+          }}
+          onClick={() => {
+            navigate(`/doctors`);
           }}
         >
           View all →
@@ -105,7 +110,7 @@ const RecentlyJoinedDoctors: React.FC<{ doctors: any }> = ({ doctors }) => {
                   {doctor.name}
                 </Typography>
                 <Typography variant="body2" color="textSecondary" noWrap>
-                 Joined on {formatted}
+                  Joined on {formatted}
                 </Typography>
               </Box>
             </Box>

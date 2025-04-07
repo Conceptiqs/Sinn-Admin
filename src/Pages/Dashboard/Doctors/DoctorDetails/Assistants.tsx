@@ -32,7 +32,7 @@ const Assistants = ({ doctor }: { doctor: any }) => {
   };
 
   // Get assistants data from the doctor prop
-  const assistants: Assistant[] = doctor.assistant || [];
+  const assistants: Assistant[] = doctor.assistants	 || [];
 
   // Paginate data
   const paginatedAssistants = assistants.slice(

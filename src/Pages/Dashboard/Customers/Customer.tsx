@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -21,21 +21,26 @@ import PaginationComponent from "../components/Pagination/PaginationComponent";
 import FilterButton from "../components/FilterButton/FilterButton";
 import ExportButton from "../components/ExportButton/ExportButton";
 import SendNotificationModal from "../components/SendNotificationButton/SendNotificationModal";
-
-const customerData = Array.from({ length: 12 }, (_, index) => ({
-  id: index + 1,
-  name: "Dr. Srikanth",
-  mobile: "9676099099",
-  email: "srikanthalapudi@hotmail.com",
-  dob: "19-05-1985",
-  gender: "Male",
-  location: "King Fahd Rd, 31952,Dammam",
-  avatarUrl: `https://i.pravatar.cc/150?img=${index + 1}`,
-}));
+import { getCustomers } from "../../../apis/customers";
 
 const Customers: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [customers, setCustomers] = useState<any[]>([]);
   const itemsPerPage = 10;
+
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        const response = await getCustomers();
+        if (response.success) {
+          setCustomers(response.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch doctors:", error);
+      }
+    };
+    fetchCustomers();
+  }, []);
 
   const handlePageChange = (
     event: React.ChangeEvent<unknown>,
@@ -44,7 +49,7 @@ const Customers: React.FC = () => {
     setCurrentPage(value);
   };
 
-  const paginatedCustomers = customerData.slice(
+  const paginatedCustomers = customers.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -141,7 +146,7 @@ const Customers: React.FC = () => {
                   <Box
                     sx={{ display: "flex", alignItems: "center", gap: "8px" }}
                   >
-                    <Avatar src={customer.avatarUrl} alt={customer.name} />
+                    <Avatar src={customer.main_images?.url} alt={customer.name} />
                     <Typography sx={{ fontSize: "14px" }}>
                       {customer.name}
                     </Typography>
@@ -186,7 +191,7 @@ const Customers: React.FC = () => {
         }}
       >
         <PaginationComponent
-          totalCount={customerData.length}
+          totalCount={customers.length}
           page={currentPage}
           onPageChange={handlePageChange}
         />

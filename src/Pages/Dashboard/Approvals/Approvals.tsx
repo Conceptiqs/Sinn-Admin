@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  Box,
-  Typography,
-  Breadcrumbs,
-  Link,
-  Button,
-} from "@mui/material";
+import { Box, Typography, Breadcrumbs, Link, Button } from "@mui/material";
 import DashboardIcon from "@mui/icons-material/Dashboard"; // Importing Dashboard Icon
 import TabsComponent from "./Tabss"; // Import the TabsComponent
 import FilterButton from "../components/FilterButton/FilterButton";
@@ -23,21 +17,20 @@ const approvalData = Array.from({ length: 12 }, (_, index) => ({
 }));
 
 const rejectedData = Array.from({ length: 12 }, (_, index) => ({
-    id: index + 1,
-    name: "Dr. Srikanth",
-    mobile: "9676099099",
-    email: "srikanthalapudi@hotmail.com",
-    dob: "19-05-1985",
-    gender: "Male",
-    location: "King Fahd Rd, 31952,Dammam",
-    avatarUrl: `https://i.pravatar.cc/150?img=${index + 1}`,
-  }));
+  id: index + 1,
+  name: "Dr. Srikanth",
+  mobile: "9676099099",
+  email: "srikanthalapudi@hotmail.com",
+  dob: "19-05-1985",
+  gender: "Male",
+  location: "King Fahd Rd, 31952,Dammam",
+  avatarUrl: `https://i.pravatar.cc/150?img=${index + 1}`,
+}));
 
 const Approvals: React.FC = () => {
   return (
     <Box sx={{ padding: "24px", fontSize: "14px" }}>
-
-    <Box
+      <Box
         sx={{
           display: "flex",
           justifyContent: "space-between",
@@ -56,7 +49,8 @@ const Approvals: React.FC = () => {
       {/* Breadcrumbs Section */}
       <Breadcrumbs sx={{ fontSize: "0.9rem", marginBottom: "16px" }}>
         <Link underline="hover" color="inherit" href="/dashboard">
-          <DashboardIcon sx={{ fontSize: "1rem", marginRight: "4px" }} /> Dashboard
+          <DashboardIcon sx={{ fontSize: "1rem", marginRight: "4px" }} />{" "}
+          Dashboard
         </Link>
         <Typography color="text.primary">Approvals</Typography>
       </Breadcrumbs>

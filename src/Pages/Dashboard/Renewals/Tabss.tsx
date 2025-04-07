@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Tabs,
@@ -8,44 +8,44 @@ import {
   Pagination,
   Chip,
 } from "@mui/material";
+import { getRenewals } from "../../../apis/renewals";
 
-interface Renewal {
-  id: number;
-  name: string;
-  message: string;
-  image: string;
-  status: string;
-}
-
-interface TabsComponentProps {
-  renewalData: Renewal[];
-  completedData: Renewal[];
-}
-
-const Tabss: React.FC<TabsComponentProps> = ({ renewalData, completedData }) => {
-  const [activeTab, setActiveTab] = useState(0);
+const Tabss: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<1 | 2>(1);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8; // Items per page
+  const [renewals, setRenewals] = useState<any[]>();
+  const itemsPerPage = 8;
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  useEffect(() => {
+    const fetchRenewals = async () => {
+      try {
+        const response = await getRenewals(activeTab);
+        if (response.success) {
+          setRenewals(response.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch doctors:", error);
+      }
+    };
+    fetchRenewals();
+  }, [activeTab]);
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: 1 | 2) => {
     setActiveTab(newValue);
-    setCurrentPage(1); // Reset page when switching tabs
+    setCurrentPage(1);
   };
 
-  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+  const handlePageChange = (
+    event: React.ChangeEvent<unknown>,
+    value: number
+  ) => {
     setCurrentPage(value);
   };
 
-  const paginatedData =
-    activeTab === 0
-      ? renewalData.slice(
-          (currentPage - 1) * itemsPerPage,
-          currentPage * itemsPerPage
-        )
-      : completedData.slice(
-          (currentPage - 1) * itemsPerPage,
-          currentPage * itemsPerPage
-        );
+  const paginatedData = renewals?.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <Box sx={{ width: "100%", marginBottom: "16px" }}>
@@ -56,8 +56,8 @@ const Tabss: React.FC<TabsComponentProps> = ({ renewalData, completedData }) => 
         aria-label="tabs"
         indicatorColor="primary"
       >
-        <Tab label="Renewals" sx={{ fontSize: "14px" }} />
-        <Tab label="Completed" sx={{ fontSize: "14px" }} />
+        <Tab value={1} label="Renewals" sx={{ fontSize: "14px" }} />
+        <Tab value={2} label="Completed" sx={{ fontSize: "14px" }} />
       </Tabs>
 
       {/* Content of the selected tab */}
@@ -68,7 +68,7 @@ const Tabss: React.FC<TabsComponentProps> = ({ renewalData, completedData }) => 
           gridTemplateColumns={{ xs: "1fr", sm: "1fr 1fr" }} // 1 column on small screens, 2 columns on medium+
           gap={2}
         >
-          {paginatedData.map((item) => (
+          {paginatedData?.map((item) => (
             <Box
               key={item.id}
               sx={{
@@ -108,8 +108,8 @@ const Tabss: React.FC<TabsComponentProps> = ({ renewalData, completedData }) => 
 
               {/* Status */}
               <Chip
-                label={item.status}
-                color={item.status === "Inactive" ? "error" : "success"}
+                label={item.status || "Inactive"}
+                color={!item.status ? "error" : "success"}
                 size="small"
                 sx={{ fontWeight: "bold", marginLeft: "auto" }}
               />
@@ -122,10 +122,7 @@ const Tabss: React.FC<TabsComponentProps> = ({ renewalData, completedData }) => 
           sx={{ display: "flex", justifyContent: "center", marginTop: "16px" }}
         >
           <Pagination
-            count={Math.ceil(
-              (activeTab === 0 ? renewalData.length : completedData.length) /
-                itemsPerPage
-            )}
+            count={Math.ceil(renewals?.length || 0 / itemsPerPage)}
             page={currentPage}
             onChange={handlePageChange}
             color="primary"

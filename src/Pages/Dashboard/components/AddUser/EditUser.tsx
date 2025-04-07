@@ -14,7 +14,7 @@ import { createUser } from "../../../../apis/uac";
 import { toast } from "react-toastify";
 
 interface Props {
-  fetchUsers: () => Promise<void>;
+  fetchUsers:  () => Promise<void>;
 }
 
 const AddUser: React.FC<Props> = ({ fetchUsers }) => {

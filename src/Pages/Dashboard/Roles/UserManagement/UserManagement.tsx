@@ -1,75 +1,156 @@
-import React, { useState } from "react";
-import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Checkbox, Avatar, IconButton, Breadcrumbs, Link } from "@mui/material";
-import { EditOutlined as EditIcon, DeleteOutlineOutlined as DeleteIcon, Dashboard as DashboardIcon } from "@mui/icons-material";
+import React, { useCallback, useEffect, useState } from "react";
+import {
+  Box,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Checkbox,
+  Avatar,
+  IconButton,
+  Breadcrumbs,
+  Link,
+} from "@mui/material";
+import {
+  EditOutlined as EditIcon,
+  DeleteOutlineOutlined as DeleteIcon,
+  Dashboard as DashboardIcon,
+} from "@mui/icons-material";
 import PaginationComponent from "../../components/Pagination/PaginationComponent";
 import FilterButton from "../../components/FilterButton/FilterButton";
 import AddUser from "../../components/AddUser/AddUser";
-
-const userData = Array.from({ length: 12 }, (_, index) => ({
-  id: index + 1,
-  user: "Srikanth",
-  phone: "9676099099",
-  email: "srikanthalapudi@hotmail.com",
-  avatarUrl: `https://i.pravatar.cc/150?img=${index + 1}`,
-}));
+import { getUsers } from "../../../../apis/uac";
+import DeleteUser from "../../components/AddUser/DeleteUser";
 
 const UserManagement: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [users, setUsers] = useState<any[]>();
   const itemsPerPage = 10;
-  
-  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => setCurrentPage(value);
 
-  const paginatedUsers = userData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const fetchUsers = useCallback(async () => {
+    try {
+      const response = await getUsers();
+      if (response.success) {
+        setUsers(response.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch Users:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) =>
+    setCurrentPage(value);
+
+  const paginatedUsers = users?.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <Box sx={{ padding: "24px", fontSize: "14px" }}>
       {/* Header Section */}
-      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px", flexWrap: "wrap", gap: "8px" }}>
-        <Typography variant="h5" fontWeight="bold" sx={{ fontSize: "18px", "@media (max-width: 600px)": { fontSize: "16px" } }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "8px",
+          flexWrap: "wrap",
+          gap: "8px",
+        }}
+      >
+        <Typography
+          variant="h5"
+          fontWeight="bold"
+          sx={{
+            fontSize: "18px",
+            "@media (max-width: 600px)": { fontSize: "16px" },
+          }}
+        >
           UserManagement
         </Typography>
-        <Box sx={{ display: "flex", gap: "8px", flexDirection: "row", "@media (max-width: 600px)": { flexDirection: "column", width: "100%", gap: "4px" } }}>
-        <FilterButton />
-        <AddUser />
-      </Box>
-
+        <Box
+          sx={{
+            display: "flex",
+            gap: "8px",
+            flexDirection: "row",
+            "@media (max-width: 600px)": {
+              flexDirection: "column",
+              width: "100%",
+              gap: "4px",
+            },
+          }}
+        >
+          <FilterButton />
+          <AddUser fetchUsers={fetchUsers} />
+        </Box>
       </Box>
 
       {/* Breadcrumbs Section */}
       <Breadcrumbs sx={{ fontSize: "0.9rem", marginBottom: "16px" }}>
         <Link underline="hover" color="inherit" href="/dashboard">
-          <DashboardIcon sx={{ fontSize: "1rem", marginRight: "4px" }} /> Dashboard
+          <DashboardIcon sx={{ fontSize: "1rem", marginRight: "4px" }} />{" "}
+          Dashboard
         </Link>
         <Typography color="text.primary">UserManagement</Typography>
       </Breadcrumbs>
 
       {/* User Table */}
-      <TableContainer sx={{ borderRadius: "16px", background: "linear-gradient(160deg, #e0e5ec, #ffffff)", padding: 1, boxShadow: "0px 6px 18px rgba(0, 0, 0, 0.3)", border: "3px solid white" }}>
+      <TableContainer
+        sx={{
+          borderRadius: "16px",
+          background: "linear-gradient(160deg, #e0e5ec, #ffffff)",
+          padding: 1,
+          boxShadow: "0px 6px 18px rgba(0, 0, 0, 0.3)",
+          border: "3px solid white",
+        }}
+      >
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontSize: "14px" }}><Checkbox /></TableCell>
+              <TableCell sx={{ fontSize: "14px" }}>
+                <Checkbox />
+              </TableCell>
               <TableCell sx={{ fontSize: "14px" }}>User</TableCell>
               <TableCell sx={{ fontSize: "14px" }}>Phone</TableCell>
               <TableCell sx={{ fontSize: "14px" }}>Email</TableCell>
-              <TableCell align="center" sx={{ fontSize: "14px" }}>Actions</TableCell>
+              <TableCell align="center" sx={{ fontSize: "14px" }}>
+                Actions
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {paginatedUsers.map((user) => (
+            {paginatedUsers?.map((user) => (
               <TableRow key={user.id} hover>
-                <TableCell><Checkbox /></TableCell>
                 <TableCell>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <Avatar src={user.avatarUrl} alt={user.user} />
-                    <Typography sx={{ fontSize: "14px" }}>{user.user}</Typography>
+                  <Checkbox />
+                </TableCell>
+                <TableCell>
+                  <Box
+                    sx={{ display: "flex", alignItems: "center", gap: "8px" }}
+                  >
+                    <Avatar src={user.user_images?.url} alt={user.user} />
+                    <Typography sx={{ fontSize: "14px" }}>
+                      {user.name}
+                    </Typography>
                   </Box>
                 </TableCell>
-                <TableCell sx={{ fontSize: "14px" }}>{user.phone}</TableCell>
+                <TableCell sx={{ fontSize: "14px" }}>
+                  {user.mobile_no}
+                </TableCell>
                 <TableCell sx={{ fontSize: "14px" }}>{user.email}</TableCell>
                 <TableCell align="center">
-                  <IconButton><DeleteIcon /></IconButton>
-                  <IconButton><EditIcon /></IconButton>
+                  <DeleteUser user={user} fetchUsers={fetchUsers} />
+                  <IconButton>
+                    <EditIcon />
+                  </IconButton>
                 </TableCell>
               </TableRow>
             ))}
@@ -78,8 +159,20 @@ const UserManagement: React.FC = () => {
       </TableContainer>
 
       {/* Footer with Pagination */}
-      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "16px", fontSize: "14px" }}>
-        <PaginationComponent totalCount={userData.length} page={currentPage} onPageChange={handlePageChange} />
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginTop: "16px",
+          fontSize: "14px",
+        }}
+      >
+        <PaginationComponent
+          totalCount={users?.length || 0}
+          page={currentPage}
+          onPageChange={handlePageChange}
+        />
       </Box>
     </Box>
   );

@@ -2,6 +2,7 @@ import React from "react";
 import { Box, Typography, Card, CardMedia, Grid } from "@mui/material";
 
 type Offer = {
+  heading: string | undefined;
   image: string;
   title: string;
 };
@@ -30,7 +31,7 @@ const Offers = ({ doctor }: { doctor: any }) => {
                   component="img"
                   height="100%"
                   image={item.image}
-                  alt={item.title}
+                  alt=""
                   sx={{ objectFit: "cover", height: "100%", width: "100%" }}
                 />
                 <Box
@@ -53,7 +54,7 @@ const Offers = ({ doctor }: { doctor: any }) => {
                   }}
                 >
                   <Typography variant="body1" fontWeight="bold">
-                    {item.title}
+                    {item.heading}
                   </Typography>
                 </Box>
               </Box>

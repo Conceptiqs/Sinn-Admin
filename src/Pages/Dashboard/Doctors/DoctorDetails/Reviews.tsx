@@ -2,6 +2,9 @@ import React from "react";
 import { Box, Typography, Card, Grid, Rating, Avatar } from "@mui/material";
 
 type Review = {
+  rate: number | null | undefined;
+  message: string;
+  customer: any;
   name: string;
   comment: string;
   rating: number;
@@ -38,15 +41,15 @@ const Reviews = ({ doctor }: { doctor: any }) => {
               {/* Content */}
               <Box sx={{ display: "flex", flexDirection: "column", flexGrow: 1 }}>
                 <Typography variant="h6" fontWeight="bold">
-                  {item.name}
+                  {item.customer?.name}
                 </Typography>
                 <Typography variant="body2" sx={{ flexGrow: 1, marginTop: 1 }}>
-                  {item.comment}
+                  {item.message}
                 </Typography>
                 <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
                   <Rating
                     name="read-only"
-                    value={item.rating}
+                    value={item.rate}
                     readOnly
                     precision={0.5}
                     sx={{ color: "gold" }} // Golden stars

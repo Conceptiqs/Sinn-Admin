@@ -24,7 +24,7 @@ export async function getDoctors(): Promise<any> {
  * @throws An error if the API response is not successful.
  */
 export async function getDoctorById(id: string): Promise<any> {
-  const path = `doctors/edit/${id}`; // Ensure the endpoint matches API specifications.
+  const path = `doctors/view/${id}`; // Ensure the endpoint matches API specifications.
 
   // Make an authenticated GET request to fetch the doctor's details.
   return await callAuthApi({

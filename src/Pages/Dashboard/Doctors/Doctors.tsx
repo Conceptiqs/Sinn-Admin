@@ -125,7 +125,7 @@ const Doctors: React.FC = () => {
                 </TableCell>
                 <TableCell>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <Avatar src={doctor.avatarUrl || ""} alt={doctor.name} />
+                    <Avatar src={doctor.main_images?.url || ""} alt={doctor.name} />
                     <Typography sx={{ fontSize: "14px" }}>
                       {doctor.name}
                     </Typography>
@@ -149,7 +149,7 @@ const Doctors: React.FC = () => {
                       fontSize: "14px",
                     }}
                   >
-                    {doctor.credit || "N/A"}
+                    {`${doctor.get_amount || 0}/${doctor.credit || 0}`}
                   </Typography>
                 </TableCell>
                 <TableCell align="center">

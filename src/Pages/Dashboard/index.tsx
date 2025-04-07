@@ -46,7 +46,7 @@ const Dashboard: React.FC = () => {
           <Label />
           <StatsCards data={data} />
           <EarningsChart />
-          <RecentRenewals />
+          <RecentRenewals renewals={data?.recentRevewal} />
         </Grid>
 
         {/* Right Column */}

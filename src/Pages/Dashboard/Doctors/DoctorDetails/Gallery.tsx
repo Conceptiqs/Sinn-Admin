@@ -2,23 +2,24 @@ import React from "react";
 import { Box, Grid, Typography } from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 
-// Define a type for the gallery item
+// Define a type for the galleries item
 interface GalleryItem {
+  main_images: any;
   image: string;
   caption: string;
-  drlocation: string;
+  location: string;
 }
 
 const Gallery = ({ doctor }: { doctor: any }) => {
-  // Ensure that 'doctor.gallery' is an array of GalleryItem
-  if (!Array.isArray(doctor.gallery)) {
-    return <div>Error: 'doctor.gallery' is not an array.</div>;
+  // Ensure that 'doctor.galleries' is an array of GalleryItem
+  if (!Array.isArray(doctor.galleries)) {
+    return <div>Error: 'doctor.galleries' is not an array.</div>;
   }
 
   return (
     <Box >
       <Grid container spacing={2}>
-        {doctor.gallery.map((item: GalleryItem, index: number) => (
+        {doctor.galleries	.map((item: GalleryItem, index: number) => (
           <Grid item xs={12} sm={4} key={index}>
             <Box
               sx={{
@@ -38,7 +39,7 @@ const Gallery = ({ doctor }: { doctor: any }) => {
                   position: "relative",
                   width: "100%",
                   height: 180,
-                  backgroundImage: `url(${item.image})`,
+                  backgroundImage: `url(${item.main_images?.url})`,
                   backgroundSize: "cover",
                   backgroundPosition: "center",
                   borderRadius: 2,
@@ -61,7 +62,7 @@ const Gallery = ({ doctor }: { doctor: any }) => {
               >
                 <LocationOnIcon sx={{ color: "#666", mr: 1 }} />
                 <Typography variant="body2" sx={{ color: "#666", fontSize: "0.85rem" }}>
-                  {item.drlocation}
+                  {item.location}
                 </Typography>
               </Box>
             </Box>
