@@ -8,10 +8,11 @@ import {
   IconButton,
   Avatar,
   useMediaQuery,
+  CircularProgress,
 } from "@mui/material";
 import { EditOutlined as EditIcon } from "@mui/icons-material";
 import { AddCircleOutline, Close, Edit } from "@mui/icons-material";
-import { createUser, updateUser } from "../../../../apis/uac";
+import { updateUser } from "../../../../apis/uac";
 import { toast } from "react-toastify";
 
 interface Props {
@@ -21,6 +22,7 @@ interface Props {
 
 const EditUser: React.FC<Props> = ({ user, fetchUsers }) => {
   const [open, setOpen] = useState(false);
+  const [pending, setPending] = useState(false); // Pending state
   const [profilePic, setProfilePic] = useState<string | null>(
     user.user_images?.url || null
   );
@@ -29,7 +31,6 @@ const EditUser: React.FC<Props> = ({ user, fetchUsers }) => {
   const [mobileNo, setMobileNo] = useState(user.mobile_no || "");
   const [email, setEmail] = useState(user.email || "");
 
-  // show preview & keep the File for upload
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -41,36 +42,42 @@ const EditUser: React.FC<Props> = ({ user, fetchUsers }) => {
   };
 
   const resetForm = () => {
-    setProfilePic(null);
+    setProfilePic(user.user_images?.url || null);
     setImageFile(null);
-    setName("");
-    setMobileNo("");
-    setEmail("");
+    setName(user.name || "");
+    setMobileNo(user.mobile_no || "");
+    setEmail(user.email || "");
   };
 
   const handleClose = () => {
-    setOpen(false);
-    resetForm();
+    if (!pending) {
+      setOpen(false);
+      resetForm();
+    }
   };
 
   const handleSubmit = async () => {
-    if (!name || !mobileNo || !email || !imageFile) {
-      toast.error("Please fill in all required fields and select a photo.");
+    if (!name || !mobileNo || !email) {
+      toast.error("Please fill in all required fields.");
       return;
     }
+
+    setPending(true);
     try {
       await updateUser(user.id, {
         name,
         email,
         mobile_no: mobileNo,
-        user_image: imageFile,
+        user_image: imageFile as File, // may be null (not changed)
       });
-      toast.success("User added successfully!");
+      toast.success("User updated successfully!");
       await fetchUsers();
       handleClose();
     } catch (err) {
-      console.error("Error creating user:", err);
-      toast.error("Error adding user. Please try again.");
+      console.error("Error updating user:", err);
+      toast.error("Error updating user. Please try again.");
+    } finally {
+      setPending(false);
     }
   };
 
@@ -103,6 +110,7 @@ const EditUser: React.FC<Props> = ({ user, fetchUsers }) => {
           <IconButton
             onClick={handleClose}
             sx={{ position: "absolute", top: 8, right: 8, color: "grey.500" }}
+            disabled={pending}
           >
             <Close />
           </IconButton>
@@ -143,6 +151,7 @@ const EditUser: React.FC<Props> = ({ user, fetchUsers }) => {
                 boxShadow: 1,
               }}
               onClick={() => document.getElementById("profile-upload")?.click()}
+              disabled={pending}
             >
               <Edit fontSize="small" />
             </IconButton>
@@ -194,6 +203,7 @@ const EditUser: React.FC<Props> = ({ user, fetchUsers }) => {
                   onChange={onChange}
                   type={type}
                   required
+                  disabled={pending}
                 />
               </Box>
             );
@@ -213,13 +223,18 @@ const EditUser: React.FC<Props> = ({ user, fetchUsers }) => {
               variant="contained"
               sx={{ backgroundColor: "#1A2338", color: "#fff", width: 120 }}
               onClick={handleSubmit}
+              disabled={pending}
+              startIcon={
+                pending ? <CircularProgress size={20} color="inherit" /> : null
+              }
             >
-              Submit
+              {pending ? "Saving..." : "Submit"}
             </Button>
             <Button
               variant="outlined"
               sx={{ width: 120, mt: isSmallScreen ? 2 : 0 }}
               onClick={resetForm}
+              disabled={pending}
             >
               Reset
             </Button>

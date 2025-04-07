@@ -13,6 +13,7 @@ import {
   IconButton,
   Breadcrumbs,
   Link,
+  CircularProgress,
 } from "@mui/material";
 import {
   EditOutlined as EditIcon,
@@ -29,16 +30,20 @@ import EditUser from "../../components/AddUser/EditUser";
 const UserManagement: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [users, setUsers] = useState<any[]>();
+  const [loading, setLoading] = useState<boolean>(true);
   const itemsPerPage = 10;
 
   const fetchUsers = useCallback(async () => {
     try {
+      setLoading(true);
       const response = await getUsers();
       if (response.success) {
         setUsers(response.data);
       }
     } catch (error) {
       console.error("Failed to fetch Users:", error);
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -103,76 +108,98 @@ const UserManagement: React.FC = () => {
         <Typography color="text.primary">UserManagement</Typography>
       </Breadcrumbs>
 
-      {/* User Table */}
-      <TableContainer
-        sx={{
-          borderRadius: "16px",
-          background: "linear-gradient(160deg, #e0e5ec, #ffffff)",
-          padding: 1,
-          boxShadow: "0px 6px 18px rgba(0, 0, 0, 0.3)",
-          border: "3px solid white",
-        }}
-      >
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{ fontSize: "14px" }}>
-                <Checkbox />
-              </TableCell>
-              <TableCell sx={{ fontSize: "14px" }}>User</TableCell>
-              <TableCell sx={{ fontSize: "14px" }}>Phone</TableCell>
-              <TableCell sx={{ fontSize: "14px" }}>Email</TableCell>
-              <TableCell align="center" sx={{ fontSize: "14px" }}>
-                Actions
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {paginatedUsers?.map((user) => (
-              <TableRow key={user.id} hover>
-                <TableCell>
-                  <Checkbox />
-                </TableCell>
-                <TableCell>
-                  <Box
-                    sx={{ display: "flex", alignItems: "center", gap: "8px" }}
-                  >
-                    <Avatar src={user.user_images?.url} alt={user.user} />
-                    <Typography sx={{ fontSize: "14px" }}>
-                      {user.name}
-                    </Typography>
-                  </Box>
-                </TableCell>
-                <TableCell sx={{ fontSize: "14px" }}>
-                  {user.mobile_no}
-                </TableCell>
-                <TableCell sx={{ fontSize: "14px" }}>{user.email}</TableCell>
-                <TableCell align="center">
-                  <DeleteUser user={user} fetchUsers={fetchUsers} />
-                  <EditUser user={user} fetchUsers={fetchUsers} />
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      {/* Loading State */}
+      {loading ? (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "300px",
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      ) : (
+        <>
+          {/* User Table */}
+          <TableContainer
+            sx={{
+              borderRadius: "16px",
+              background: "linear-gradient(160deg, #e0e5ec, #ffffff)",
+              padding: 1,
+              boxShadow: "0px 6px 18px rgba(0, 0, 0, 0.3)",
+              border: "3px solid white",
+            }}
+          >
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ fontSize: "14px" }}>
+                    <Checkbox />
+                  </TableCell>
+                  <TableCell sx={{ fontSize: "14px" }}>User</TableCell>
+                  <TableCell sx={{ fontSize: "14px" }}>Phone</TableCell>
+                  <TableCell sx={{ fontSize: "14px" }}>Email</TableCell>
+                  <TableCell align="center" sx={{ fontSize: "14px" }}>
+                    Actions
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {paginatedUsers?.map((user) => (
+                  <TableRow key={user.id} hover>
+                    <TableCell>
+                      <Checkbox />
+                    </TableCell>
+                    <TableCell>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                        }}
+                      >
+                        <Avatar src={user.user_images?.url} alt={user.user} />
+                        <Typography sx={{ fontSize: "14px" }}>
+                          {user.name}
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                    <TableCell sx={{ fontSize: "14px" }}>
+                      {user.mobile_no}
+                    </TableCell>
+                    <TableCell sx={{ fontSize: "14px" }}>
+                      {user.email}
+                    </TableCell>
+                    <TableCell align="center">
+                      <DeleteUser user={user} fetchUsers={fetchUsers} />
+                      <EditUser user={user} fetchUsers={fetchUsers} />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
 
-      {/* Footer with Pagination */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginTop: "16px",
-          fontSize: "14px",
-        }}
-      >
-        <PaginationComponent
-          totalCount={users?.length || 0}
-          page={currentPage}
-          onPageChange={handlePageChange}
-        />
-      </Box>
+          {/* Footer with Pagination */}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginTop: "16px",
+              fontSize: "14px",
+            }}
+          >
+            <PaginationComponent
+              totalCount={users?.length || 0}
+              page={currentPage}
+              onPageChange={handlePageChange}
+            />
+          </Box>
+        </>
+      )}
     </Box>
   );
 };

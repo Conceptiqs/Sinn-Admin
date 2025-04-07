@@ -8,6 +8,7 @@ import {
   IconButton,
   Avatar,
   useMediaQuery,
+  CircularProgress,
 } from "@mui/material";
 import { AddCircleOutline, Close, Edit } from "@mui/icons-material";
 import { createUser } from "../../../../apis/uac";
@@ -24,8 +25,8 @@ const AddUser: React.FC<Props> = ({ fetchUsers }) => {
   const [name, setName] = useState("");
   const [mobileNo, setMobileNo] = useState("");
   const [email, setEmail] = useState("");
+  const [pending, setPending] = useState(false); // Loading state
 
-  // show preview & keep the File for upload
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -54,6 +55,8 @@ const AddUser: React.FC<Props> = ({ fetchUsers }) => {
       toast.error("Please fill in all required fields and select a photo.");
       return;
     }
+
+    setPending(true);
     try {
       await createUser({
         name,
@@ -62,11 +65,13 @@ const AddUser: React.FC<Props> = ({ fetchUsers }) => {
         user_image: imageFile,
       });
       toast.success("User added successfully!");
-      await fetchUsers()
+      await fetchUsers();
       handleClose();
     } catch (err) {
       console.error("Error creating user:", err);
       toast.error("Error adding user. Please try again.");
+    } finally {
+      setPending(false);
     }
   };
 
@@ -217,13 +222,19 @@ const AddUser: React.FC<Props> = ({ fetchUsers }) => {
               variant="contained"
               sx={{ backgroundColor: "#1A2338", color: "#fff", width: 120 }}
               onClick={handleSubmit}
+              disabled={pending}
             >
-              Submit
+              {pending ? (
+                <CircularProgress size={24} sx={{ color: "#fff" }} />
+              ) : (
+                "Submit"
+              )}
             </Button>
             <Button
               variant="outlined"
               sx={{ width: 120, mt: isSmallScreen ? 2 : 0 }}
               onClick={resetForm}
+              disabled={pending}
             >
               Reset
             </Button>

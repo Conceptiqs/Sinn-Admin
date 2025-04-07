@@ -1,8 +1,15 @@
 import React, { useState } from "react";
-import { Button, Modal, Box, Typography, IconButton } from "@mui/material";
+import {
+  Button,
+  Modal,
+  Box,
+  Typography,
+  IconButton,
+  CircularProgress,
+} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { toast } from "react-toastify";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { toast } from "react-toastify";
 import { deleteUser } from "../../../../apis/uac";
 
 interface CmsItem {
@@ -20,19 +27,25 @@ interface Props {
 
 const DeleteUser: React.FC<Props> = ({ user, fetchUsers }) => {
   const [open, setOpen] = useState(false);
+  const [pending, setPending] = useState(false); // Pending state
 
   const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    if (!pending) setOpen(false);
+  };
 
   const handleDelete = async () => {
+    setPending(true);
     try {
       await deleteUser(user.id);
       toast.success("User deleted successfully!");
-      fetchUsers();
+      await fetchUsers();
       handleClose();
     } catch (error) {
       console.error("Error deleting user:", error);
       toast.error("Failed to delete user. Please try again.");
+    } finally {
+      setPending(false);
     }
   };
 
@@ -59,6 +72,7 @@ const DeleteUser: React.FC<Props> = ({ user, fetchUsers }) => {
           <IconButton
             onClick={handleClose}
             sx={{ position: "absolute", top: 8, right: 8, color: "grey.500" }}
+            disabled={pending}
           >
             <CloseIcon />
           </IconButton>
@@ -81,11 +95,19 @@ const DeleteUser: React.FC<Props> = ({ user, fetchUsers }) => {
           </Typography>
 
           <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
-            <Button variant="outlined" onClick={handleClose}>
+            <Button variant="outlined" onClick={handleClose} disabled={pending}>
               Cancel
             </Button>
-            <Button variant="contained" color="error" onClick={handleDelete}>
-              Delete
+            <Button
+              variant="contained"
+              color="error"
+              onClick={handleDelete}
+              disabled={pending}
+              startIcon={
+                pending ? <CircularProgress color="inherit" size={20} /> : null
+              }
+            >
+              {pending ? "Deleting..." : "Delete"}
             </Button>
           </Box>
         </Box>
