@@ -2,6 +2,7 @@ import React from "react";
 import { Box, Typography, Card, CardMedia, Grid } from "@mui/material";
 
 type Offer = {
+  main_images: any;
   heading: string | undefined;
   image: string;
   title: string;
@@ -12,7 +13,9 @@ const Offers = ({ doctor }: { doctor: any }) => {
     <Box sx={{ padding: 2 }}>
       <Grid container spacing={2}>
         {doctor.offers.map((item: Offer, index: number) => (
-          <Grid item xs={6} sm={4} md={2} key={index}> {/* Adjusted for responsiveness */}
+          <Grid item xs={6} sm={4} md={2} key={index}>
+            {" "}
+            {/* Adjusted for responsiveness */}
             <Card
               sx={{
                 borderRadius: "16px",
@@ -30,7 +33,7 @@ const Offers = ({ doctor }: { doctor: any }) => {
                 <CardMedia
                   component="img"
                   height="100%"
-                  image={item.image}
+                  image={item.main_images?.url}
                   alt=""
                   sx={{ objectFit: "cover", height: "100%", width: "100%" }}
                 />
@@ -42,7 +45,8 @@ const Offers = ({ doctor }: { doctor: any }) => {
                     left: 0,
                     width: "100%",
                     height: "100%",
-                    background: "linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.2))",
+                    background:
+                      "linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.2))",
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "end", // Align content to the bottom

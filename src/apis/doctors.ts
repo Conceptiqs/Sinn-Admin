@@ -32,3 +32,13 @@ export async function getDoctorById(id: string): Promise<any> {
     method: "GET",
   });
 }
+
+export async function deleteDoctor(id: number): Promise<any> {
+  const path = `doctors/delete/${id}`; // Ensure the endpoint matches API specifications.
+
+  // Make an authenticated GET request to fetch the doctor's details.
+  return await callAuthApi({
+    path,
+    method: "POST",
+  });
+}

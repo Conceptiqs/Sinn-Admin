@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -25,6 +25,7 @@ import FilterButton from "../components/FilterButton/FilterButton";
 import ExportButton from "../components/ExportButton/ExportButton";
 import { getDoctors } from "../../../apis/doctors";
 import SendNotificationModal from "../components/SendNotificationButton/SendNotificationModal";
+import DeleteDoctor from "./DeleteDoctor";
 
 const Doctors: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -32,17 +33,18 @@ const Doctors: React.FC = () => {
   const itemsPerPage = 10;
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchDoctors = async () => {
-      try {
-        const response = await getDoctors();
-        if (response.success) {
-          setDoctors(response.data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch doctors:", error);
+  const fetchDoctors = useCallback(async () => {
+    try {
+      const response = await getDoctors();
+      if (response.success) {
+        setDoctors(response.data);
       }
-    };
+    } catch (error) {
+      console.error("Failed to fetch doctors:", error);
+    }
+  }, []);
+
+  useEffect(() => {
     fetchDoctors();
   }, []);
 
@@ -125,7 +127,10 @@ const Doctors: React.FC = () => {
                 </TableCell>
                 <TableCell>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <Avatar src={doctor.main_images?.url || ""} alt={doctor.name} />
+                    <Avatar
+                      src={doctor.main_images?.url || ""}
+                      alt={doctor.name}
+                    />
                     <Typography sx={{ fontSize: "14px" }}>
                       {doctor.name}
                     </Typography>
@@ -156,9 +161,7 @@ const Doctors: React.FC = () => {
                   <IconButton onClick={() => handleViewDoctor(doctor.id)}>
                     <ViewIcon />
                   </IconButton>
-                  <IconButton>
-                    <DeleteIcon />
-                  </IconButton>
+                  <DeleteDoctor doctor={doctor} fetchDoctors={fetchDoctors} />
                 </TableCell>
               </TableRow>
             ))}

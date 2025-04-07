@@ -137,41 +137,52 @@ const Customers: React.FC = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {paginatedCustomers.map((customer) => (
-              <TableRow key={customer.id} hover>
-                <TableCell>
-                  <Checkbox />
-                </TableCell>
-                <TableCell>
-                  <Box
-                    sx={{ display: "flex", alignItems: "center", gap: "8px" }}
-                  >
-                    <Avatar src={customer.main_images?.url} alt={customer.name} />
-                    <Typography sx={{ fontSize: "14px" }}>
-                      {customer.name}
-                    </Typography>
-                  </Box>
-                </TableCell>
-                <TableCell sx={{ fontSize: "14px" }}>
-                  {customer.mobile}
-                </TableCell>
-                <TableCell sx={{ fontSize: "14px" }}>
-                  {customer.email}
-                </TableCell>
-                <TableCell sx={{ fontSize: "14px" }}>{customer.dob}</TableCell>
-                <TableCell sx={{ fontSize: "14px" }}>
-                  {customer.gender}
-                </TableCell>
-                <TableCell sx={{ fontSize: "14px" }}>
-                  {customer.location}
-                </TableCell>
-                <TableCell align="center">
-                  <IconButton>
-                    <DeleteOutlineOutlinedIcon />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
+            {paginatedCustomers.map((customer) => {
+              const image = customer.media?.find(
+                (item: { collection_name: string }) =>
+                  item.collection_name === "user_images"
+              );
+              return (
+                <TableRow key={customer.id} hover>
+                  <TableCell>
+                    <Checkbox />
+                  </TableCell>
+                  <TableCell>
+                    <Box
+                      sx={{ display: "flex", alignItems: "center", gap: "8px" }}
+                    >
+                      <Avatar
+                        src={image?.original_url}
+                        alt={customer.name}
+                      />
+                      <Typography sx={{ fontSize: "14px" }}>
+                        {customer.name}
+                      </Typography>
+                    </Box>
+                  </TableCell>
+                  <TableCell sx={{ fontSize: "14px" }}>
+                    {customer.mobile}
+                  </TableCell>
+                  <TableCell sx={{ fontSize: "14px" }}>
+                    {customer.email}
+                  </TableCell>
+                  <TableCell sx={{ fontSize: "14px" }}>
+                    {customer.dob}
+                  </TableCell>
+                  <TableCell sx={{ fontSize: "14px" }}>
+                    {customer.gender}
+                  </TableCell>
+                  <TableCell sx={{ fontSize: "14px" }}>
+                    {customer.location}
+                  </TableCell>
+                  <TableCell align="center">
+                    <IconButton>
+                      <DeleteOutlineOutlinedIcon />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </TableContainer>
