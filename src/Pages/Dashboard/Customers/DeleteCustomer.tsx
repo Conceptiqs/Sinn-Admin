@@ -1,8 +1,15 @@
 import React, { useState } from "react";
-import { Button, Modal, Box, Typography, IconButton } from "@mui/material";
+import {
+  Button,
+  Modal,
+  Box,
+  Typography,
+  IconButton,
+  CircularProgress,
+} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { toast } from "react-toastify";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { toast } from "react-toastify";
 import { deleteCustomer } from "../../../apis/customers";
 
 interface CmsItem {
@@ -20,19 +27,25 @@ interface Props {
 
 const DeleteCustomer: React.FC<Props> = ({ customer, fetchCustomers }) => {
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false); // 👈 New loading state
 
   const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    if (!loading) setOpen(false);
+  };
 
   const handleDelete = async () => {
+    setLoading(true);
     try {
       await deleteCustomer(customer.id);
       toast.success("Customer deleted successfully!");
-      fetchCustomers();
+      await fetchCustomers();
       handleClose();
     } catch (error) {
       console.error("Error deleting customer:", error);
       toast.error("Failed to delete customer. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -59,6 +72,7 @@ const DeleteCustomer: React.FC<Props> = ({ customer, fetchCustomers }) => {
           <IconButton
             onClick={handleClose}
             sx={{ position: "absolute", top: 8, right: 8, color: "grey.500" }}
+            disabled={loading}
           >
             <CloseIcon />
           </IconButton>
@@ -81,11 +95,17 @@ const DeleteCustomer: React.FC<Props> = ({ customer, fetchCustomers }) => {
           </Typography>
 
           <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
-            <Button variant="outlined" onClick={handleClose}>
+            <Button variant="outlined" onClick={handleClose} disabled={loading}>
               Cancel
             </Button>
-            <Button variant="contained" color="error" onClick={handleDelete}>
-              Delete
+            <Button
+              variant="contained"
+              color="error"
+              onClick={handleDelete}
+              disabled={loading}
+              startIcon={loading ? <CircularProgress size={20} /> : null}
+            >
+              {loading ? "Deleting..." : "Delete"}
             </Button>
           </Box>
         </Box>
