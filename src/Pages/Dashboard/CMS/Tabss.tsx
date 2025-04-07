@@ -1,7 +1,12 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Box, Typography, Grid, Tabs, Tab, IconButton } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
+import {
+  Box,
+  Typography,
+  Grid,
+  Tabs,
+  Tab,
+  CircularProgress,
+} from "@mui/material";
 
 import AddOnboarding from "../components/AddOnboarding/AddOnboarding";
 import AddBanner from "../components/AddBanner/AddBanner";
@@ -38,11 +43,17 @@ const Tabss: React.FC = () => {
     banner: [],
   });
 
-  // pick the right dataset
+  const [loading, setLoading] = useState({
+    customerOnboarding: false,
+    customerBanner: false,
+    doctorOnboarding: false,
+    doctorBanner: false,
+  });
+
   const data = activeTab === "customer" ? customerData : doctorData;
 
-  // --- Fetchers ---
   const fetchCustomerBanner = useCallback(async () => {
+    setLoading((prev) => ({ ...prev, customerBanner: true }));
     try {
       const res = await getCMSBanner("customer");
       if (res.success) {
@@ -57,10 +68,13 @@ const Tabss: React.FC = () => {
       }
     } catch (err) {
       console.error("Error fetching customer banners:", err);
+    } finally {
+      setLoading((prev) => ({ ...prev, customerBanner: false }));
     }
   }, []);
 
   const fetchDoctorBanner = useCallback(async () => {
+    setLoading((prev) => ({ ...prev, doctorBanner: true }));
     try {
       const res = await getCMSBanner("doctor");
       if (res.success) {
@@ -75,10 +89,13 @@ const Tabss: React.FC = () => {
       }
     } catch (err) {
       console.error("Error fetching doctor banners:", err);
+    } finally {
+      setLoading((prev) => ({ ...prev, doctorBanner: false }));
     }
   }, []);
 
   const fetchCustomerOnboarding = useCallback(async () => {
+    setLoading((prev) => ({ ...prev, customerOnboarding: true }));
     try {
       const res = await getCMSOnboarding("customer");
       if (res.success) {
@@ -93,10 +110,13 @@ const Tabss: React.FC = () => {
       }
     } catch (err) {
       console.error("Error fetching customer onboarding:", err);
+    } finally {
+      setLoading((prev) => ({ ...prev, customerOnboarding: false }));
     }
   }, []);
 
   const fetchDoctorOnboarding = useCallback(async () => {
+    setLoading((prev) => ({ ...prev, doctorOnboarding: true }));
     try {
       const res = await getCMSOnboarding("doctor");
       if (res.success) {
@@ -111,10 +131,11 @@ const Tabss: React.FC = () => {
       }
     } catch (err) {
       console.error("Error fetching doctor onboarding:", err);
+    } finally {
+      setLoading((prev) => ({ ...prev, doctorOnboarding: false }));
     }
   }, []);
 
-  // on mount, load both sides
   useEffect(() => {
     fetchCustomerBanner();
     fetchCustomerOnboarding();
@@ -130,16 +151,16 @@ const Tabss: React.FC = () => {
   const renderSection = (
     title: string,
     items: CmsItem[],
-    AddButton: React.ReactNode
+    AddButton: React.ReactNode,
+    isLoading: boolean
   ) => (
-    <Box sx={{ mt: 2 }}>
+    <Box sx={{ mt: 4 }}>
       <Box
         sx={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
           mb: 1,
-          mt: 5,
         }}
       >
         <Typography variant="h6" fontWeight="bold">
@@ -147,101 +168,107 @@ const Tabss: React.FC = () => {
         </Typography>
         {AddButton}
       </Box>
-      <Grid container spacing={2}>
-        {items.map((item) => (
-          <Grid item xs={12} sm={4} key={item.id}>
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                background: "linear-gradient(10deg, #e0e5ec, #ffffff)",
-                borderRadius: 2,
-                boxShadow: "0 4px 6px rgba(0, 0, 0, 0.4)",
-                border: "3px solid white",
-                transition: "transform 0.2s ease-in-out",
-                "&:hover": { transform: "scale(1.08)" },
-                textAlign: "center",
-              }}
-            >
+
+      {isLoading ? (
+        <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        <Grid container spacing={2}>
+          {items.map((item) => (
+            <Grid item xs={12} sm={4} key={item.id}>
               <Box
                 sx={{
-                  position: "relative",
-                  width: "100%",
-                  height: 180,
-                  backgroundImage: `url(${item.image})`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  background: "linear-gradient(10deg, #e0e5ec, #ffffff)",
                   borderRadius: 2,
-                  mb: 2,
+                  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.4)",
+                  border: "3px solid white",
+                  transition: "transform 0.2s ease-in-out",
+                  "&:hover": { transform: "scale(1.08)" },
+                  textAlign: "center",
                 }}
               >
                 <Box
                   sx={{
-                    position: "absolute",
-                    top: 8,
-                    right: 8,
-                    display: "flex",
-                    gap: 1,
+                    position: "relative",
+                    width: "100%",
+                    height: 180,
+                    backgroundImage: `url(${item.image})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    borderRadius: 2,
+                    mb: 2,
                   }}
                 >
-                  {title === "Onboarding" && (
-                    <>
-                      <EditOnboarding
-                        onboarding={item}
-                        fetchOnboardings={
-                          activeTab === "customer"
-                            ? fetchCustomerOnboarding
-                            : fetchDoctorOnboarding
-                        }
-                        activeTab={activeTab}
-                      />
-                      <DeleteOnBoarding
-                        onboarding={item}
-                        fetchOnBoardings={
-                          activeTab === "customer"
-                            ? fetchCustomerOnboarding
-                            : fetchDoctorOnboarding
-                        }
-                      />
-                    </>
-                  )}
-                  {title === "Banner" && (
-                    <>
-                      <EditBanner
-                        banner={item}
-                        fetchBanners={
-                          activeTab === "customer"
-                            ? fetchCustomerBanner
-                            : fetchDoctorBanner
-                        }
-                        activeTab={activeTab}
-                      />
-                      <DeleteBanner
-                        banner={item}
-                        fetchBanners={
-                          activeTab === "customer"
-                            ? fetchCustomerBanner
-                            : fetchDoctorBanner
-                        }
-                      />
-                    </>
-                  )}
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      top: 8,
+                      right: 8,
+                      display: "flex",
+                      gap: 1,
+                    }}
+                  >
+                    {title === "Onboarding" ? (
+                      <>
+                        <EditOnboarding
+                          onboarding={item}
+                          fetchOnboardings={
+                            activeTab === "customer"
+                              ? fetchCustomerOnboarding
+                              : fetchDoctorOnboarding
+                          }
+                          activeTab={activeTab}
+                        />
+                        <DeleteOnBoarding
+                          onboarding={item}
+                          fetchOnBoardings={
+                            activeTab === "customer"
+                              ? fetchCustomerOnboarding
+                              : fetchDoctorOnboarding
+                          }
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <EditBanner
+                          banner={item}
+                          fetchBanners={
+                            activeTab === "customer"
+                              ? fetchCustomerBanner
+                              : fetchDoctorBanner
+                          }
+                          activeTab={activeTab}
+                        />
+                        <DeleteBanner
+                          banner={item}
+                          fetchBanners={
+                            activeTab === "customer"
+                              ? fetchCustomerBanner
+                              : fetchDoctorBanner
+                          }
+                        />
+                      </>
+                    )}
+                  </Box>
                 </Box>
+                <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
+                  {item.title}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{ color: "#666", fontSize: "0.85rem", px: 2 }}
+                >
+                  {item.description}
+                </Typography>
               </Box>
-              <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
-                {item.title}
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{ color: "#666", fontSize: "0.85rem", px: 2 }}
-              >
-                {item.description}
-              </Typography>
-            </Box>
-          </Grid>
-        ))}
-      </Grid>
+            </Grid>
+          ))}
+        </Grid>
+      )}
     </Box>
   );
 
@@ -267,7 +294,10 @@ const Tabss: React.FC = () => {
               : fetchDoctorOnboarding
           }
           activeTab={activeTab}
-        />
+        />,
+        activeTab === "customer"
+          ? loading.customerOnboarding
+          : loading.doctorOnboarding
       )}
 
       {renderSection(
@@ -278,7 +308,8 @@ const Tabss: React.FC = () => {
             activeTab === "customer" ? fetchCustomerBanner : fetchDoctorBanner
           }
           activeTab={activeTab}
-        />
+        />,
+        activeTab === "customer" ? loading.customerBanner : loading.doctorBanner
       )}
     </Box>
   );

@@ -1,8 +1,15 @@
 import React, { useState } from "react";
-import { Button, Modal, Box, Typography, IconButton } from "@mui/material";
+import {
+  Button,
+  Modal,
+  Box,
+  Typography,
+  IconButton,
+  CircularProgress,
+} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { toast } from "react-toastify";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { toast } from "react-toastify";
 import { deleteCmsBanner } from "../../../../apis/cms";
 
 interface CmsItem {
@@ -19,19 +26,25 @@ interface Props {
 
 const DeleteBanner: React.FC<Props> = ({ banner, fetchBanners }) => {
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false); // ← Added
 
   const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    if (!loading) setOpen(false); // prevent closing while loading
+  };
 
   const handleDelete = async () => {
+    setLoading(true); // ← Start loading
     try {
       await deleteCmsBanner(banner.id);
       toast.success("Banner deleted successfully!");
-      fetchBanners();
+      await fetchBanners();
       handleClose();
     } catch (error) {
       console.error("Error deleting banner:", error);
       toast.error("Failed to delete banner. Please try again.");
+    } finally {
+      setLoading(false); // ← Stop loading
     }
   };
 
@@ -66,6 +79,7 @@ const DeleteBanner: React.FC<Props> = ({ banner, fetchBanners }) => {
           <IconButton
             onClick={handleClose}
             sx={{ position: "absolute", top: 8, right: 8, color: "grey.500" }}
+            disabled={loading}
           >
             <CloseIcon />
           </IconButton>
@@ -88,11 +102,19 @@ const DeleteBanner: React.FC<Props> = ({ banner, fetchBanners }) => {
           </Typography>
 
           <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
-            <Button variant="outlined" onClick={handleClose}>
+            <Button variant="outlined" onClick={handleClose} disabled={loading}>
               Cancel
             </Button>
-            <Button variant="contained" color="error" onClick={handleDelete}>
-              Delete
+            <Button
+              variant="contained"
+              color="error"
+              onClick={handleDelete}
+              disabled={loading}
+              startIcon={
+                loading ? <CircularProgress size={18} color="inherit" /> : null
+              }
+            >
+              {loading ? "Deleting..." : "Delete"}
             </Button>
           </Box>
         </Box>

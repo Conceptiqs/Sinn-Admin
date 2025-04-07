@@ -7,6 +7,7 @@ import {
   TextField,
   IconButton,
   useMediaQuery,
+  CircularProgress,
 } from "@mui/material";
 import {
   Close as CloseIcon,
@@ -29,6 +30,7 @@ const AddOnboarding: React.FC<Props> = ({ fetchOnboardings, activeTab }) => {
   const [imagePreview, setImagePreview] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [loading, setLoading] = useState(false); // ← loading state
 
   const isSmallScreen = useMediaQuery((theme: any) =>
     theme.breakpoints.down("sm")
@@ -61,6 +63,7 @@ const AddOnboarding: React.FC<Props> = ({ fetchOnboardings, activeTab }) => {
       return;
     }
 
+    setLoading(true); // start loading
     try {
       await createCmsOnboarding({
         type: activeTab,
@@ -74,6 +77,8 @@ const AddOnboarding: React.FC<Props> = ({ fetchOnboardings, activeTab }) => {
     } catch (err) {
       console.error("Error creating onboarding:", err);
       toast.error("Failed to create onboarding. Try again.");
+    } finally {
+      setLoading(false); // end loading
     }
   };
 
@@ -156,6 +161,7 @@ const AddOnboarding: React.FC<Props> = ({ fetchOnboardings, activeTab }) => {
                 border: "2px dashed #ccc",
                 borderRadius: 1,
                 cursor: "pointer",
+                opacity: loading ? 0.6 : 1,
               }}
             >
               <CloudUploadIcon fontSize="large" color="action" />
@@ -168,6 +174,7 @@ const AddOnboarding: React.FC<Props> = ({ fetchOnboardings, activeTab }) => {
                 accept="image/*"
                 style={{ display: "none" }}
                 onChange={handleFileChange}
+                disabled={loading}
               />
             </Box>
           )}
@@ -182,6 +189,7 @@ const AddOnboarding: React.FC<Props> = ({ fetchOnboardings, activeTab }) => {
               placeholder="Enter here"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
+              disabled={loading}
             />
           </Box>
 
@@ -197,6 +205,7 @@ const AddOnboarding: React.FC<Props> = ({ fetchOnboardings, activeTab }) => {
               minRows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+              disabled={loading}
             />
           </Box>
 
@@ -210,10 +219,19 @@ const AddOnboarding: React.FC<Props> = ({ fetchOnboardings, activeTab }) => {
                 textTransform: "none",
               }}
               onClick={handleSubmit}
+              disabled={loading}
+              startIcon={
+                loading && <CircularProgress size={20} color="inherit" />
+              }
             >
-              Submit
+              {loading ? "Submitting..." : "Submit"}
             </Button>
-            <Button fullWidth variant="outlined" onClick={resetForm}>
+            <Button
+              fullWidth
+              variant="outlined"
+              onClick={resetForm}
+              disabled={loading}
+            >
               Reset
             </Button>
           </Box>

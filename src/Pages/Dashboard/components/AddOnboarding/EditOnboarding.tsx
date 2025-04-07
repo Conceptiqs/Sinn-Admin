@@ -7,6 +7,7 @@ import {
   TextField,
   IconButton,
   useMediaQuery,
+  CircularProgress,
 } from "@mui/material";
 import {
   Close as CloseIcon,
@@ -42,6 +43,7 @@ const EditOnboarding: React.FC<Props> = ({
   const [imagePreview, setImagePreview] = useState(onboarding.image || "");
   const [title, setTitle] = useState(onboarding.title || "");
   const [description, setDescription] = useState(onboarding.description || "");
+  const [loading, setLoading] = useState(false); // ← added
 
   const isSmallScreen = useMediaQuery((theme: any) =>
     theme.breakpoints.down("sm")
@@ -56,8 +58,10 @@ const EditOnboarding: React.FC<Props> = ({
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
-    setOpen(false);
-    resetForm();
+    if (!loading) {
+      setOpen(false);
+      resetForm();
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,24 +73,27 @@ const EditOnboarding: React.FC<Props> = ({
   };
 
   const handleSubmit = async () => {
-    if (!imageFile || !title || !description) {
+    if (!title || !description || (!imageFile && !imagePreview)) {
       toast.error("Please fill in all required fields.");
       return;
     }
 
+    setLoading(true);
     try {
       await updateCmsOnboarding(onboarding.id, {
         type: activeTab,
         title,
         description,
-        boarding_image: imageFile,
+        boarding_image: imageFile as File,
       });
-      toast.success("Onboarding step created!");
+      toast.success("Onboarding step updated!");
       await fetchOnboardings();
       handleClose();
     } catch (err) {
-      console.error("Error creating onboarding:", err);
-      toast.error("Failed to create onboarding. Try again.");
+      console.error("Error updating onboarding:", err);
+      toast.error("Failed to update onboarding. Try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -120,6 +127,7 @@ const EditOnboarding: React.FC<Props> = ({
           <IconButton
             onClick={handleClose}
             sx={{ position: "absolute", top: 8, right: 8 }}
+            disabled={loading}
           >
             <CloseIcon />
           </IconButton>
@@ -143,8 +151,10 @@ const EditOnboarding: React.FC<Props> = ({
               <IconButton
                 onClick={(e) => {
                   e.stopPropagation();
-                  setImageFile(null);
-                  setImagePreview("");
+                  if (!loading) {
+                    setImageFile(null);
+                    setImagePreview("");
+                  }
                 }}
                 sx={{
                   position: "absolute",
@@ -152,13 +162,14 @@ const EditOnboarding: React.FC<Props> = ({
                   right: 8,
                   bgcolor: "rgba(255,255,255,0.8)",
                 }}
+                disabled={loading}
               >
                 <CloseIcon fontSize="small" />
               </IconButton>
             </Box>
           ) : (
             <Box
-              onClick={() => fileRef.current?.click()}
+              onClick={() => !loading && fileRef.current?.click()}
               sx={{
                 display: "flex",
                 flexDirection: "column",
@@ -167,7 +178,8 @@ const EditOnboarding: React.FC<Props> = ({
                 mb: 2,
                 border: "2px dashed #ccc",
                 borderRadius: 1,
-                cursor: "pointer",
+                cursor: loading ? "not-allowed" : "pointer",
+                opacity: loading ? 0.5 : 1,
               }}
             >
               <CloudUploadIcon fontSize="large" color="action" />
@@ -180,6 +192,7 @@ const EditOnboarding: React.FC<Props> = ({
                 accept="image/*"
                 style={{ display: "none" }}
                 onChange={handleFileChange}
+                disabled={loading}
               />
             </Box>
           )}
@@ -194,6 +207,7 @@ const EditOnboarding: React.FC<Props> = ({
               placeholder="Enter here"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
+              disabled={loading}
             />
           </Box>
 
@@ -209,6 +223,7 @@ const EditOnboarding: React.FC<Props> = ({
               minRows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+              disabled={loading}
             />
           </Box>
 
@@ -222,10 +237,21 @@ const EditOnboarding: React.FC<Props> = ({
                 textTransform: "none",
               }}
               onClick={handleSubmit}
+              disabled={loading}
+              startIcon={
+                loading ? (
+                  <CircularProgress color="inherit" size={18} />
+                ) : undefined
+              }
             >
-              Submit
+              {loading ? "Saving..." : "Submit"}
             </Button>
-            <Button fullWidth variant="outlined" onClick={resetForm}>
+            <Button
+              fullWidth
+              variant="outlined"
+              onClick={resetForm}
+              disabled={loading}
+            >
               Reset
             </Button>
           </Box>

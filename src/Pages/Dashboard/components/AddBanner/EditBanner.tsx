@@ -7,14 +7,15 @@ import {
   TextField,
   IconButton,
   useMediaQuery,
+  CircularProgress,
 } from "@mui/material";
 import {
   Close as CloseIcon,
   CloudUpload as CloudUploadIcon,
 } from "@mui/icons-material";
+import EditIcon from "@mui/icons-material/Edit";
 import { toast } from "react-toastify";
 import { updateCmsBanner } from "../../../../apis/cms";
-import EditIcon from "@mui/icons-material/Edit";
 
 type TabKey = "customer" | "doctor";
 
@@ -37,6 +38,7 @@ const EditBanner: React.FC<Props> = ({ fetchBanners, activeTab, banner }) => {
   const [title, setTitle] = useState(banner.title || "");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState(banner.image || "");
+  const [loading, setLoading] = useState(false); // ← New
 
   const isSmallScreen = useMediaQuery((theme: any) =>
     theme.breakpoints.down("sm")
@@ -44,8 +46,10 @@ const EditBanner: React.FC<Props> = ({ fetchBanners, activeTab, banner }) => {
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
-    setOpen(false);
-    resetForm();
+    if (!loading) {
+      setOpen(false);
+      resetForm();
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,21 +65,24 @@ const EditBanner: React.FC<Props> = ({ fetchBanners, activeTab, banner }) => {
   };
 
   const handleSubmit = async () => {
-    if (!title || !imageFile) {
+    if (!title || (!imageFile && !imagePreview)) {
       toast.error("Please fill in title and select an image.");
       return;
     }
 
     try {
+      setLoading(true); // ← Start loading
       const payload: any = { title, type: activeTab };
       payload.banner_image = imageFile;
       await updateCmsBanner(banner.id, payload);
-      toast.success("Banner created successfully!");
+      toast.success("Banner updated successfully!");
       await fetchBanners();
       handleClose();
     } catch (err) {
-      console.error("Error creating banner:", err);
-      toast.error("Error creating banner. Please try again.");
+      console.error("Error updating banner:", err);
+      toast.error("Error updating banner. Please try again.");
+    } finally {
+      setLoading(false); // ← Stop loading
     }
   };
 
@@ -109,6 +116,7 @@ const EditBanner: React.FC<Props> = ({ fetchBanners, activeTab, banner }) => {
           <IconButton
             onClick={handleClose}
             sx={{ position: "absolute", top: 8, right: 8 }}
+            disabled={loading}
           >
             <CloseIcon />
           </IconButton>
@@ -141,6 +149,7 @@ const EditBanner: React.FC<Props> = ({ fetchBanners, activeTab, banner }) => {
                   right: 8,
                   bgcolor: "rgba(255,255,255,0.8)",
                 }}
+                disabled={loading}
               >
                 <CloseIcon fontSize="small" />
               </IconButton>
@@ -187,6 +196,7 @@ const EditBanner: React.FC<Props> = ({ fetchBanners, activeTab, banner }) => {
             sx={{ mb: 2 }}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            disabled={loading}
           />
 
           <Box sx={{ display: "flex", gap: 2 }}>
@@ -195,14 +205,19 @@ const EditBanner: React.FC<Props> = ({ fetchBanners, activeTab, banner }) => {
               variant="contained"
               sx={{ bgcolor: "#1A2338", color: "#fff", textTransform: "none" }}
               onClick={handleSubmit}
+              disabled={loading}
+              startIcon={
+                loading ? <CircularProgress size={18} color="inherit" /> : null
+              }
             >
-              Submit
+              {loading ? "Saving..." : "Submit"}
             </Button>
             <Button
               fullWidth
               variant="outlined"
               sx={{ textTransform: "none" }}
               onClick={resetForm}
+              disabled={loading}
             >
               Reset
             </Button>

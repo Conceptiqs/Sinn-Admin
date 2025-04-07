@@ -7,6 +7,7 @@ import {
   TextField,
   IconButton,
   useMediaQuery,
+  CircularProgress,
 } from "@mui/material";
 import {
   Close as CloseIcon,
@@ -28,6 +29,7 @@ const AddBanner: React.FC<Props> = ({ fetchBanners, activeTab }) => {
   const [title, setTitle] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState("");
+  const [loading, setLoading] = useState(false); // ← Added
 
   const isSmallScreen = useMediaQuery((theme: any) =>
     theme.breakpoints.down("sm")
@@ -35,8 +37,10 @@ const AddBanner: React.FC<Props> = ({ fetchBanners, activeTab }) => {
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
-    setOpen(false);
-    resetForm();
+    if (!loading) {
+      setOpen(false);
+      resetForm();
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -57,10 +61,9 @@ const AddBanner: React.FC<Props> = ({ fetchBanners, activeTab }) => {
       return;
     }
 
+    setLoading(true); // ← Start loading
     try {
-      // build payload with correct field name
-      const payload: any = { title, type: activeTab };
-      payload.banner_image = imageFile;
+      const payload: any = { title, type: activeTab, banner_image: imageFile };
       await createCmsBanner(payload);
       toast.success("Banner created successfully!");
       await fetchBanners();
@@ -68,6 +71,8 @@ const AddBanner: React.FC<Props> = ({ fetchBanners, activeTab }) => {
     } catch (err) {
       console.error("Error creating banner:", err);
       toast.error("Error creating banner. Please try again.");
+    } finally {
+      setLoading(false); // ← End loading
     }
   };
 
@@ -103,6 +108,7 @@ const AddBanner: React.FC<Props> = ({ fetchBanners, activeTab }) => {
           <IconButton
             onClick={handleClose}
             sx={{ position: "absolute", top: 8, right: 8 }}
+            disabled={loading}
           >
             <CloseIcon />
           </IconButton>
@@ -126,8 +132,10 @@ const AddBanner: React.FC<Props> = ({ fetchBanners, activeTab }) => {
               <IconButton
                 onClick={(e) => {
                   e.stopPropagation();
-                  setImageFile(null);
-                  setImagePreview("");
+                  if (!loading) {
+                    setImageFile(null);
+                    setImagePreview("");
+                  }
                 }}
                 sx={{
                   position: "absolute",
@@ -135,13 +143,14 @@ const AddBanner: React.FC<Props> = ({ fetchBanners, activeTab }) => {
                   right: 8,
                   bgcolor: "rgba(255,255,255,0.8)",
                 }}
+                disabled={loading}
               >
                 <CloseIcon fontSize="small" />
               </IconButton>
             </Box>
           ) : (
             <Box
-              onClick={() => fileRef.current?.click()}
+              onClick={() => !loading && fileRef.current?.click()}
               sx={{
                 display: "flex",
                 flexDirection: "column",
@@ -150,7 +159,8 @@ const AddBanner: React.FC<Props> = ({ fetchBanners, activeTab }) => {
                 mb: 2,
                 border: "2px dashed #ccc",
                 borderRadius: 1,
-                cursor: "pointer",
+                cursor: loading ? "not-allowed" : "pointer",
+                opacity: loading ? 0.5 : 1,
               }}
             >
               <CloudUploadIcon fontSize="large" color="action" />
@@ -163,6 +173,7 @@ const AddBanner: React.FC<Props> = ({ fetchBanners, activeTab }) => {
                 accept="image/*"
                 style={{ display: "none" }}
                 onChange={handleFileChange}
+                disabled={loading}
               />
             </Box>
           )}
@@ -181,6 +192,7 @@ const AddBanner: React.FC<Props> = ({ fetchBanners, activeTab }) => {
             sx={{ mb: 2 }}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            disabled={loading}
           />
 
           <Box sx={{ display: "flex", gap: 2 }}>
@@ -189,14 +201,21 @@ const AddBanner: React.FC<Props> = ({ fetchBanners, activeTab }) => {
               variant="contained"
               sx={{ bgcolor: "#1A2338", color: "#fff", textTransform: "none" }}
               onClick={handleSubmit}
+              disabled={loading}
+              startIcon={
+                loading ? (
+                  <CircularProgress size={18} color="inherit" />
+                ) : undefined
+              }
             >
-              Submit
+              {loading ? "Saving..." : "Submit"}
             </Button>
             <Button
               fullWidth
               variant="outlined"
               sx={{ textTransform: "none" }}
               onClick={resetForm}
+              disabled={loading}
             >
               Reset
             </Button>

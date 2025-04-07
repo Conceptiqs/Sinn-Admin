@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { Button, Modal, Box, Typography, IconButton } from "@mui/material";
+import {
+  Button,
+  Modal,
+  Box,
+  Typography,
+  IconButton,
+  CircularProgress,
+} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { toast } from "react-toastify";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -22,19 +29,27 @@ const DeleteOnBoarding: React.FC<Props> = ({
   fetchOnBoardings,
 }) => {
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false); // ← added
 
   const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    if (!loading) {
+      setOpen(false);
+    }
+  };
 
   const handleDelete = async () => {
+    setLoading(true); // start loading
     try {
       await deleteCmsOnboarding(onboarding.id);
       toast.success("OnBoarding deleted successfully!");
-      fetchOnBoardings();
+      await fetchOnBoardings();
       handleClose();
     } catch (error) {
       console.error("Error deleting onboarding:", error);
       toast.error("Failed to delete onboarding. Please try again.");
+    } finally {
+      setLoading(false); // end loading
     }
   };
 
@@ -69,6 +84,7 @@ const DeleteOnBoarding: React.FC<Props> = ({
           <IconButton
             onClick={handleClose}
             sx={{ position: "absolute", top: 8, right: 8, color: "grey.500" }}
+            disabled={loading}
           >
             <CloseIcon />
           </IconButton>
@@ -91,11 +107,21 @@ const DeleteOnBoarding: React.FC<Props> = ({
           </Typography>
 
           <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
-            <Button variant="outlined" onClick={handleClose}>
+            <Button variant="outlined" onClick={handleClose} disabled={loading}>
               Cancel
             </Button>
-            <Button variant="contained" color="error" onClick={handleDelete}>
-              Delete
+            <Button
+              variant="contained"
+              color="error"
+              onClick={handleDelete}
+              disabled={loading}
+              startIcon={
+                loading ? (
+                  <CircularProgress color="inherit" size={18} />
+                ) : undefined
+              }
+            >
+              {loading ? "Deleting..." : "Delete"}
             </Button>
           </Box>
         </Box>
