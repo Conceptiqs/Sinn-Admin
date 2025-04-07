@@ -1,6 +1,7 @@
-import React from 'react';
-import { IconButton, Avatar, Menu, MenuItem, Tooltip } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import { IconButton, Avatar, Menu, MenuItem, Tooltip } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 const Profile: React.FC = () => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -16,7 +17,8 @@ const Profile: React.FC = () => {
 
   const handleLogout = () => {
     handleMenuClose();
-    navigate('/login'); // Redirect to the login page
+    Cookies.remove("token");
+    navigate("/login"); // Redirect to the login page
   };
 
   const isMenuOpen = Boolean(anchorEl);
@@ -33,15 +35,13 @@ const Profile: React.FC = () => {
         open={isMenuOpen}
         onClose={handleMenuClose}
         anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right',
+          vertical: "bottom",
+          horizontal: "right",
         }}
         transformOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
+          vertical: "top",
+          horizontal: "right",
         }}
-
-        
       >
         {/* <MenuItem onClick={handleMenuClose}>Profile</MenuItem> */}
         <MenuItem onClick={handleLogout}>Logout</MenuItem>
