@@ -13,24 +13,24 @@ import {
   TableBody,
   IconButton,
   Avatar,
+  CircularProgress,
 } from "@mui/material";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import PaginationComponent from "../components/Pagination/PaginationComponent";
 import { getApprovals } from "../../../apis/approvals";
 import { useNavigate } from "react-router-dom";
 
-interface TabsComponentProps {}
-
-const Tabss: React.FC<TabsComponentProps> = () => {
+const Tabss: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<1 | 2>(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [approvals, setApprovals] = useState<any[]>();
-  const itemsPerPage = 10; // Set number of items per page
+  const [loading, setLoading] = useState(false); // 🔹 Add loading state
+  const itemsPerPage = 10;
 
   useEffect(() => {
     const fetchApprovals = async () => {
+      setLoading(true); // 🔹 Start loading
       try {
         const response = await getApprovals(activeTab);
         if (response.success) {
@@ -39,13 +39,16 @@ const Tabss: React.FC<TabsComponentProps> = () => {
       } catch (error) {
         console.error("Failed to fetch doctors:", error);
       }
+      setLoading(false); // 🔹 End loading
     };
     fetchApprovals();
   }, [activeTab]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: 1 | 2) => {
+    setCurrentPage(1); // Reset to first page on tab change
     setActiveTab(newValue);
   };
+
   const handlePageChange = (
     event: React.ChangeEvent<unknown>,
     value: number
@@ -53,189 +56,100 @@ const Tabss: React.FC<TabsComponentProps> = () => {
     setCurrentPage(value);
   };
 
-  // Paginate doctors data
   const paginatedData = approvals?.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
+  const renderTable = (data: any[]) => (
+    <Table>
+      <TableHead>
+        <TableRow>
+          <TableCell sx={{ fontSize: "14px" }}>
+            <Checkbox />
+          </TableCell>
+          <TableCell sx={{ fontSize: "14px" }}>Name</TableCell>
+          <TableCell sx={{ fontSize: "14px" }}>Mobile</TableCell>
+          <TableCell sx={{ fontSize: "14px" }}>Email</TableCell>
+          <TableCell sx={{ fontSize: "14px" }}>DOB</TableCell>
+          <TableCell sx={{ fontSize: "14px" }}>Gender</TableCell>
+          <TableCell align="center" sx={{ fontSize: "14px" }}>
+            Actions
+          </TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {data.map((person) => (
+          <TableRow key={person.id} hover>
+            <TableCell>
+              <Checkbox />
+            </TableCell>
+            <TableCell>
+              <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <Avatar src={person.avatarUrl} alt={person.name} />
+                <Typography sx={{ fontSize: "14px" }}>{person.name}</Typography>
+              </Box>
+            </TableCell>
+            <TableCell>{person.mobile}</TableCell>
+            <TableCell>{person.email}</TableCell>
+            <TableCell>{person.dob}</TableCell>
+            <TableCell>{person.gender}</TableCell>
+            <TableCell align="center">
+              <IconButton
+                onClick={() =>
+                  navigate(`/doctor/${person.id}`, {
+                    state: { isApproval: true },
+                  })
+                }
+              >
+                <VisibilityOutlinedIcon />
+              </IconButton>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+
   return (
     <Box sx={{ width: "100%", marginBottom: "16px" }}>
-      {/* Tabs Section */}
       <Tabs
         value={activeTab}
         onChange={handleTabChange}
-        aria-label="tabs"
         indicatorColor="primary"
+        aria-label="tabs"
       >
         <Tab value={1} label="Approvals" sx={{ fontSize: "14px" }} />
         <Tab value={2} label="Rejected" sx={{ fontSize: "14px" }} />
       </Tabs>
 
-      {/* Content of the selected tab */}
-      {activeTab === 1 && (
-        <Box>
-          {/* You can render your approvals table here */}
-          <TableContainer
-            sx={{
-              borderRadius: "16px",
-              background: "linear-gradient(160deg, #e0e5ec, #ffffff)",
-              padding: 1,
-              boxShadow: "0px 6px 18px rgba(0, 0, 0, 0.3)",
-              border: "3px solid white",
-            }}
-          >
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell sx={{ fontSize: "14px" }}>
-                    <Checkbox />
-                  </TableCell>
-                  <TableCell sx={{ fontSize: "14px" }}>Name</TableCell>
-                  <TableCell sx={{ fontSize: "14px" }}>Mobile</TableCell>
-                  <TableCell sx={{ fontSize: "14px" }}>Email</TableCell>
-                  <TableCell sx={{ fontSize: "14px" }}>DOB</TableCell>
-                  <TableCell sx={{ fontSize: "14px" }}>Gender</TableCell>
-                  <TableCell align="center" sx={{ fontSize: "14px" }}>
-                    Actions
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {paginatedData?.map((approval) => (
-                  <TableRow key={approval.id} hover>
-                    <TableCell>
-                      <Checkbox />
-                    </TableCell>
-                    <TableCell>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "8px",
-                        }}
-                      >
-                        <Avatar src={approval.avatarUrl} alt={approval.name} />
-                        <Typography sx={{ fontSize: "14px" }}>
-                          {approval.name}
-                        </Typography>
-                      </Box>
-                    </TableCell>
-                    <TableCell>{approval.mobile}</TableCell>
-                    <TableCell>{approval.email}</TableCell>
-                    <TableCell>{approval.dob}</TableCell>
-                    <TableCell>{approval.gender}</TableCell>
-                    <TableCell align="center">
-                      <IconButton
-                        onClick={() =>
-                          navigate(`/doctor/${approval.id}`, {
-                            state: { isApproval: true },
-                          })
-                        }
-                      >
-                        <VisibilityOutlinedIcon />
-                      </IconButton>
-                      {/* <IconButton>
-                        <DeleteOutlineOutlinedIcon />
-                      </IconButton> */}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          {/* Footer with Pagination and "2025" Text */}
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginTop: "16px",
-              fontSize: "14px",
-            }}
-          >
-            {/* Use the PaginationComponent here */}
-            <PaginationComponent
-              totalCount={approvals?.length || 0}
-              page={currentPage}
-              onPageChange={handlePageChange}
-            />
-          </Box>
+      {loading ? (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            padding: "32px",
+          }}
+        >
+          <CircularProgress />
         </Box>
-      )}
-
-      {activeTab === 2 && (
+      ) : (
         <Box>
-          {/* You can render your approvals table here */}
           <TableContainer
             sx={{
               borderRadius: "16px",
-              background: "linear-gradient(160deg, #ffcccc, #ffe0e0)",
+              background:
+                activeTab === 1
+                  ? "linear-gradient(160deg, #e0e5ec, #ffffff)"
+                  : "linear-gradient(160deg, #ffcccc, #ffe0e0)",
               padding: 1,
               boxShadow: "0px 6px 18px rgba(0, 0, 0, 0.3)",
               border: "3px solid white",
             }}
           >
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell sx={{ fontSize: "14px" }}>
-                    <Checkbox />
-                  </TableCell>
-                  <TableCell sx={{ fontSize: "14px" }}>Name</TableCell>
-                  <TableCell sx={{ fontSize: "14px" }}>Mobile</TableCell>
-                  <TableCell sx={{ fontSize: "14px" }}>Email</TableCell>
-                  <TableCell sx={{ fontSize: "14px" }}>DOB</TableCell>
-                  <TableCell sx={{ fontSize: "14px" }}>Gender</TableCell>
-                  <TableCell align="center" sx={{ fontSize: "14px" }}>
-                    Actions
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {paginatedData?.map((rejected) => (
-                  <TableRow key={rejected.id} hover>
-                    <TableCell>
-                      <Checkbox />
-                    </TableCell>
-                    <TableCell>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "8px",
-                        }}
-                      >
-                        <Avatar src={rejected.avatarUrl} alt={rejected.name} />
-                        <Typography sx={{ fontSize: "14px" }}>
-                          {rejected.name}
-                        </Typography>
-                      </Box>
-                    </TableCell>
-                    <TableCell>{rejected.mobile}</TableCell>
-                    <TableCell>{rejected.email}</TableCell>
-                    <TableCell>{rejected.dob}</TableCell>
-                    <TableCell>{rejected.gender}</TableCell>
-                    <TableCell align="center">
-                      <IconButton
-                        onClick={() =>
-                          navigate(`/doctor/${rejected.id}`, {
-                            state: { isApproval: true },
-                          })
-                        }
-                      >
-                        <VisibilityOutlinedIcon />
-                      </IconButton>
-                      {/* <IconButton>
-                        <DeleteOutlineOutlinedIcon />
-                      </IconButton> */}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            {renderTable(paginatedData || [])}
           </TableContainer>
-          {/* Footer with Pagination and "2025" Text */}
+
           <Box
             sx={{
               display: "flex",
@@ -245,7 +159,6 @@ const Tabss: React.FC<TabsComponentProps> = () => {
               fontSize: "14px",
             }}
           >
-            {/* Use the PaginationComponent here */}
             <PaginationComponent
               totalCount={approvals?.length || 0}
               page={currentPage}
