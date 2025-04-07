@@ -6,6 +6,7 @@ import {
   Typography,
   TextField,
   IconButton,
+  CircularProgress,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
@@ -23,6 +24,7 @@ const AddServiceButton = ({ fetchServices }: Props) => {
   const [shortDescription, setShortDescription] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState("");
+  const [pending, setPending] = useState(false); // 🔹 Add pending state
 
   const handleOpen = () => setOpen(true);
 
@@ -46,6 +48,7 @@ const AddServiceButton = ({ fetchServices }: Props) => {
       return;
     }
 
+    setPending(true); // 🔹 Start pending
     try {
       const response = await createService({
         title,
@@ -54,12 +57,13 @@ const AddServiceButton = ({ fetchServices }: Props) => {
       });
       toast.success("Service created successfully!");
       console.log("Service created successfully:", response);
-      fetchServices()
+      await fetchServices();
       handleClose();
     } catch (error) {
       console.error("Error creating service:", error);
       toast.error("Error creating service. Please try again.");
     }
+    setPending(false); // 🔹 End pending
   };
 
   const handleReset = () => {
@@ -112,7 +116,6 @@ const AddServiceButton = ({ fetchServices }: Props) => {
             <CloseIcon />
           </IconButton>
 
-          {/* Modal Title */}
           <Typography
             variant="h6"
             sx={{
@@ -199,12 +202,9 @@ const AddServiceButton = ({ fetchServices }: Props) => {
             </Box>
           )}
 
-          {/* Input for Service Title */}
+          {/* Title */}
           <Box sx={{ textAlign: "left", marginBottom: "8px" }}>
-            <Typography
-              variant="body2"
-              sx={{ display: "inline", fontWeight: "normal" }}
-            >
+            <Typography variant="body2" sx={{ display: "inline" }}>
               Enter Service Title{" "}
             </Typography>
             <Typography
@@ -224,12 +224,9 @@ const AddServiceButton = ({ fetchServices }: Props) => {
             onChange={(e) => setTitle(e.target.value)}
           />
 
-          {/* Input for Short Description */}
+          {/* Description */}
           <Box sx={{ textAlign: "left", marginBottom: "8px" }}>
-            <Typography
-              variant="body2"
-              sx={{ display: "inline", fontWeight: "normal" }}
-            >
+            <Typography variant="body2" sx={{ display: "inline" }}>
               Enter Short Description{" "}
             </Typography>
             <Typography
@@ -249,26 +246,43 @@ const AddServiceButton = ({ fetchServices }: Props) => {
             onChange={(e) => setShortDescription(e.target.value)}
           />
 
-          {/* Submit and Reset Buttons */}
+          {/* Submit and Reset */}
           <Box
             sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}
           >
             <Button
               variant="contained"
+              disabled={pending} // 🔹 disable when pending
               sx={{
                 backgroundColor: "#1A2338",
                 color: "#fff",
                 textTransform: "none",
                 flexGrow: 1,
+                position: "relative",
               }}
               onClick={handleSubmit}
             >
-              Submit
+              {pending ? (
+                <CircularProgress
+                  size={20}
+                  sx={{
+                    color: "#fff",
+                    position: "absolute",
+                    left: "50%",
+                    top: "50%",
+                    transform: "translate(-50%, -50%)",
+                  }}
+                />
+              ) : (
+                "Submit"
+              )}
             </Button>
+
             <Button
               variant="outlined"
               sx={{ textTransform: "none", flexGrow: 1 }}
               onClick={handleReset}
+              disabled={pending}
             >
               Reset
             </Button>

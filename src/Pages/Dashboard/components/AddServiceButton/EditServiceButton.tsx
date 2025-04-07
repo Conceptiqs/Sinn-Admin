@@ -6,6 +6,7 @@ import {
   Typography,
   TextField,
   IconButton,
+  CircularProgress,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
@@ -34,8 +35,8 @@ const EditServiceButton: React.FC<Props> = ({ service, fetchServices }) => {
   );
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState(service.icon || "");
+  const [pending, setPending] = useState(false);
 
-  // Update state when service prop changes
   useEffect(() => {
     setTitle(service.name);
     setShortDescription(service.short_description);
@@ -43,6 +44,7 @@ const EditServiceButton: React.FC<Props> = ({ service, fetchServices }) => {
   }, [service]);
 
   const handleOpen = () => setOpen(true);
+
   const handleClose = () => {
     setOpen(false);
     handleReset();
@@ -63,6 +65,7 @@ const EditServiceButton: React.FC<Props> = ({ service, fetchServices }) => {
       return;
     }
 
+    setPending(true);
     try {
       const response = await updateService(service.id, {
         title,
@@ -76,6 +79,8 @@ const EditServiceButton: React.FC<Props> = ({ service, fetchServices }) => {
     } catch (error) {
       console.error("Error updating service:", error);
       toast.error("Error updating service. Please try again.");
+    } finally {
+      setPending(false);
     }
   };
 
@@ -281,15 +286,22 @@ const EditServiceButton: React.FC<Props> = ({ service, fetchServices }) => {
                 color: "#fff",
                 textTransform: "none",
                 flexGrow: 1,
+                position: "relative",
               }}
               onClick={handleSubmit}
+              disabled={pending}
             >
-              Save Changes
+              {pending ? (
+                <CircularProgress size={20} sx={{ color: "#fff" }} />
+              ) : (
+                "Save Changes"
+              )}
             </Button>
             <Button
               variant="outlined"
               sx={{ textTransform: "none", flexGrow: 1 }}
               onClick={handleReset}
+              disabled={pending}
             >
               Reset
             </Button>

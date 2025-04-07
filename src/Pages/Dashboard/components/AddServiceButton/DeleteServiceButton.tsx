@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { Button, Modal, Box, Typography, IconButton } from "@mui/material";
+import {
+  Button,
+  Modal,
+  Box,
+  Typography,
+  IconButton,
+  CircularProgress,
+} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { toast } from "react-toastify";
 import { Delete } from "@mui/icons-material";
@@ -17,11 +24,17 @@ interface Props {
 
 const DeleteServiceButton: React.FC<Props> = ({ service, fetchServices }) => {
   const [open, setOpen] = useState(false);
+  const [pending, setPending] = useState(false);
 
   const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    if (!pending) {
+      setOpen(false);
+    }
+  };
 
   const handleDelete = async () => {
+    setPending(true);
     try {
       await deleteService(service.id);
       toast.success("Service deleted successfully!");
@@ -30,6 +43,8 @@ const DeleteServiceButton: React.FC<Props> = ({ service, fetchServices }) => {
     } catch (error) {
       console.error("Error deleting service:", error);
       toast.error("Failed to delete service. Please try again.");
+    } finally {
+      setPending(false);
     }
   };
 
@@ -45,7 +60,7 @@ const DeleteServiceButton: React.FC<Props> = ({ service, fetchServices }) => {
           padding: 0,
           width: "max-content !important",
           minWidth: 0,
-          display: "none", // adjust to show on hover or as needed
+          display: "none",
           "&:hover": { backgroundColor: "transparent" },
         }}
         className="delete"
@@ -71,6 +86,7 @@ const DeleteServiceButton: React.FC<Props> = ({ service, fetchServices }) => {
           <IconButton
             onClick={handleClose}
             sx={{ position: "absolute", top: 8, right: 8, color: "grey.500" }}
+            disabled={pending}
           >
             <CloseIcon />
           </IconButton>
@@ -93,11 +109,19 @@ const DeleteServiceButton: React.FC<Props> = ({ service, fetchServices }) => {
           </Typography>
 
           <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
-            <Button variant="outlined" onClick={handleClose}>
+            <Button variant="outlined" onClick={handleClose} disabled={pending}>
               Cancel
             </Button>
-            <Button variant="contained" color="error" onClick={handleDelete}>
-              Delete
+            <Button
+              variant="contained"
+              color="error"
+              onClick={handleDelete}
+              disabled={pending}
+              startIcon={
+                pending ? <CircularProgress size={16} color="inherit" /> : null
+              }
+            >
+              {pending ? "Deleting..." : "Delete"}
             </Button>
           </Box>
         </Box>
