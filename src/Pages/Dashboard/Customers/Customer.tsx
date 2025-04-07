@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -22,23 +22,25 @@ import FilterButton from "../components/FilterButton/FilterButton";
 import ExportButton from "../components/ExportButton/ExportButton";
 import SendNotificationModal from "../components/SendNotificationButton/SendNotificationModal";
 import { getCustomers } from "../../../apis/customers";
+import DeleteCustomer from "./DeleteCustomer";
 
 const Customers: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [customers, setCustomers] = useState<any[]>([]);
   const itemsPerPage = 10;
 
-  useEffect(() => {
-    const fetchCustomers = async () => {
-      try {
-        const response = await getCustomers();
-        if (response.success) {
-          setCustomers(response.data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch doctors:", error);
+  const fetchCustomers = useCallback(async () => {
+    try {
+      const response = await getCustomers();
+      if (response.success) {
+        setCustomers(response.data);
       }
-    };
+    } catch (error) {
+      console.error("Failed to fetch doctors:", error);
+    }
+  }, []);
+
+  useEffect(() => {
     fetchCustomers();
   }, []);
 
@@ -151,10 +153,7 @@ const Customers: React.FC = () => {
                     <Box
                       sx={{ display: "flex", alignItems: "center", gap: "8px" }}
                     >
-                      <Avatar
-                        src={image?.original_url}
-                        alt={customer.name}
-                      />
+                      <Avatar src={image?.original_url} alt={customer.name} />
                       <Typography sx={{ fontSize: "14px" }}>
                         {customer.name}
                       </Typography>
@@ -176,9 +175,7 @@ const Customers: React.FC = () => {
                     {customer.location}
                   </TableCell>
                   <TableCell align="center">
-                    <IconButton>
-                      <DeleteOutlineOutlinedIcon />
-                    </IconButton>
+                    <DeleteCustomer customer={customer} fetchCustomers={fetchCustomers} />
                   </TableCell>
                 </TableRow>
               );
