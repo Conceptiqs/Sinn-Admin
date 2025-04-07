@@ -46,3 +46,13 @@ export async function addCredit(
     data: formData,
   });
 }
+
+export async function getReceipt(id: number): Promise<any> {
+  const path = `doctors/payment-recept-list/${id}`; // Adjust the endpoint path as needed.
+
+  // Call the API with the GET method. Note: No data is required.
+  return await callAuthApi({
+    path,
+    method: "GET",
+  });
+}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Box,
   Tabs,
@@ -9,6 +9,8 @@ import {
   Chip,
 } from "@mui/material";
 import { getRenewals } from "../../../apis/renewals";
+import AddCredits from "./AddCredits";
+import PaymentReceipt from "./PaymentReceipt";
 
 const Tabss: React.FC = () => {
   const [activeTab, setActiveTab] = useState<1 | 2>(1);
@@ -16,17 +18,18 @@ const Tabss: React.FC = () => {
   const [renewals, setRenewals] = useState<any[]>();
   const itemsPerPage = 8;
 
-  useEffect(() => {
-    const fetchRenewals = async () => {
-      try {
-        const response = await getRenewals(activeTab);
-        if (response.success) {
-          setRenewals(response.data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch doctors:", error);
+  const fetchRenewals = useCallback(async () => {
+    try {
+      const response = await getRenewals(activeTab);
+      if (response.success) {
+        setRenewals(response.data);
       }
-    };
+    } catch (error) {
+      console.error("Failed to fetch doctors:", error);
+    }
+  }, [activeTab]);
+
+  useEffect(() => {
     fetchRenewals();
   }, [activeTab]);
 
@@ -107,12 +110,20 @@ const Tabss: React.FC = () => {
               </Box>
 
               {/* Status */}
-              <Chip
-                label={item.status || "Inactive"}
-                color={!item.status ? "error" : "success"}
-                size="small"
-                sx={{ fontWeight: "bold", marginLeft: "auto" }}
-              />
+              {activeTab === 1 && parseInt(item.get_amount) <= 0 && (
+                <Chip
+                  label="Inactive"
+                  color="error"
+                  size="small"
+                  sx={{ fontWeight: "bold", marginLeft: "auto" }}
+                />
+              )}
+              {activeTab === 1 &&
+                parseInt(item.get_amount) > 0 &&
+                parseInt(item.get_amount) <= 200 && (
+                  <AddCredits id={item.id} fetchRenewals={fetchRenewals} />
+                )}
+              {activeTab === 2 && <PaymentReceipt id={item.id} />}
             </Box>
           ))}
         </Box>

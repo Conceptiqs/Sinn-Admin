@@ -19,10 +19,9 @@ import { addCredit } from "../../../apis/renewals";
 interface Props {
   fetchRenewals: () => Promise<void>;
   id: string;
-  status: string;
 }
 
-const AddCredits: React.FC<Props> = ({ fetchRenewals, id, status }) => {
+const AddCredits: React.FC<Props> = ({ fetchRenewals, id }) => {
   const fileRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
@@ -34,7 +33,7 @@ const AddCredits: React.FC<Props> = ({ fetchRenewals, id, status }) => {
   );
 
   const handleOpen = () => {
-    status === "Renew" && setOpen(true);
+    setOpen(true);
   };
   const handleClose = () => {
     setOpen(false);
@@ -60,7 +59,6 @@ const AddCredits: React.FC<Props> = ({ fetchRenewals, id, status }) => {
     }
 
     try {
-      // build payload with correct field name
       const payload: any = { credit: title };
       payload.credit_receipt = imageFile;
       await addCredit(id, payload);
@@ -68,16 +66,16 @@ const AddCredits: React.FC<Props> = ({ fetchRenewals, id, status }) => {
       await fetchRenewals();
       handleClose();
     } catch (err) {
-      console.error("Error creating banner:", err);
-      toast.error("Error creating banner. Please try again.");
+      console.error("Error creating credit:", err);
+      toast.error("Error creating credit. Please try again.");
     }
   };
 
   return (
     <>
       <Chip
-        label={status}
-        color={status === "Inactive" ? "error" : "success"}
+        label="Renew"
+        color="success"
         size="small"
         sx={{ fontWeight: "bold", marginLeft: "auto" }}
         onClick={handleOpen}
@@ -177,6 +175,7 @@ const AddCredits: React.FC<Props> = ({ fetchRenewals, id, status }) => {
             placeholder="Enter here"
             sx={{ mb: 2 }}
             value={title}
+            type="number"
             onChange={(e) => setTitle(e.target.value)}
           />
 
