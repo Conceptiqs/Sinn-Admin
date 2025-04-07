@@ -24,6 +24,7 @@ import FilterButton from "../../components/FilterButton/FilterButton";
 import AddUser from "../../components/AddUser/AddUser";
 import { getUsers } from "../../../../apis/uac";
 import DeleteUser from "../../components/AddUser/DeleteUser";
+import EditUser from "../../components/AddUser/EditUser";
 
 const UserManagement: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -148,9 +149,7 @@ const UserManagement: React.FC = () => {
                 <TableCell sx={{ fontSize: "14px" }}>{user.email}</TableCell>
                 <TableCell align="center">
                   <DeleteUser user={user} fetchUsers={fetchUsers} />
-                  <IconButton>
-                    <EditIcon />
-                  </IconButton>
+                  <EditUser user={user} fetchUsers={fetchUsers} />
                 </TableCell>
               </TableRow>
             ))}

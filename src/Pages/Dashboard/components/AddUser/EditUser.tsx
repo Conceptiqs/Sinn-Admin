@@ -9,21 +9,25 @@ import {
   Avatar,
   useMediaQuery,
 } from "@mui/material";
+import { EditOutlined as EditIcon } from "@mui/icons-material";
 import { AddCircleOutline, Close, Edit } from "@mui/icons-material";
-import { createUser } from "../../../../apis/uac";
+import { createUser, updateUser } from "../../../../apis/uac";
 import { toast } from "react-toastify";
 
 interface Props {
-  fetchUsers:  () => Promise<void>;
+  fetchUsers: () => Promise<void>;
+  user: any;
 }
 
-const AddUser: React.FC<Props> = ({ fetchUsers }) => {
+const EditUser: React.FC<Props> = ({ user, fetchUsers }) => {
   const [open, setOpen] = useState(false);
-  const [profilePic, setProfilePic] = useState<string | null>(null);
+  const [profilePic, setProfilePic] = useState<string | null>(
+    user.user_images?.url || null
+  );
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [name, setName] = useState("");
-  const [mobileNo, setMobileNo] = useState("");
-  const [email, setEmail] = useState("");
+  const [name, setName] = useState(user.name || "");
+  const [mobileNo, setMobileNo] = useState(user.mobile_no || "");
+  const [email, setEmail] = useState(user.email || "");
 
   // show preview & keep the File for upload
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,14 +59,14 @@ const AddUser: React.FC<Props> = ({ fetchUsers }) => {
       return;
     }
     try {
-      await createUser({
+      await updateUser(user.id, {
         name,
         email,
         mobile_no: mobileNo,
         user_image: imageFile,
       });
       toast.success("User added successfully!");
-      await fetchUsers()
+      await fetchUsers();
       handleClose();
     } catch (err) {
       console.error("Error creating user:", err);
@@ -76,17 +80,9 @@ const AddUser: React.FC<Props> = ({ fetchUsers }) => {
 
   return (
     <>
-      <Button
-        variant="contained"
-        sx={{
-          backgroundColor: "#1A2338",
-          color: "#fff",
-          textTransform: "none",
-        }}
-        onClick={() => setOpen(true)}
-      >
-        Add User
-      </Button>
+      <IconButton onClick={() => setOpen(true)}>
+        <EditIcon />
+      </IconButton>
 
       <Modal open={open} onClose={handleClose}>
         <Box
@@ -125,7 +121,7 @@ const AddUser: React.FC<Props> = ({ fetchUsers }) => {
             startIcon={<AddCircleOutline sx={{ color: "green" }} />}
             disableRipple
           >
-            Add User
+            Edit User
           </Button>
 
           {/* Profile Picture with Edit Button */}
@@ -234,4 +230,4 @@ const AddUser: React.FC<Props> = ({ fetchUsers }) => {
   );
 };
 
-export default AddUser;
+export default EditUser;
