@@ -8,6 +8,7 @@ import {
   IconButton,
   useMediaQuery,
   Chip,
+  CircularProgress,
 } from "@mui/material";
 import {
   Close as CloseIcon,
@@ -27,14 +28,13 @@ const AddCredits: React.FC<Props> = ({ fetchRenewals, id }) => {
   const [title, setTitle] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState("");
+  const [pending, setPending] = useState(false); // ⏳ pending state
 
   const isSmallScreen = useMediaQuery((theme: any) =>
     theme.breakpoints.down("sm")
   );
 
-  const handleOpen = () => {
-    setOpen(true);
-  };
+  const handleOpen = () => setOpen(true);
   const handleClose = () => {
     setOpen(false);
     resetForm();
@@ -58,6 +58,7 @@ const AddCredits: React.FC<Props> = ({ fetchRenewals, id }) => {
       return;
     }
 
+    setPending(true); // Start loading
     try {
       const payload: any = { credit: title };
       payload.credit_receipt = imageFile;
@@ -68,6 +69,8 @@ const AddCredits: React.FC<Props> = ({ fetchRenewals, id }) => {
     } catch (err) {
       console.error("Error creating credit:", err);
       toast.error("Error creating credit. Please try again.");
+    } finally {
+      setPending(false); // End loading
     }
   };
 
@@ -183,16 +186,30 @@ const AddCredits: React.FC<Props> = ({ fetchRenewals, id }) => {
             <Button
               fullWidth
               variant="contained"
-              sx={{ bgcolor: "#1A2338", color: "#fff", textTransform: "none" }}
+              disabled={pending}
+              sx={{
+                bgcolor: "#1A2338",
+                color: "#fff",
+                textTransform: "none",
+                "&:disabled": {
+                  bgcolor: "#ccc",
+                  color: "#666",
+                },
+              }}
               onClick={handleSubmit}
+              startIcon={
+                pending && <CircularProgress size={16} color="inherit" />
+              }
             >
-              Submit
+              {pending ? "Submitting..." : "Submit"}
             </Button>
+
             <Button
               fullWidth
               variant="outlined"
               sx={{ textTransform: "none" }}
               onClick={resetForm}
+              disabled={pending}
             >
               Reset
             </Button>

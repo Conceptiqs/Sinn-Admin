@@ -1,13 +1,12 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
-  Button,
   Modal,
   Box,
   Typography,
-  TextField,
   IconButton,
   useMediaQuery,
   Chip,
+  CircularProgress,
 } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
 import { getReceipt } from "../../../apis/renewals";
@@ -19,41 +18,41 @@ interface Props {
 const PaymentReceipt: React.FC<Props> = ({ id }) => {
   const [open, setOpen] = useState(false);
   const [imagePreview, setImagePreview] = useState("");
+  const [loading, setLoading] = useState(false); // ⏳ Loader state
 
   const isSmallScreen = useMediaQuery((theme: any) =>
     theme.breakpoints.down("sm")
   );
 
-  const handleOpen = () => {
-    setOpen(true);
-  };
+  const handleOpen = () => setOpen(true);
   const handleClose = () => {
     setOpen(false);
+    setImagePreview("");
   };
 
   const fetchReceipt = useCallback(async () => {
-    if (open) {
-      try {
-        const response = await getReceipt(id);
-        console.log(response);
-        if (response.success) {
-          const credit_receipts = response.data?.media?.find(
-            (item: { collection_name: string }) =>
-              item.collection_name === "credit_receipts"
-          );
-          setImagePreview(credit_receipts?.original_url || "");
-        }
-      } catch (error) {
-        console.error("Failed to fetch doctors:", error);
+    if (!open) return;
+
+    setLoading(true);
+    try {
+      const response = await getReceipt(id);
+      if (response.success) {
+        const credit_receipts = response.data?.media?.find(
+          (item: { collection_name: string }) =>
+            item.collection_name === "credit_receipts"
+        );
+        setImagePreview(credit_receipts?.original_url || "");
       }
-    } else {
-      setImagePreview("");
+    } catch (error) {
+      console.error("Failed to fetch receipt:", error);
+    } finally {
+      setLoading(false);
     }
   }, [id, open]);
 
   useEffect(() => {
     fetchReceipt();
-  }, [id, open]);
+  }, [fetchReceipt]);
 
   return (
     <>
@@ -97,18 +96,27 @@ const PaymentReceipt: React.FC<Props> = ({ id }) => {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              minHeight: "200px", // Ensures layout doesn't jump
             }}
           >
-            <img
-              src={imagePreview}
-              alt="Preview"
-              style={{
-                width: "max-content",
-                maxHeight: "300px",
-                objectFit: "contain",
-                borderRadius: 8,
-              }}
-            />
+            {loading ? (
+              <CircularProgress />
+            ) : imagePreview ? (
+              <img
+                src={imagePreview}
+                alt="Payment Receipt"
+                style={{
+                  width: "100%",
+                  maxHeight: "300px",
+                  objectFit: "contain",
+                  borderRadius: 8,
+                }}
+              />
+            ) : (
+              <Typography variant="body2" color="textSecondary">
+                No receipt found.
+              </Typography>
+            )}
           </Box>
         </Box>
       </Modal>

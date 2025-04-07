@@ -7,6 +7,7 @@ import {
   Avatar,
   Pagination,
   Chip,
+  CircularProgress,
 } from "@mui/material";
 import { getRenewals } from "../../../apis/renewals";
 import AddCredits from "./AddCredits";
@@ -16,16 +17,20 @@ const Tabss: React.FC = () => {
   const [activeTab, setActiveTab] = useState<1 | 2>(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [renewals, setRenewals] = useState<any[]>();
+  const [loading, setLoading] = useState(false); // 🔄 Loading state
   const itemsPerPage = 8;
 
   const fetchRenewals = useCallback(async () => {
     try {
+      setLoading(true); // Start loading
       const response = await getRenewals(activeTab);
       if (response.success) {
         setRenewals(response.data);
       }
     } catch (error) {
       console.error("Failed to fetch doctors:", error);
+    } finally {
+      setLoading(false); // End loading
     }
   }, [activeTab]);
 
@@ -63,82 +68,94 @@ const Tabss: React.FC = () => {
         <Tab value={2} label="Completed" sx={{ fontSize: "14px" }} />
       </Tabs>
 
-      {/* Content of the selected tab */}
+      {/* Content Section */}
       <Box sx={{ marginTop: "16px" }}>
-        {/* Renewals or Completed Grid */}
-        <Box
-          display="grid"
-          gridTemplateColumns={{ xs: "1fr", sm: "1fr 1fr" }} // 1 column on small screens, 2 columns on medium+
-          gap={2}
-        >
-          {paginatedData?.map((item) => (
+        {loading ? (
+          <Box sx={{ textAlign: "center", mt: 5 }}>
+            <CircularProgress color="primary" />
+          </Box>
+        ) : (
+          <>
+            {/* Renewals or Completed Grid */}
             <Box
-              key={item.id}
+              display="grid"
+              gridTemplateColumns={{ xs: "1fr", sm: "1fr 1fr" }}
+              gap={2}
+            >
+              {paginatedData?.map((item) => (
+                <Box
+                  key={item.id}
+                  sx={{
+                    display: "flex",
+                    padding: 1,
+                    alignItems: "center",
+                    background: "linear-gradient(90deg, #e0e5ec, #e0e5ec)",
+                    borderRadius: 2,
+                    boxShadow: "0 1px 4px rgba(0, 0, 0, 0.5)",
+                    border: "3px solid white",
+                    height: "75px",
+                  }}
+                >
+                  {/* Avatar */}
+                  <Avatar
+                    src={item.image}
+                    alt={item.name}
+                    sx={{ width: 48, height: 48, marginRight: 2 }}
+                  />
+
+                  {/* Text Content */}
+                  <Box flex={1}>
+                    <Typography
+                      variant="subtitle2"
+                      fontWeight="bold"
+                      sx={{ color: "#333" }}
+                    >
+                      {item.name}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "#666", fontSize: "0.85rem" }}
+                    >
+                      {item.message}
+                    </Typography>
+                  </Box>
+
+                  {/* Status */}
+                  {activeTab === 1 && parseInt(item.get_amount) <= 0 && (
+                    <Chip
+                      label="Inactive"
+                      color="error"
+                      size="small"
+                      sx={{ fontWeight: "bold", marginLeft: "auto" }}
+                    />
+                  )}
+                  {activeTab === 1 &&
+                    parseInt(item.get_amount) > 0 &&
+                    parseInt(item.get_amount) <= 200 && (
+                      <AddCredits id={item.id} fetchRenewals={fetchRenewals} />
+                    )}
+                  {activeTab === 2 && <PaymentReceipt id={item.id} />}
+                </Box>
+              ))}
+            </Box>
+
+            {/* Pagination Section */}
+            <Box
               sx={{
                 display: "flex",
-                padding: 1,
-                alignItems: "center",
-                background: "linear-gradient(90deg, #e0e5ec, #e0e5ec)",
-                borderRadius: 2,
-                boxShadow: "0 1px 4px rgba(0, 0, 0, 0.5)", // Adding box shadow
-                border: "3px solid white", // White border with 3px thickness
-                height: "75px", // Adjusting the height for a rectangular shape
+                justifyContent: "center",
+                marginTop: "16px",
               }}
             >
-              {/* Avatar */}
-              <Avatar
-                src={item.image}
-                alt={item.name}
-                sx={{ width: 48, height: 48, marginRight: 2 }}
+              <Pagination
+                count={Math.ceil((renewals?.length || 0) / itemsPerPage)}
+                page={currentPage}
+                onChange={handlePageChange}
+                color="primary"
               />
-
-              {/* Text Content */}
-              <Box flex={1}>
-                <Typography
-                  variant="subtitle2" // Smaller font for the title
-                  fontWeight="bold"
-                  sx={{ color: "#333" }}
-                >
-                  {item.name}
-                </Typography>
-                <Typography
-                  variant="body2" // Normal font size for the message
-                  sx={{ color: "#666", fontSize: "0.85rem" }}
-                >
-                  {item.message}
-                </Typography>
-              </Box>
-
-              {/* Status */}
-              {activeTab === 1 && parseInt(item.get_amount) <= 0 && (
-                <Chip
-                  label="Inactive"
-                  color="error"
-                  size="small"
-                  sx={{ fontWeight: "bold", marginLeft: "auto" }}
-                />
-              )}
-              {activeTab === 1 &&
-                parseInt(item.get_amount) > 0 &&
-                parseInt(item.get_amount) <= 200 && (
-                  <AddCredits id={item.id} fetchRenewals={fetchRenewals} />
-                )}
-              {activeTab === 2 && <PaymentReceipt id={item.id} />}
             </Box>
-          ))}
-        </Box>
-
-        {/* Pagination Section */}
-        <Box
-          sx={{ display: "flex", justifyContent: "center", marginTop: "16px" }}
-        >
-          <Pagination
-            count={Math.ceil(renewals?.length || 0 / itemsPerPage)}
-            page={currentPage}
-            onChange={handlePageChange}
-            color="primary"
-          />
-        </Box>
+          </>
+        )}
       </Box>
     </Box>
   );
