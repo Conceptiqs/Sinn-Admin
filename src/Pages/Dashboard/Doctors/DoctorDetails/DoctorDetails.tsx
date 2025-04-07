@@ -1,5 +1,11 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Breadcrumbs, Link, Typography } from "@mui/material";
+import {
+  Breadcrumbs,
+  Link,
+  Typography,
+  CircularProgress,
+  Box,
+} from "@mui/material";
 import { useParams } from "react-router-dom";
 import { Dashboard as DashboardIcon } from "@mui/icons-material";
 import DoctorTabs from "./DoctorTabs";
@@ -8,58 +14,73 @@ import { getDoctorById } from "../../../../apis/doctors";
 
 const DoctorDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [data, setData] = useState();
+  const [data, setData] = useState<any>();
+  const [loading, setLoading] = useState(false);
 
   const fetchData = useCallback(async () => {
     if (!id) return;
     try {
+      setLoading(true);
       const response = await getDoctorById(id);
       if (response.success) {
         setData(response.data);
       }
     } catch (error) {
       console.error("Failed to fetch doctors:", error);
+    } finally {
+      setLoading(false);
     }
   }, [id]);
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "60vh",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   if (!data) {
-    return <h2>Doctor not found</h2>;
+    return <Typography variant="h6">Doctor not found</Typography>;
   }
 
   return (
     <>
       <Breadcrumbs sx={{ fontSize: "0.9rem", mb: 2 }}>
-        {/* Dashboard Link */}
         <Link
-          component={RouterLink} // Use RouterLink for navigation
+          component={RouterLink}
           underline="hover"
           color="inherit"
-          to="/dashboard" // Use "to" instead of "href" for RouterLink
+          to="/dashboard"
         >
           <DashboardIcon sx={{ fontSize: "1rem", mr: 0.5 }} /> Dashboard
         </Link>
 
-        {/* Doctors Link */}
         <Link
-          component={RouterLink} // Use RouterLink for navigation
+          component={RouterLink}
           underline="hover"
           color="inherit"
-          to="/doctors" // Redirect to /doctors
+          to="/doctors"
         >
           Doctors
         </Link>
 
-        {/* Doctor Details (Current Page) */}
         <Typography color="text.primary" fontSize={15}>
           Doctor Details
         </Typography>
       </Breadcrumbs>
 
-      {/* Doctor Tabs Component */}
       <DoctorTabs doctor={data} />
     </>
   );

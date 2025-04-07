@@ -7,10 +7,9 @@ import {
   TextField,
   IconButton,
   useMediaQuery,
+  CircularProgress,
 } from "@mui/material";
-import {
-  Close as CloseIcon,
-} from "@mui/icons-material";
+import { Close as CloseIcon } from "@mui/icons-material";
 import { toast } from "react-toastify";
 import { createNotification } from "../../../../apis/notification";
 import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
@@ -20,6 +19,7 @@ const SendNotificationModal: React.FC<{ type: string }> = ({ type }) => {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [pending, setPending] = useState(false);
 
   const isSmallScreen = useMediaQuery((theme: any) =>
     theme.breakpoints.down("sm")
@@ -33,6 +33,8 @@ const SendNotificationModal: React.FC<{ type: string }> = ({ type }) => {
 
   const resetForm = () => {
     setTitle("");
+    setDescription("");
+    setPending(false);
   };
 
   const handleSubmit = async () => {
@@ -42,6 +44,7 @@ const SendNotificationModal: React.FC<{ type: string }> = ({ type }) => {
     }
 
     try {
+      setPending(true);
       const payload: any = { title, short_description: description, type };
       await createNotification(payload);
       toast.success("Notification created successfully!");
@@ -49,6 +52,8 @@ const SendNotificationModal: React.FC<{ type: string }> = ({ type }) => {
     } catch (err) {
       console.error("Error creating notification:", err);
       toast.error("Error creating notification. Please try again.");
+    } finally {
+      setPending(false);
     }
   };
 
@@ -135,14 +140,20 @@ const SendNotificationModal: React.FC<{ type: string }> = ({ type }) => {
               variant="contained"
               sx={{ bgcolor: "#1A2338", color: "#fff", textTransform: "none" }}
               onClick={handleSubmit}
+              disabled={pending}
             >
-              Submit
+              {pending ? (
+                <CircularProgress size={20} color="inherit" />
+              ) : (
+                "Submit"
+              )}
             </Button>
             <Button
               fullWidth
               variant="outlined"
               sx={{ textTransform: "none" }}
               onClick={resetForm}
+              disabled={pending}
             >
               Reset
             </Button>

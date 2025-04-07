@@ -14,6 +14,7 @@ import {
   IconButton,
   Breadcrumbs,
   Link,
+  CircularProgress,
 } from "@mui/material";
 import {
   VisibilityOutlined as ViewIcon,
@@ -30,17 +31,21 @@ import DeleteDoctor from "./DeleteDoctor";
 const Doctors: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [doctors, setDoctors] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const itemsPerPage = 10;
   const navigate = useNavigate();
 
   const fetchDoctors = useCallback(async () => {
     try {
+      setLoading(true);
       const response = await getDoctors();
       if (response.success) {
         setDoctors(response.data);
       }
     } catch (error) {
       console.error("Failed to fetch doctors:", error);
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -55,6 +60,21 @@ const Doctors: React.FC = () => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ padding: "24px", fontSize: "14px" }}>
