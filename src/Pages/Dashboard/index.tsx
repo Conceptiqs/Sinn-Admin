@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Box, Grid } from "@mui/material";
+import { Box, Grid, CircularProgress } from "@mui/material";
 import Label from "./components/Label";
 import StatsCards from "./components/StatsCards";
 import EarningsChart from "./components/EarningsChart";
@@ -10,25 +10,46 @@ import { getDashboard } from "../../apis/dashboard";
 
 const Dashboard: React.FC = () => {
   const [data, setData] = useState<any>();
+  const [loading, setLoading] = useState<boolean>(true);
+
   const fetchDashboard = useCallback(async () => {
     try {
+      setLoading(true);
       const res = await getDashboard();
       if (res.success) {
         setData(res.data);
       }
     } catch (err) {
       console.error("Error fetching customer banners:", err);
+    } finally {
+      setLoading(false);
     }
   }, []);
 
   useEffect(() => {
     fetchDashboard();
   }, []);
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
   return (
     <Box
       sx={{
         minHeight: "100vh",
-        padding: 2, // Added padding for better spacing
+        padding: 2,
       }}
     >
       <Grid container spacing={2}>
@@ -40,7 +61,7 @@ const Dashboard: React.FC = () => {
           sx={{
             display: "flex",
             flexDirection: "column",
-            gap: 2, // Space between components
+            gap: 2,
           }}
         >
           <Label />
@@ -57,7 +78,7 @@ const Dashboard: React.FC = () => {
           sx={{
             display: "flex",
             flexDirection: "column",
-            gap: 2, // Space between components
+            gap: 2,
           }}
         >
           <RecentlyJoinedDoctors doctors={data?.recentDoctor} />
