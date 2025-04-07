@@ -8,6 +8,7 @@ import {
   Grid,
   Card,
   CardContent,
+  CircularProgress,
 } from "@mui/material";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import DashboardIcon from "@mui/icons-material/Dashboard";
@@ -48,8 +49,16 @@ const Notifications: React.FC = () => {
 
   if (loading) {
     return (
-      <Box sx={{ padding: "24px" }}>
-        <Typography>Loading...</Typography>
+      <Box
+        sx={{
+          padding: "24px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "50vh",
+        }}
+      >
+        <CircularProgress />
       </Box>
     );
   }
