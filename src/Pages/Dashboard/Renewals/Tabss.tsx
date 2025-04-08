@@ -122,17 +122,20 @@ const Tabss: React.FC = () => {
 
                   {/* Status */}
                   {activeTab === 1 && parseInt(item.get_amount) <= 0 && (
-                    <Chip
-                      label="Inactive"
-                      color="error"
-                      size="small"
-                      sx={{ fontWeight: "bold", marginLeft: "auto" }}
+                    <AddCredits
+                      id={item.id}
+                      fetchRenewals={fetchRenewals}
+                      type="inactive"
                     />
                   )}
                   {activeTab === 1 &&
                     parseInt(item.get_amount) > 0 &&
                     parseInt(item.get_amount) <= 200 && (
-                      <AddCredits id={item.id} fetchRenewals={fetchRenewals} />
+                      <AddCredits
+                        id={item.id}
+                        fetchRenewals={fetchRenewals}
+                        type="renew"
+                      />
                     )}
                   {activeTab === 2 && <PaymentReceipt id={item.id} />}
                 </Box>

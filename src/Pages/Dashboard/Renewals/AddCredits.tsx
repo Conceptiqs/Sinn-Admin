@@ -20,9 +20,10 @@ import { addCredit } from "../../../apis/renewals";
 interface Props {
   fetchRenewals: () => Promise<void>;
   id: string;
+  type: "inactive" | "renew";
 }
 
-const AddCredits: React.FC<Props> = ({ fetchRenewals, id }) => {
+const AddCredits: React.FC<Props> = ({ fetchRenewals, id, type }) => {
   const fileRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
@@ -76,13 +77,25 @@ const AddCredits: React.FC<Props> = ({ fetchRenewals, id }) => {
 
   return (
     <>
-      <Chip
-        label="Renew"
-        color="success"
-        size="small"
-        sx={{ fontWeight: "bold", marginLeft: "auto" }}
-        onClick={handleOpen}
-      />
+      {type === "renew" && (
+        <Chip
+          label="Renew"
+          color="success"
+          size="small"
+          sx={{ fontWeight: "bold", marginLeft: "auto" }}
+          onClick={handleOpen}
+        />
+      )}
+
+      {type === "inactive" && (
+        <Chip
+          label="Inactive"
+          color="error"
+          size="small"
+          sx={{ fontWeight: "bold", marginLeft: "auto" }}
+          onClick={handleOpen}
+        />
+      )}
 
       <Modal open={open} onClose={handleClose}>
         <Box
