@@ -21,6 +21,7 @@ import PaginationComponent from "../../components/Pagination/PaginationComponent
 import FilterButton from "../../components/FilterButton/FilterButton";
 import CreateNewRole from "../../components/CreateNewRole/CreateNewRole";
 import { getRoles } from "../../../../apis/uac";
+import UpdateRole from "../../components/CreateNewRole/UpdateRole";
 
 const RoleManagement: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -124,8 +125,8 @@ const RoleManagement: React.FC = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {paginatedRoles?.map((user) => (
-              <TableRow key={user.id} hover>
+            {paginatedRoles?.map((role) => (
+              <TableRow key={role.id} hover>
                 <TableCell>
                   <Checkbox />
                 </TableCell>
@@ -133,21 +134,19 @@ const RoleManagement: React.FC = () => {
                   <Box
                     sx={{ display: "flex", alignItems: "center", gap: "8px" }}
                   >
-                    <Avatar src={user.user_images?.url} alt={user.user} />
+                    <Avatar src={role.user_images?.url} alt={role.user} />
                     <Typography sx={{ fontSize: "14px" }}>
-                      {user.user}
+                      {role.user}
                     </Typography>
                   </Box>
                 </TableCell>
-                <TableCell sx={{ fontSize: "14px" }}>{user.description}</TableCell>
+                <TableCell sx={{ fontSize: "14px" }}>{role.description}</TableCell>
 
                 <TableCell align="center">
                   <IconButton>
                     <DeleteOutlineOutlinedIcon />
                   </IconButton>
-                  <IconButton>
-                    <EditOutlinedIcon /> {/* Edit Icon */}
-                  </IconButton>
+                  <UpdateRole role={role} fetchRoles={fetchRoles} />
                 </TableCell>
               </TableRow>
             ))}

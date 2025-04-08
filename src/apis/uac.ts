@@ -95,6 +95,16 @@ export async function getRoles(): Promise<any> {
   });
 }
 
+export async function getRole(id: number): Promise<any> {
+  const path = `role/edit/${id}`; // Adjust the endpoint path as needed.
+
+  // Call the API with the GET method. Note: No data is required.
+  return await callAuthApi({
+    path,
+    method: "GET",
+  });
+}
+
 export async function getPermissions(): Promise<any> {
   const path = `permissions`; // Adjust the endpoint path as needed.
 
@@ -114,6 +124,36 @@ interface CreateRolePayload {
 
 export async function createRole(payload: CreateRolePayload): Promise<any> {
   const path = `role/create`;
+
+  // Convert payload into FormData
+  const formData = new FormData();
+  formData.append("name", payload.name);
+  formData.append("user_id", payload.user_id);
+  formData.append("description", payload.description);
+  payload.permission.forEach((perm) => {
+    formData.append("permission[]", perm);
+  });
+
+  // Call the API without setting Content-Type header manually.
+  return await callAuthApi({
+    path,
+    method: "POST",
+    data: formData,
+  });
+}
+
+interface UpdateRolePayload {
+  name: string;
+  user_id: string;
+  description: string;
+  permission: string[];
+}
+
+export async function updateRole(
+  id: number,
+  payload: UpdateRolePayload
+): Promise<any> {
+  const path = `role/update/${id}`;
 
   // Convert payload into FormData
   const formData = new FormData();
