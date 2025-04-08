@@ -22,14 +22,6 @@ import FilterButton from "../../components/FilterButton/FilterButton";
 import CreateNewRole from "../../components/CreateNewRole/CreateNewRole";
 import { getRoles } from "../../../../apis/uac";
 
-const userData = Array.from({ length: 12 }, (_, index) => ({
-  id: index + 1,
-  user: "Srikanth",
-  phone: "9676099099",
-  email: "srikanthalapudi@hotmail.com",
-  avatarUrl: `https://i.pravatar.cc/150?img=${index + 1}`,
-}));
-
 const RoleManagement: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [roles, setRoles] = useState<any[]>();
@@ -95,7 +87,7 @@ const RoleManagement: React.FC = () => {
           }}
         >
           <FilterButton />
-          <CreateNewRole />
+          <CreateNewRole fetchRoles={fetchRoles} />
         </Box>
       </Box>
 
@@ -125,8 +117,7 @@ const RoleManagement: React.FC = () => {
                 <Checkbox />
               </TableCell>
               <TableCell sx={{ fontSize: "14px" }}>User</TableCell>
-              <TableCell sx={{ fontSize: "14px" }}>Phone</TableCell>
-              <TableCell sx={{ fontSize: "14px" }}>Email</TableCell>
+              <TableCell sx={{ fontSize: "14px" }}>description</TableCell>
               <TableCell align="center" sx={{ fontSize: "14px" }}>
                 Actions
               </TableCell>
@@ -142,14 +133,13 @@ const RoleManagement: React.FC = () => {
                   <Box
                     sx={{ display: "flex", alignItems: "center", gap: "8px" }}
                   >
-                    <Avatar src={user.avatarUrl} alt={user.user} />
+                    <Avatar src={user.user_images?.url} alt={user.user} />
                     <Typography sx={{ fontSize: "14px" }}>
                       {user.user}
                     </Typography>
                   </Box>
                 </TableCell>
-                <TableCell sx={{ fontSize: "14px" }}>{user.phone}</TableCell>
-                <TableCell sx={{ fontSize: "14px" }}>{user.email}</TableCell>
+                <TableCell sx={{ fontSize: "14px" }}>{user.description}</TableCell>
 
                 <TableCell align="center">
                   <IconButton>
@@ -176,7 +166,7 @@ const RoleManagement: React.FC = () => {
         }}
       >
         <PaginationComponent
-          totalCount={userData.length}
+          totalCount={roles?.length || 0}
           page={currentPage}
           onPageChange={handlePageChange}
         />
