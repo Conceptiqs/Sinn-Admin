@@ -27,12 +27,11 @@ import {
   getRole,
 } from "../../../../apis/uac";
 import { toast } from "react-toastify";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined"; // Import Edit Icon
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 
-// Types for individual permission actions.
+// Permission action keys.
 type PermissionKey = "read" | "write" | "edit" | "view";
-
-// Permission categories that are returned by your API.
+// Permission categories returned by the API.
 type PermissionCategory =
   | "customer"
   | "doctor"
@@ -44,98 +43,81 @@ type PermissionCategory =
   | "role"
   | "notification";
 
-// Each permission detail stores the original API name and whether it’s checked.
+// Each permission detail stores its id, its original name, and whether it's checked.
 type PermissionDetail = {
+  id: number;
   checked: boolean;
   name: string;
 };
 
-// The Permissions state groups each category into a map of actions.
+// Permissions state groups each category into a map of actions.
 type Permissions = {
   [key in PermissionCategory]?: { [key in PermissionKey]?: PermissionDetail };
 };
 
-// Define the Role interface. Adjust fields as needed.
+// The Role interface; getRole() returns the full details including rolePermissions.
 interface Role {
   id: number;
   name: string;
   user_id: string;
   description: string;
-  permission: string[]; // e.g. [ "doctor-read", "user-write", ... ]
+  rolePermissions: { [key: string]: number };
+  user:any;
 }
 
 interface Props {
   fetchRoles: () => Promise<void>;
-  role: Role;
+  roleId: number;
 }
 
-const UpdateRole: React.FC<Props> = ({ fetchRoles, role }) => {
+const UpdateRole: React.FC<Props> = ({ fetchRoles, roleId }) => {
+  // Modal state.
   const [open, setOpen] = useState(false);
+  // Users list.
   const [users, setUsers] = useState<any[]>([]);
+  // Loading states.
   const [loading, setLoading] = useState<boolean>(false);
   const [initialLoading, setInitialLoading] = useState<boolean>(false);
-  const [data, setData] = useState();
-
-  // Form state initialized from role prop when the modal opens.
+  // The freshly fetched role data.
+  const [data, setData] = useState<Role | null>(null);
+  // Form state.
   const [selectedUser, setSelectedUser] = useState<string>("");
   const [roleName, setRoleName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-
-  // Permissions state stores the API permissions along with their original names.
+  // Permissions state.
   const [permissions, setPermissions] = useState<Permissions>({});
 
-  // When the modal opens, load the initial values from the role prop.
-  useEffect(() => {
-    if (open) {
-      setSelectedUser(role.user_id);
-      setRoleName(role.name);
-      setDescription(role.description);
-    }
-  }, [open, role]);
-
-  const fetchRole = useCallback(async () => {
+  // A single loadData function to fetch role details, users and permissions.
+  const loadData = useCallback(async () => {
     if (!open) return;
     try {
       setInitialLoading(true);
-      const response = await getRole(role.id);
-      if (response.success) {
-        setData(response.data);
+
+      // Fetch full role details.
+      const roleRes = await getRole(roleId);
+      let roleData: Role | null = null;
+      if (roleRes.success) {
+        roleData = roleRes.data;
+        setData(roleData);
+        // Initialize form fields.
+        setSelectedUser(roleData?.user?.id.toString());
+        setRoleName(roleData?.user.name);
+        setDescription(roleData?.user.description || "");
       }
-    } catch (error) {
-      console.error("Failed to fetch users:", error);
-    } finally {
-      setInitialLoading(false);
-    }
-  }, [open]);
 
-  // Fetch users for the Select field.
-  const fetchUsers = useCallback(async () => {
-    if (!open) return;
-    try {
-      setInitialLoading(true);
-      const response = await getUsers();
-      if (response.success) {
-        setUsers(response.data);
+      // Fetch users.
+      const usersRes = await getUsers();
+      if (usersRes.success) {
+        setUsers(usersRes.data);
       }
-    } catch (error) {
-      console.error("Failed to fetch users:", error);
-    } finally {
-      setInitialLoading(false);
-    }
-  }, [open]);
 
-  // Fetch permissions from the API and mark those already assigned in the role prop.
-  const fetchPermissions = useCallback(async () => {
-    if (!open) return;
-    try {
-      setInitialLoading(true);
-      const response = await getPermissions();
-      if (response.success) {
-        const apiData = response.data;
+      // Fetch available permissions.
+      const permRes = await getPermissions();
+      if (permRes.success) {
+        const apiData = permRes.data;
         const newPermissions: Permissions = {};
         const validActions: PermissionKey[] = ["read", "write", "edit", "view"];
-
-        // Process each category from the API response.
+        // Build permission map per category.
         Object.keys(apiData).forEach((category) => {
           if (
             [
@@ -157,22 +139,26 @@ const UpdateRole: React.FC<Props> = ({ fetchRoles, role }) => {
               if (parts.length === 2) {
                 const action = parts[1] as PermissionKey;
                 if (validActions.includes(action)) {
-                  permissionMap[action] = { checked: false, name: perm.name };
+                  permissionMap[action] = {
+                    id: perm.id,
+                    checked: false,
+                    name: perm.name,
+                  };
                 }
               }
             });
             newPermissions[category as PermissionCategory] = permissionMap;
           }
         });
-
-        // Mark the permissions that exist on the role as checked.
-        if (role && Array.isArray(role.permission)) {
+        // Mark permissions as checked based on roleData.rolePermissions.
+        const rolePerms = roleData?.rolePermissions;
+        if (rolePerms) {
           Object.keys(newPermissions).forEach((category) => {
             const permMap = newPermissions[category as PermissionCategory];
             if (permMap) {
               Object.keys(permMap).forEach((action) => {
                 const detail = permMap[action as PermissionKey];
-                if (detail && role.permission.includes(detail.name)) {
+                if (detail && rolePerms.hasOwnProperty(detail.id.toString())) {
                   permMap[action as PermissionKey] = {
                     ...detail,
                     checked: true,
@@ -185,21 +171,20 @@ const UpdateRole: React.FC<Props> = ({ fetchRoles, role }) => {
         setPermissions(newPermissions);
       }
     } catch (error) {
-      console.error("Failed to fetch permissions:", error);
+      console.error("Error loading data:", error);
     } finally {
       setInitialLoading(false);
     }
-  }, [open, role]);
+  }, [open, roleId]);
 
+  // When modal opens, call loadData once.
   useEffect(() => {
     if (open) {
-      fetchUsers();
-      fetchRole()
-      fetchPermissions();
+      loadData();
     }
-  }, [open, fetchUsers, fetchPermissions]);
+  }, [open, loadData]);
 
-  // Toggle the checked state of an individual permission.
+  // Toggle permission check state.
   const handlePermissionChange = (
     category: PermissionCategory,
     key: PermissionKey
@@ -216,12 +201,14 @@ const UpdateRole: React.FC<Props> = ({ fetchRoles, role }) => {
     }));
   };
 
-  // Reset the form to the initial values from the role prop.
+  // Reset form fields and re-load permissions.
   const resetForm = () => {
-    setSelectedUser(role.user_id);
-    setRoleName(role.name);
-    setDescription(role.description);
-    fetchPermissions();
+    if (data) {
+      setSelectedUser(data.user.id.toString());
+      setRoleName(data.user.name);
+      setDescription(data.user.description || "");
+    }
+    loadData();
   };
 
   const handleClose = () => {
@@ -231,7 +218,7 @@ const UpdateRole: React.FC<Props> = ({ fetchRoles, role }) => {
     }
   };
 
-  // On submit compile the selected permission names and call updateRole.
+  // On submit, compile the checked permissions and call updateRole.
   const handleSubmit = async () => {
     if (!selectedUser || !roleName) {
       toast.error("Please fill in all required fields (User and Role Name).");
@@ -253,7 +240,7 @@ const UpdateRole: React.FC<Props> = ({ fetchRoles, role }) => {
         description,
         permission: selectedPermissions,
       };
-      await updateRole(role.id, payload);
+      await updateRole(roleId, payload);
       toast.success("Role updated successfully!");
       await fetchRoles();
       handleClose();
@@ -271,7 +258,7 @@ const UpdateRole: React.FC<Props> = ({ fetchRoles, role }) => {
   return (
     <>
       <IconButton onClick={() => setOpen(true)}>
-        <EditOutlinedIcon /> {/* Edit Icon */}
+        <EditOutlinedIcon />
       </IconButton>
 
       <Modal open={open} onClose={handleClose}>

@@ -22,6 +22,7 @@ import FilterButton from "../../components/FilterButton/FilterButton";
 import CreateNewRole from "../../components/CreateNewRole/CreateNewRole";
 import { getRoles } from "../../../../apis/uac";
 import UpdateRole from "../../components/CreateNewRole/UpdateRole";
+import DeleteRole from "../../components/CreateNewRole/DeleteRole";
 
 const RoleManagement: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -143,10 +144,8 @@ const RoleManagement: React.FC = () => {
                 <TableCell sx={{ fontSize: "14px" }}>{role.description}</TableCell>
 
                 <TableCell align="center">
-                  <IconButton>
-                    <DeleteOutlineOutlinedIcon />
-                  </IconButton>
-                  <UpdateRole role={role} fetchRoles={fetchRoles} />
+                  <DeleteRole role={role} fetchRoles={fetchRoles}  />
+                  <UpdateRole roleId={role.id} fetchRoles={fetchRoles} />
                 </TableCell>
               </TableRow>
             ))}

@@ -171,3 +171,13 @@ export async function updateRole(
     data: formData,
   });
 }
+
+export async function deleteRole(id: number): Promise<any> {
+  const path = `role/delete/${id}`;
+
+  // Call the API without setting Content-Type header manually.
+  return await callAuthApi({
+    path,
+    method: "POST",
+  });
+}
