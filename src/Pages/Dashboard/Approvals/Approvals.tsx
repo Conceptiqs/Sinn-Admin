@@ -21,7 +21,7 @@ const Approvals: React.FC = () => {
         </Typography>
         <Box sx={{ display: "flex", gap: "8px" }}>
           <FilterButton />
-          <ExportButton />
+          <ExportButton data={[]} />
         </Box>
       </Box>
       {/* Breadcrumbs Section */}

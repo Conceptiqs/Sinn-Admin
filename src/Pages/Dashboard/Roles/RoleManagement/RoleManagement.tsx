@@ -119,6 +119,7 @@ const RoleManagement: React.FC = () => {
                 <Checkbox />
               </TableCell>
               <TableCell sx={{ fontSize: "14px" }}>User</TableCell>
+              <TableCell sx={{ fontSize: "14px" }}>Roles</TableCell>
               <TableCell sx={{ fontSize: "14px" }}>description</TableCell>
               <TableCell align="center" sx={{ fontSize: "14px" }}>
                 Actions
@@ -137,14 +138,21 @@ const RoleManagement: React.FC = () => {
                   >
                     <Avatar src={role.user_images?.url} alt={role.user} />
                     <Typography sx={{ fontSize: "14px" }}>
-                      {role.user}
+                      {role.name}
                     </Typography>
                   </Box>
                 </TableCell>
-                <TableCell sx={{ fontSize: "14px" }}>{role.description}</TableCell>
+                <TableCell sx={{ fontSize: "14px" }}>
+                  {role.roles
+                    ?.map((item: { name: string }) => item.name)
+                    ?.join(", ")}
+                </TableCell>
+                <TableCell sx={{ fontSize: "14px" }}>
+                  {role.description}
+                </TableCell>
 
-                <TableCell align="center">
-                  <DeleteRole role={role} fetchRoles={fetchRoles}  />
+                <TableCell width={100} align="center">
+                  <DeleteRole role={role} fetchRoles={fetchRoles} />
                   <UpdateRole roleId={role.id} fetchRoles={fetchRoles} />
                 </TableCell>
               </TableRow>

@@ -98,7 +98,15 @@ const Doctors: React.FC = () => {
         <Box sx={{ display: "flex", gap: "8px" }}>
           <FilterButton />
           <SendNotificationModal type="doctor" />
-          <ExportButton />
+          <ExportButton
+            data={doctors?.map((doctor) => ({
+              name: doctor.name,
+              email: doctor.email,
+              dob: doctor.dob,
+              gender: doctor.gender,
+            }))}
+            fileName="doctors.csv"
+          />
         </Box>
       </Box>
 

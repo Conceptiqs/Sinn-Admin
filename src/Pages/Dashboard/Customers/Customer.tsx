@@ -101,7 +101,17 @@ const Customers: React.FC = () => {
         >
           <FilterButton />
           <SendNotificationModal type="customer" />
-          <ExportButton />
+          <ExportButton
+            data={customers?.map((customer) => ({
+              name: customer.name,
+              mobile: customer.mobile,
+              email: customer.email,
+              dob: customer.dob,
+              gender: customer.gender,
+              location: customer.location,
+            }))}
+            fileName="customers.csv"
+          />
         </Box>
       </Box>
 
