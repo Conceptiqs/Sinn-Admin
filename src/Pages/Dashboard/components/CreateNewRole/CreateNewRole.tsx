@@ -23,9 +23,8 @@ import { Close, AddCircleOutline } from "@mui/icons-material";
 import { createRole, getPermissions, getUsers } from "../../../../apis/uac";
 import { toast } from "react-toastify";
 
-// Define the available permission actions.
 type PermissionKey = "read" | "write" | "edit" | "view";
-// Categories reflect the keys from your API response.
+
 type PermissionCategory =
   | "customer"
   | "doctor"
@@ -37,14 +36,11 @@ type PermissionCategory =
   | "role"
   | "notification";
 
-// Each permission detail now contains the original permission name and a checked flag.
 type PermissionDetail = {
   checked: boolean;
   name: string;
 };
 
-// The state shape: for each category, store an object mapping each action (if available)
-// to its corresponding PermissionDetail.
 type Permissions = {
   [key in PermissionCategory]?: { [key in PermissionKey]?: PermissionDetail };
 };
@@ -57,17 +53,18 @@ const CreateNewRole: React.FC<Props> = ({ fetchRoles }) => {
   const [open, setOpen] = useState(false);
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [initialLoading, setInitialLoading] = useState<boolean>(false);
 
-  // State for form fields.
   const [selectedUser, setSelectedUser] = useState<string>("");
   const [roleName, setRoleName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
 
-  // Fetch users for the Select field.
+  const [permissions, setPermissions] = useState<Permissions>({});
+
   const fetchUsers = useCallback(async () => {
     if (!open) return;
     try {
-      setLoading(true);
+      setInitialLoading(true);
       const response = await getUsers();
       if (response.success) {
         setUsers(response.data);
@@ -75,28 +72,20 @@ const CreateNewRole: React.FC<Props> = ({ fetchRoles }) => {
     } catch (error) {
       console.error("Failed to fetch users:", error);
     } finally {
-      setLoading(false);
+      setInitialLoading(false);
     }
   }, [open]);
-
-  useEffect(() => {
-    fetchUsers();
-  }, [open, fetchUsers]);
-
-  // Permissions state built from API, each permission stores its original name.
-  const [permissions, setPermissions] = useState<Permissions>({});
 
   const fetchPermissions = useCallback(async () => {
     if (!open) return;
     try {
-      setLoading(true);
+      setInitialLoading(true);
       const response = await getPermissions();
       if (response.success) {
         const apiData = response.data;
         const newPermissions: Permissions = {};
         const validActions: PermissionKey[] = ["read", "write", "edit", "view"];
 
-        // Loop through each category in the API response.
         Object.keys(apiData).forEach((category) => {
           if (
             [
@@ -111,11 +100,9 @@ const CreateNewRole: React.FC<Props> = ({ fetchRoles }) => {
               "notification",
             ].includes(category)
           ) {
-            // Build a map for permissions within this category.
             const permissionMap: { [key in PermissionKey]?: PermissionDetail } =
               {};
-            (apiData as any)[category].forEach((perm: any) => {
-              // Assuming permission names are formatted like "user-read" etc.
+            apiData[category].forEach((perm: any) => {
               const parts = perm.name.split("-");
               if (parts.length === 2) {
                 const action = parts[1] as PermissionKey;
@@ -127,20 +114,23 @@ const CreateNewRole: React.FC<Props> = ({ fetchRoles }) => {
             newPermissions[category as PermissionCategory] = permissionMap;
           }
         });
+
         setPermissions(newPermissions);
       }
     } catch (error) {
       console.error("Failed to fetch permissions:", error);
     } finally {
-      setLoading(false);
+      setInitialLoading(false);
     }
   }, [open]);
 
   useEffect(() => {
-    fetchPermissions();
-  }, [open, fetchPermissions]);
+    if (open) {
+      fetchUsers();
+      fetchPermissions();
+    }
+  }, [open, fetchUsers, fetchPermissions]);
 
-  // Toggle a permission's checked state while preserving its name.
   const handlePermissionChange = (
     category: PermissionCategory,
     key: PermissionKey
@@ -157,7 +147,6 @@ const CreateNewRole: React.FC<Props> = ({ fetchRoles }) => {
     }));
   };
 
-  // Reset form fields and reload permissions.
   const resetForm = () => {
     setSelectedUser("");
     setRoleName("");
@@ -172,22 +161,18 @@ const CreateNewRole: React.FC<Props> = ({ fetchRoles }) => {
     }
   };
 
-  // Compile the list of permission names (from API, e.g. "user-read") for submission.
   const handleSubmit = async () => {
     if (!selectedUser || !roleName) {
       toast.error("Please fill in all required fields (User and Role Name).");
       return;
     }
     const selectedPermissions: string[] = [];
-    Object.entries(permissions).forEach(([category, actions]) => {
+    Object.entries(permissions).forEach(([_, actions]) => {
       if (!actions) return;
-      Object.entries(actions).forEach(([action, detail]) => {
-        if (detail && detail.checked) {
-          selectedPermissions.push(detail.name);
-        }
+      Object.values(actions).forEach((detail) => {
+        if (detail.checked) selectedPermissions.push(detail.name);
       });
     });
-    console.log("Selected Permissions:", selectedPermissions);
 
     setLoading(true);
     try {
@@ -209,7 +194,6 @@ const CreateNewRole: React.FC<Props> = ({ fetchRoles }) => {
     }
   };
 
-  // Responsive breakpoints for Modal dimensions.
   const isMobile = useMediaQuery("(max-width:600px)");
   const isTablet = useMediaQuery("(max-width:900px)");
 
@@ -243,166 +227,190 @@ const CreateNewRole: React.FC<Props> = ({ fetchRoles }) => {
             overflow: "auto",
           }}
         >
-          <IconButton
-            onClick={handleClose}
-            sx={{ position: "absolute", top: 8, right: 8, color: "grey.500" }}
-            disabled={loading}
-          >
-            <Close />
-          </IconButton>
-
-          <Button
-            variant="text"
-            sx={{
-              fontSize: 20,
-              textTransform: "none",
-              color: "black",
-              display: "flex",
-              alignItems: "center",
-              gap: 1,
-              mb: 2,
-            }}
-            startIcon={<AddCircleOutline sx={{ color: "green" }} />}
-            disableRipple
-          >
-            Create New Role
-          </Button>
-
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: isMobile ? "column" : "row",
-              gap: 2,
-            }}
-          >
-            <Box sx={{ flex: 1 }}>
-              <Typography variant="body2">
-                Select User <span style={{ color: "red" }}>*</span>
-              </Typography>
-              <Select
-                fullWidth
-                size="small"
-                value={selectedUser}
-                onChange={(e) => setSelectedUser(e.target.value)}
+          {initialLoading ? (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                minHeight: 300,
+              }}
+            >
+              <CircularProgress size={40} />
+            </Box>
+          ) : (
+            <>
+              <IconButton
+                onClick={handleClose}
+                sx={{
+                  position: "absolute",
+                  top: 8,
+                  right: 8,
+                  color: "grey.500",
+                }}
                 disabled={loading}
               >
-                <MenuItem value="">Select</MenuItem>
-                {users.map((user) => (
-                  <MenuItem key={user.id} value={user.id}>
-                    {user.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </Box>
-            <Box sx={{ flex: 1 }}>
-              <Typography variant="body2">
-                Role Name <span style={{ color: "red" }}>*</span>
-              </Typography>
-              <TextField
-                fullWidth
-                placeholder="Enter role name"
-                variant="outlined"
-                size="small"
-                value={roleName}
-                onChange={(e) => setRoleName(e.target.value)}
-                disabled={loading}
-              />
-            </Box>
-          </Box>
+                <Close />
+              </IconButton>
 
-          <Box sx={{ mt: 2 }}>
-            <Typography variant="body2">
-              Description <span style={{ color: "red" }}>*</span>
-            </Typography>
-            <TextField
-              fullWidth
-              placeholder="Enter description"
-              variant="outlined"
-              size="small"
-              multiline
-              rows={3}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              disabled={loading}
-            />
-          </Box>
+              <Button
+                variant="text"
+                sx={{
+                  fontSize: 20,
+                  textTransform: "none",
+                  color: "black",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  mb: 2,
+                }}
+                startIcon={<AddCircleOutline sx={{ color: "green" }} />}
+                disableRipple
+              >
+                Create New Role
+              </Button>
 
-          {/* Render the permissions table using names from the API response */}
-          <TableContainer component={Paper} sx={{ mt: 2 }}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Nav Name</TableCell>
-                  <TableCell>Read</TableCell>
-                  <TableCell>Write</TableCell>
-                  <TableCell>Edit</TableCell>
-                  <TableCell>View</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {Object.entries(permissions).map(([category, actions]) => {
-                  if (!actions) return null;
-                  return (
-                    <TableRow key={category}>
-                      <TableCell sx={{ textTransform: "capitalize" }}>
-                        {category}
-                      </TableCell>
-                      {(
-                        ["read", "write", "edit", "view"] as PermissionKey[]
-                      ).map((action) => (
-                        <TableCell key={action}>
-                          <Checkbox
-                            checked={actions[action]?.checked || false}
-                            onChange={() =>
-                              handlePermissionChange(
-                                category as PermissionCategory,
-                                action
-                              )
-                            }
-                            sx={{
-                              color: "green",
-                              "&.Mui-checked": { color: "green" },
-                            }}
-                            disabled={loading}
-                          />
-                        </TableCell>
-                      ))}
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: isMobile ? "column" : "row",
+                  gap: 2,
+                }}
+              >
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="body2">
+                    Select User <span style={{ color: "red" }}>*</span>
+                  </Typography>
+                  <Select
+                    fullWidth
+                    size="small"
+                    value={selectedUser}
+                    onChange={(e) => setSelectedUser(e.target.value)}
+                    disabled={loading}
+                  >
+                    <MenuItem value="">Select</MenuItem>
+                    {users.map((user) => (
+                      <MenuItem key={user.id} value={user.id}>
+                        {user.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </Box>
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="body2">
+                    Role Name <span style={{ color: "red" }}>*</span>
+                  </Typography>
+                  <TextField
+                    fullWidth
+                    placeholder="Enter role name"
+                    variant="outlined"
+                    size="small"
+                    value={roleName}
+                    onChange={(e) => setRoleName(e.target.value)}
+                    disabled={loading}
+                  />
+                </Box>
+              </Box>
+
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="body2">
+                  Description <span style={{ color: "red" }}>*</span>
+                </Typography>
+                <TextField
+                  fullWidth
+                  placeholder="Enter description"
+                  variant="outlined"
+                  size="small"
+                  multiline
+                  rows={3}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  disabled={loading}
+                />
+              </Box>
+
+              <TableContainer component={Paper} sx={{ mt: 2 }}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Nav Name</TableCell>
+                      <TableCell>Read</TableCell>
+                      <TableCell>Write</TableCell>
+                      <TableCell>Edit</TableCell>
+                      <TableCell>View</TableCell>
                     </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                  </TableHead>
+                  <TableBody>
+                    {Object.entries(permissions).map(([category, actions]) => {
+                      if (!actions) return null;
+                      return (
+                        <TableRow key={category}>
+                          <TableCell sx={{ textTransform: "capitalize" }}>
+                            {category}
+                          </TableCell>
+                          {(
+                            ["read", "write", "edit", "view"] as PermissionKey[]
+                          ).map((action) => (
+                            <TableCell key={action}>
+                              <Checkbox
+                                checked={actions[action]?.checked || false}
+                                onChange={() =>
+                                  handlePermissionChange(
+                                    category as PermissionCategory,
+                                    action
+                                  )
+                                }
+                                sx={{
+                                  color: "green",
+                                  "&.Mui-checked": { color: "green" },
+                                }}
+                                disabled={loading}
+                              />
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </TableContainer>
 
-          <Box
-            sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 3 }}
-          >
-            <Button
-              variant="contained"
-              onClick={handleSubmit}
-              sx={{
-                backgroundColor: "#1A2338",
-                color: "#fff",
-                textTransform: "none",
-              }}
-              disabled={loading}
-              startIcon={
-                loading ? (
-                  <CircularProgress size={18} color="inherit" />
-                ) : undefined
-              }
-            >
-              {loading ? "Saving..." : "Submit"}
-            </Button>
-            <Button
-              variant="outlined"
-              onClick={resetForm}
-              disabled={loading}
-              sx={{ textTransform: "none" }}
-            >
-              Reset
-            </Button>
-          </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  gap: 2,
+                  mt: 3,
+                }}
+              >
+                <Button
+                  variant="contained"
+                  onClick={handleSubmit}
+                  sx={{
+                    backgroundColor: "#1A2338",
+                    color: "#fff",
+                    textTransform: "none",
+                  }}
+                  disabled={loading}
+                  startIcon={
+                    loading ? (
+                      <CircularProgress size={18} color="inherit" />
+                    ) : undefined
+                  }
+                >
+                  {loading ? "Saving..." : "Submit"}
+                </Button>
+                <Button
+                  variant="outlined"
+                  onClick={resetForm}
+                  disabled={loading}
+                  sx={{ textTransform: "none" }}
+                >
+                  Reset
+                </Button>
+              </Box>
+            </>
+          )}
         </Box>
       </Modal>
     </>
