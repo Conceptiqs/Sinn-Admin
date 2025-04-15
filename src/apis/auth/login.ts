@@ -31,3 +31,60 @@ export const login = async (
     throw error;
   }
 };
+
+export const forgotPasswordApi = async (number: string): Promise<any> => {
+  const url = `${baseUrl}forgot-password`;
+  const form = new FormData();
+  form.append("number", number);
+  const options: RequestInit = {
+    method: "POST",
+    body: form,
+  };
+
+  const response = await fetch(url, options);
+  if (!response.ok) {
+    throw new Error(`HTTP error! Status: ${response.status}`);
+  }
+  return await response.json();
+};
+
+export const verifyOtpApi = async (number: string, otp: string): Promise<any> => {
+  const url = `${baseUrl}admin-number-verification`;
+  const form = new FormData();
+  form.append("number", number);
+  form.append("otp", otp);
+  const options: RequestInit = {
+    method: "POST",
+    body: form,
+  };
+
+  const response = await fetch(url, options);
+  if (!response.ok) {
+    throw new Error(`HTTP error! Status: ${response.status}`);
+  }
+  return await response.json();
+};
+
+export const resetPasswordApi = async (
+  number: string,
+  otp: string,
+  newPassword: string,
+  newPasswordConfirmation: string
+): Promise<any> => {
+  const url = `${baseUrl}reset-password`;
+  const form = new FormData();
+  form.append("number", number);
+  form.append("otp", otp);
+  form.append("new_password", newPassword);
+  form.append("new_password_confirmation", newPasswordConfirmation);
+  const options: RequestInit = {
+    method: "POST",
+    body: form,
+  };
+
+  const response = await fetch(url, options);
+  if (!response.ok) {
+    throw new Error(`HTTP error! Status: ${response.status}`);
+  }
+  return await response.json();
+};

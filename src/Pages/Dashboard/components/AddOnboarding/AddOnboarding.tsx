@@ -166,7 +166,7 @@ const AddOnboarding: React.FC<Props> = ({ fetchOnboardings, activeTab }) => {
             >
               <CloudUploadIcon fontSize="large" color="action" />
               <Typography variant="body2" sx={{ mt: 1, color: "#888" }}>
-                Upload Image
+                Upload Image {`(430 width x 1000 height & max 2MB)`}
               </Typography>
               <input
                 ref={fileRef}

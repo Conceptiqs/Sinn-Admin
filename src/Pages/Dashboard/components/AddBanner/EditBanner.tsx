@@ -170,7 +170,7 @@ const EditBanner: React.FC<Props> = ({ fetchBanners, activeTab, banner }) => {
             >
               <CloudUploadIcon fontSize="large" color="action" />
               <Typography variant="body2" sx={{ mt: 1, color: "#888" }}>
-                Upload Banner Image
+                Upload Banner Image {`(430 width x 1000 height & max 2MB)`}
               </Typography>
               <input
                 ref={fileRef}
