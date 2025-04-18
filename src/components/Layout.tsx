@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Box, Toolbar, useMediaQuery } from "@mui/material";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 
 const Layout: React.FC = () => {
-  const location = useLocation();
-  console.log(location.state)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const isMobile = useMediaQuery((theme: any) => theme.breakpoints.down("sm"));
 
@@ -29,7 +27,6 @@ const Layout: React.FC = () => {
       <Sidebar
         isOpen={isSidebarOpen}
         onClose={handleSidebarClose}
-        permissions={location.state}
       />
       <Box
         component="main"

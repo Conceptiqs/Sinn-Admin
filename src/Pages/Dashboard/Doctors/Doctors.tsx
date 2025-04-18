@@ -18,9 +18,9 @@ import {
 } from "@mui/material";
 import {
   VisibilityOutlined as ViewIcon,
-  DeleteOutlineOutlined as DeleteIcon,
   Dashboard as DashboardIcon,
 } from "@mui/icons-material";
+
 import PaginationComponent from "../components/Pagination/PaginationComponent";
 import FilterButton from "../components/FilterButton/FilterButton";
 import ExportButton from "../components/ExportButton/ExportButton";
@@ -35,6 +35,12 @@ const Doctors: React.FC = () => {
   const [selectedDoctorIds, setSelectedDoctorIds] = useState<number[]>([]);
   const itemsPerPage = 10;
   const navigate = useNavigate();
+
+  // Get permissions from localStorage
+  const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
+  const permissionNames = permissions.map((p: any) => p.name);
+
+  const hasPermission = (perm: string) => permissionNames.includes(perm);
 
   const fetchDoctors = useCallback(async () => {
     try {
@@ -51,8 +57,12 @@ const Doctors: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    fetchDoctors();
-  }, []);
+    if (hasPermission("doctor-read")) {
+      fetchDoctors();
+    } else {
+      setLoading(false);
+    }
+  }, [fetchDoctors]);
 
   const isAllSelected =
     doctors.length > 0 && selectedDoctorIds.length === doctors.length;
@@ -72,6 +82,7 @@ const Doctors: React.FC = () => {
   const handlePageChange = (e: React.ChangeEvent<unknown>, value: number) => {
     setCurrentPage(value);
   };
+
   const handleViewDoctor = (id: number) => {
     navigate(`/doctor/${id}`);
   };
@@ -92,6 +103,16 @@ const Doctors: React.FC = () => {
         }}
       >
         <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (!hasPermission("doctor-read")) {
+    return (
+      <Box p={4}>
+        <Typography variant="h6" color="error">
+          You do not have permission to view this page.
+        </Typography>
       </Box>
     );
   }
@@ -117,16 +138,20 @@ const Doctors: React.FC = () => {
         </Typography>
         <Box sx={{ display: "flex", gap: "8px" }}>
           <FilterButton />
-          <SendNotificationModal type="doctor" userIds={selectedDoctorIds} />
-          <ExportButton
-            data={doctors?.map((doctor) => ({
-              name: doctor.name,
-              email: doctor.email,
-              dob: doctor.dob,
-              gender: doctor.gender,
-            }))}
-            fileName="doctors.csv"
-          />
+          {hasPermission("notification-write") && (
+            <SendNotificationModal type="doctor" userIds={selectedDoctorIds} />
+          )}
+          {hasPermission("doctor-read") && (
+            <ExportButton
+              data={doctors?.map((doctor) => ({
+                name: doctor.name,
+                email: doctor.email,
+                dob: doctor.dob,
+                gender: doctor.gender,
+              }))}
+              fileName="doctors.csv"
+            />
+          )}
         </Box>
       </Box>
 
@@ -214,10 +239,14 @@ const Doctors: React.FC = () => {
                   </Typography>
                 </TableCell>
                 <TableCell align="center">
-                  <IconButton onClick={() => handleViewDoctor(doctor.id)}>
-                    <ViewIcon />
-                  </IconButton>
-                  <DeleteDoctor doctor={doctor} fetchDoctors={fetchDoctors} />
+                  {hasPermission("doctor-view") && (
+                    <IconButton onClick={() => handleViewDoctor(doctor.id)}>
+                      <ViewIcon />
+                    </IconButton>
+                  )}
+                  {hasPermission("doctor-edit") && (
+                    <DeleteDoctor doctor={doctor} fetchDoctors={fetchDoctors} />
+                  )}
                 </TableCell>
               </TableRow>
             ))}

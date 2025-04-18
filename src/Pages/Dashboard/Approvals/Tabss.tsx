@@ -28,6 +28,12 @@ const Tabss: React.FC = () => {
   const [loading, setLoading] = useState(false); // 🔹 Add loading state
   const itemsPerPage = 10;
 
+  // Get permissions from localStorage
+  const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
+  const permissionNames = permissions.map((p: any) => p.name);
+
+  const hasPermission = (perm: string) => permissionNames.includes(perm);
+
   useEffect(() => {
     const fetchApprovals = async () => {
       setLoading(true); // 🔹 Start loading
@@ -95,15 +101,17 @@ const Tabss: React.FC = () => {
             <TableCell>{person.dob}</TableCell>
             <TableCell>{person.gender}</TableCell>
             <TableCell align="center">
-              <IconButton
-                onClick={() =>
-                  navigate(`/doctor/${person.id}`, {
-                    state: { isApproval: true },
-                  })
-                }
-              >
-                <VisibilityOutlinedIcon />
-              </IconButton>
+              {hasPermission("approval-view") && (
+                <IconButton
+                  onClick={() =>
+                    navigate(`/doctor/${person.id}`, {
+                      state: { isApproval: true },
+                    })
+                  }
+                >
+                  <VisibilityOutlinedIcon />
+                </IconButton>
+              )}
             </TableCell>
           </TableRow>
         ))}

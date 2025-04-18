@@ -27,6 +27,12 @@ const Services: React.FC = () => {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState<boolean>(false); // 🔹 New loading state
 
+  // Get permissions from localStorage
+  const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
+  const permissionNames = permissions.map((p: any) => p.name);
+
+  const hasPermission = (perm: string) => permissionNames.includes(perm);
+
   const fetchServices = useCallback(async () => {
     setLoading(true); // 🔹 Start loading
     try {
@@ -69,7 +75,9 @@ const Services: React.FC = () => {
         <Typography variant="h5" fontWeight="bold" sx={{ fontSize: "18px" }}>
           Services
         </Typography>
-        <AddServiceButton fetchServices={fetchServices} />
+        {hasPermission("service-write") && (
+          <AddServiceButton fetchServices={fetchServices} />
+        )}
       </Box>
 
       {/* Breadcrumbs */}
@@ -126,14 +134,18 @@ const Services: React.FC = () => {
                   },
                 }}
               >
-                <DeleteServiceButton
-                  service={service}
-                  fetchServices={fetchServices}
-                />
-                <EditServiceButton
-                  service={service}
-                  fetchServices={fetchServices}
-                />
+                {hasPermission("service-edit") && (
+                  <DeleteServiceButton
+                    service={service}
+                    fetchServices={fetchServices}
+                  />
+                )}
+                {hasPermission("service-edit") && (
+                  <EditServiceButton
+                    service={service}
+                    fetchServices={fetchServices}
+                  />
+                )}
                 <CardMedia
                   component="img"
                   src={service.icon}

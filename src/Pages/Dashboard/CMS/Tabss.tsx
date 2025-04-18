@@ -50,6 +50,12 @@ const Tabss: React.FC = () => {
     doctorBanner: false,
   });
 
+  // Get permissions from localStorage
+  const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
+  const permissionNames = permissions.map((p: any) => p.name);
+
+  const hasPermission = (perm: string) => permissionNames.includes(perm);
+
   const data = activeTab === "customer" ? customerData : doctorData;
 
   const fetchCustomerBanner = useCallback(async () => {
@@ -166,7 +172,7 @@ const Tabss: React.FC = () => {
         <Typography variant="h6" fontWeight="bold">
           {title}
         </Typography>
-        {AddButton}
+        {hasPermission("cms-write") && AddButton}
       </Box>
 
       {isLoading ? (
@@ -214,43 +220,51 @@ const Tabss: React.FC = () => {
                   >
                     {title === "Onboarding" ? (
                       <>
-                        <EditOnboarding
-                          onboarding={item}
-                          fetchOnboardings={
-                            activeTab === "customer"
-                              ? fetchCustomerOnboarding
-                              : fetchDoctorOnboarding
-                          }
-                          activeTab={activeTab}
-                        />
-                        <DeleteOnBoarding
-                          onboarding={item}
-                          fetchOnBoardings={
-                            activeTab === "customer"
-                              ? fetchCustomerOnboarding
-                              : fetchDoctorOnboarding
-                          }
-                        />
+                        {hasPermission("cms-edit") && (
+                          <EditOnboarding
+                            onboarding={item}
+                            fetchOnboardings={
+                              activeTab === "customer"
+                                ? fetchCustomerOnboarding
+                                : fetchDoctorOnboarding
+                            }
+                            activeTab={activeTab}
+                          />
+                        )}
+                        {hasPermission("cms-edit") && (
+                          <DeleteOnBoarding
+                            onboarding={item}
+                            fetchOnBoardings={
+                              activeTab === "customer"
+                                ? fetchCustomerOnboarding
+                                : fetchDoctorOnboarding
+                            }
+                          />
+                        )}
                       </>
                     ) : (
                       <>
-                        <EditBanner
-                          banner={item}
-                          fetchBanners={
-                            activeTab === "customer"
-                              ? fetchCustomerBanner
-                              : fetchDoctorBanner
-                          }
-                          activeTab={activeTab}
-                        />
-                        <DeleteBanner
-                          banner={item}
-                          fetchBanners={
-                            activeTab === "customer"
-                              ? fetchCustomerBanner
-                              : fetchDoctorBanner
-                          }
-                        />
+                        {hasPermission("cms-edit") && (
+                          <EditBanner
+                            banner={item}
+                            fetchBanners={
+                              activeTab === "customer"
+                                ? fetchCustomerBanner
+                                : fetchDoctorBanner
+                            }
+                            activeTab={activeTab}
+                          />
+                        )}
+                        {hasPermission("cms-edit") && (
+                          <DeleteBanner
+                            banner={item}
+                            fetchBanners={
+                              activeTab === "customer"
+                                ? fetchCustomerBanner
+                                : fetchDoctorBanner
+                            }
+                          />
+                        )}
                       </>
                     )}
                   </Box>

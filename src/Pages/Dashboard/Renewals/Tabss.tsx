@@ -20,6 +20,12 @@ const Tabss: React.FC = () => {
   const [loading, setLoading] = useState(false); // 🔄 Loading state
   const itemsPerPage = 8;
 
+  // Get permissions from localStorage
+  const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
+  const permissionNames = permissions.map((p: any) => p.name);
+
+  const hasPermission = (perm: string) => permissionNames.includes(perm);
+
   const fetchRenewals = useCallback(async () => {
     try {
       setLoading(true); // Start loading
@@ -121,14 +127,17 @@ const Tabss: React.FC = () => {
                   </Box>
 
                   {/* Status */}
-                  {activeTab === 1 && parseInt(item.get_amount) <= 0 && (
-                    <AddCredits
-                      id={item.id}
-                      fetchRenewals={fetchRenewals}
-                      type="inactive"
-                    />
-                  )}
-                  {activeTab === 1 &&
+                  {hasPermission("revewal-edit") &&
+                    activeTab === 1 &&
+                    parseInt(item.get_amount) <= 0 && (
+                      <AddCredits
+                        id={item.id}
+                        fetchRenewals={fetchRenewals}
+                        type="inactive"
+                      />
+                    )}
+                  {hasPermission("revewal-view") &&
+                    activeTab === 1 &&
                     parseInt(item.get_amount) > 0 &&
                     parseInt(item.get_amount) <= 200 && (
                       <AddCredits
@@ -137,7 +146,9 @@ const Tabss: React.FC = () => {
                         type="renew"
                       />
                     )}
-                  {activeTab === 2 && <PaymentReceipt id={item.id} />}
+                  {hasPermission("revewal-edit") && activeTab === 2 && (
+                    <PaymentReceipt id={item.id} />
+                  )}
                 </Box>
               ))}
             </Box>

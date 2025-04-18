@@ -25,6 +25,12 @@ const BasicInfo: React.FC<{ doctor: any }> = ({ doctor }) => {
     theme.breakpoints.down("sm")
   );
 
+  // Get permissions from localStorage
+  const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
+  const permissionNames = permissions.map((p: any) => p.name);
+
+  const hasPermission = (perm: string) => permissionNames.includes(perm);
+
   // -- Approval state
   const [pending, setPending] = useState(false);
 
@@ -64,7 +70,7 @@ const BasicInfo: React.FC<{ doctor: any }> = ({ doctor }) => {
       toast.success(
         `Doctor ${type === 1 ? "accepted" : "rejected"} successfully!`
       );
-      navigate(`/approvals`);
+      navigate(`/doctors`);
     } catch (error) {
       console.error("Error updating approval:", error);
       toast.error("Failed to update approval. Please try again.");
@@ -273,7 +279,7 @@ const BasicInfo: React.FC<{ doctor: any }> = ({ doctor }) => {
             )
         )}
       </Box>
-      {location.state?.isApproval && (
+      {location.state?.isApproval && hasPermission("approval-edit") && (
         <Box
           sx={{
             display: "flex",

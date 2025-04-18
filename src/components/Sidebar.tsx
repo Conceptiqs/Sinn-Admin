@@ -5,10 +5,9 @@ import Navigation from "./SidebarNav/Navigation";
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
-  permissions: any;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, permissions }) => {
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const isMobile = useMediaQuery((theme: any) => theme.breakpoints.down("sm"));
 
   return (
@@ -40,7 +39,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, permissions }) => {
           flexDirection: "column",
         }}
       >
-        <Navigation onNavigate={onClose} permissions={permissions} />
+        <Navigation onNavigate={onClose} />
       </Box>
     </Drawer>
   );

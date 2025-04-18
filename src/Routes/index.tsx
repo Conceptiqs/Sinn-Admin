@@ -1,9 +1,14 @@
+// src/router/index.tsx
 import React from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
+import PermissionRoute from "../components/PermissionRoute";
+import Layout from "../components/Layout";
+
 import {
   Dashboard,
   Login,
   Doctors,
+  DoctorDetails,
   Customers,
   Approvals,
   Services,
@@ -12,10 +17,7 @@ import {
   UserManagement,
   RoleManagement,
   Notifications,
-  DoctorDetails,
 } from "../Pages/Exports";
-import Layout from "../components/Layout";
-import ProtectedRoute from "../components/ProtectedRoute";
 
 const router = createBrowserRouter([
   {
@@ -27,61 +29,101 @@ const router = createBrowserRouter([
     element: <Login />,
   },
   {
-    element: (
-      <ProtectedRoute>
-        <Layout />
-      </ProtectedRoute>
-    ), // Wrap Layout with ProtectedRoute to secure nested routes
+    element: <Layout />,
     children: [
+      // dashboard is open to everyone once “logged in”
       {
         path: "/dashboard",
         element: <Dashboard />,
       },
+
+      // all other pages require a corresponding "<type>-read" permission
       {
         path: "/doctors",
-        element: <Doctors />,
+        element: (
+          <PermissionRoute permission="doctor-read">
+            <Doctors />
+          </PermissionRoute>
+        ),
       },
       {
         path: "/doctor/:id",
-        element: <DoctorDetails />,
+        element: (
+          <PermissionRoute permission="doctor-view">
+            <DoctorDetails />
+          </PermissionRoute>
+        ),
       },
       {
         path: "/customers",
-        element: <Customers />,
+        element: (
+          <PermissionRoute permission="customer-read">
+            <Customers />
+          </PermissionRoute>
+        ),
       },
       {
         path: "/approvals",
-        element: <Approvals />,
+        element: (
+          <PermissionRoute permission="approval-read">
+            <Approvals />
+          </PermissionRoute>
+        ),
       },
       {
         path: "/services",
-        element: <Services />,
+        element: (
+          <PermissionRoute permission="service-read">
+            <Services />
+          </PermissionRoute>
+        ),
       },
       {
         path: "/renewals",
-        element: <Renewals />,
+        element: (
+          <PermissionRoute permission="revewal-read">
+            <Renewals />
+          </PermissionRoute>
+        ),
       },
       {
         path: "/cms",
-        element: <Cms />,
+        element: (
+          <PermissionRoute permission="cms-read">
+            <Cms />
+          </PermissionRoute>
+        ),
       },
       {
         path: "/roles/user-management",
-        element: <UserManagement />,
+        element: (
+          <PermissionRoute permission="user-read">
+            <UserManagement />
+          </PermissionRoute>
+        ),
       },
       {
         path: "/roles/role-management",
-        element: <RoleManagement />,
+        element: (
+          <PermissionRoute permission="role-read">
+            <RoleManagement />
+          </PermissionRoute>
+        ),
       },
       {
         path: "/notification",
-        element: <Notifications />,
+        element: (
+          <PermissionRoute permission="notification-read">
+            <Notifications />
+          </PermissionRoute>
+        ),
       },
     ],
   },
   {
     path: "*",
-    // element: <NotFound />,  // Optional custom 404 page
+    // you could render a custom 404 or redirect to /dashboard
+    element: <Navigate to="/dashboard" replace />,
   },
 ]);
 

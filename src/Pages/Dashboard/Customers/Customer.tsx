@@ -30,6 +30,12 @@ const Customers: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const itemsPerPage = 10;
 
+  // Get permissions from localStorage
+  const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
+  const permissionNames = permissions.map((p: any) => p.name);
+
+  const hasPermission = (perm: string) => permissionNames.includes(perm);
+
   const fetchCustomers = useCallback(async () => {
     setLoading(true);
     try {
@@ -116,21 +122,25 @@ const Customers: React.FC = () => {
           }}
         >
           <FilterButton />
-          <SendNotificationModal
-            type="customer"
-            userIds={selectedCustomerIds}
-          />
-          <ExportButton
-            data={customers?.map((customer) => ({
-              name: customer.name,
-              mobile: customer.mobile,
-              email: customer.email,
-              dob: customer.dob,
-              gender: customer.gender,
-              location: customer.location,
-            }))}
-            fileName="customers.csv"
-          />
+          {hasPermission("notification-write") && (
+            <SendNotificationModal
+              type="customer"
+              userIds={selectedCustomerIds}
+            />
+          )}
+          {hasPermission("customer-read") && (
+            <ExportButton
+              data={customers?.map((customer) => ({
+                name: customer.name,
+                mobile: customer.mobile,
+                email: customer.email,
+                dob: customer.dob,
+                gender: customer.gender,
+                location: customer.location,
+              }))}
+              fileName="customers.csv"
+            />
+          )}
         </Box>
       </Box>
 
@@ -231,10 +241,12 @@ const Customers: React.FC = () => {
                         {customer.location}
                       </TableCell>
                       <TableCell align="center">
-                        <DeleteCustomer
-                          customer={customer}
-                          fetchCustomers={fetchCustomers}
-                        />
+                        {hasPermission("customer-edit") && (
+                          <DeleteCustomer
+                            customer={customer}
+                            fetchCustomers={fetchCustomers}
+                          />
+                        )}
                       </TableCell>
                     </TableRow>
                   );

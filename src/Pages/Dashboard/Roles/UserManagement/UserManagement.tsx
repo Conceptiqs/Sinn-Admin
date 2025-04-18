@@ -33,6 +33,12 @@ const UserManagement: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const itemsPerPage = 10;
 
+  // Get permissions from localStorage
+  const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
+  const permissionNames = permissions.map((p: any) => p.name);
+
+  const hasPermission = (perm: string) => permissionNames.includes(perm);
+
   const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
@@ -95,7 +101,7 @@ const UserManagement: React.FC = () => {
           }}
         >
           <FilterButton />
-          <AddUser fetchUsers={fetchUsers} />
+          {hasPermission("user-write") && <AddUser fetchUsers={fetchUsers} />}
         </Box>
       </Box>
 
@@ -173,8 +179,12 @@ const UserManagement: React.FC = () => {
                       {user.email}
                     </TableCell>
                     <TableCell align="center">
-                      <DeleteUser user={user} fetchUsers={fetchUsers} />
-                      <EditUser user={user} fetchUsers={fetchUsers} />
+                      {hasPermission("user-edit") && (
+                        <DeleteUser user={user} fetchUsers={fetchUsers} />
+                      )}
+                      {hasPermission("user-edit") && (
+                        <EditUser user={user} fetchUsers={fetchUsers} />
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}

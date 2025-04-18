@@ -28,6 +28,11 @@ const RoleManagement: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [roles, setRoles] = useState<any[]>();
   const itemsPerPage = 10;
+  // Get permissions from localStorage
+  const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
+  const permissionNames = permissions.map((p: any) => p.name);
+
+  const hasPermission = (perm: string) => permissionNames.includes(perm);
 
   const fetchRoles = useCallback(async () => {
     try {
@@ -89,7 +94,9 @@ const RoleManagement: React.FC = () => {
           }}
         >
           <FilterButton />
-          <CreateNewRole fetchRoles={fetchRoles} />
+          {hasPermission("role-write") && (
+            <CreateNewRole fetchRoles={fetchRoles} />
+          )}
         </Box>
       </Box>
 
@@ -152,8 +159,12 @@ const RoleManagement: React.FC = () => {
                 </TableCell>
 
                 <TableCell width={100} align="center">
-                  <DeleteRole role={role} fetchRoles={fetchRoles} />
-                  <UpdateRole roleId={role.id} fetchRoles={fetchRoles} />
+                  {hasPermission("role-edit") && (
+                    <DeleteRole role={role} fetchRoles={fetchRoles} />
+                  )}
+                  {hasPermission("role-edit") && (
+                    <UpdateRole roleId={role.id} fetchRoles={fetchRoles} />
+                  )}
                 </TableCell>
               </TableRow>
             ))}
