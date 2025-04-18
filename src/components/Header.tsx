@@ -106,9 +106,6 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle }) => {
               {/* Hide on mobile */}
               {!isMobile && (
                 <>
-                  <IconButton>
-                    <SettingsIcon />
-                  </IconButton>
                   <IconButton onClick={() => navigate("/notification")}>
                     <NotificationsIcon />
                   </IconButton>

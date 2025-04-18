@@ -1,46 +1,46 @@
-import React from 'react';
-import { Drawer, Box, useMediaQuery } from '@mui/material';
-import Navigation from './SidebarNav/Navigation'; // Import the Navigation component
+import React from "react";
+import { Drawer, Box, useMediaQuery } from "@mui/material";
+import Navigation from "./SidebarNav/Navigation";
 
 interface SidebarProps {
   isOpen: boolean;
-  onClose: () => void; // Add onClose as a prop
+  onClose: () => void;
+  permissions: any;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
-  const isMobile = useMediaQuery((theme: any) => theme.breakpoints.down('sm')); // Check if the screen is small (mobile)
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, permissions }) => {
+  const isMobile = useMediaQuery((theme: any) => theme.breakpoints.down("sm"));
 
   return (
     <Drawer
-      variant={isMobile ? 'temporary' : 'persistent'} // Switch between temporary and persistent drawer based on screen size
+      variant={isMobile ? "temporary" : "persistent"}
       anchor="left"
       open={isOpen}
-      onClose={onClose} // Close drawer when clicking outside
+      onClose={onClose}
       sx={{
         width: 280,
         flexShrink: 0,
-        '& .MuiDrawer-paper': {
+        "& .MuiDrawer-paper": {
           width: 280,
-          overflowX: 'hidden', // Ensure no horizontal scrollbar in the Drawer
+          overflowX: "hidden",
         },
       }}
       ModalProps={{
-        keepMounted: true, // Improves performance on mobile by not unmounting the Drawer
+        keepMounted: true,
       }}
     >
       <Box
         sx={{
-          width: '100%', // Ensure the width matches the Drawer width
-          backgroundColor: 'white',
-          paddingTop: '80px', // Move content down from the top
-          overflow: 'hidden', // Hide any overflow content
-          height: '100%', // Ensure the height of the Box fills the Drawer
-          display: 'flex',
-          flexDirection: 'column',
+          width: "100%",
+          backgroundColor: "white",
+          paddingTop: "80px",
+          overflow: "hidden",
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
         }}
       >
-        {/* Pass the onClose function to the Navigation component */}
-        <Navigation onNavigate={onClose} />
+        <Navigation onNavigate={onClose} permissions={permissions} />
       </Box>
     </Drawer>
   );

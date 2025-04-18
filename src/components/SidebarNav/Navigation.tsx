@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   List,
   ListItemIcon,
   ListItemText,
   ListItemButton,
   Collapse,
-} from '@mui/material';
+} from "@mui/material";
 import {
   Dashboard as DashboardIcon,
   People as PeopleIcon,
@@ -17,14 +17,15 @@ import {
   Notifications as NotificationsIcon,
   ExpandLess as ExpandLessIcon,
   ExpandMore as ExpandMoreIcon,
-} from '@mui/icons-material';
-import { Link } from 'react-router-dom';
+} from "@mui/icons-material";
+import { Link } from "react-router-dom";
 
 interface NavigationProps {
   onNavigate: () => void; // Function to close the sidebar on navigation
+  permissions: any;
 }
 
-const Navigation: React.FC<NavigationProps> = ({ onNavigate }) => {
+const Navigation: React.FC<NavigationProps> = ({ onNavigate,permissions }) => {
   const [openRoles, setOpenRoles] = useState(false);
 
   // Toggle Roles & Permissions submenu
@@ -34,13 +35,13 @@ const Navigation: React.FC<NavigationProps> = ({ onNavigate }) => {
 
   // List of navigation links (excluding Notifications)
   const navigationLinks = [
-    { label: 'Dashboard', path: '/dashboard', icon: <DashboardIcon /> },
-    { label: 'Doctors', path: '/doctors', icon: <PeopleIcon /> },
-    { label: 'Customers', path: '/customers', icon: <PeopleIcon /> },
-    { label: 'Approvals', path: '/approvals', icon: <ApprovalIcon /> },
-    { label: 'Services', path: '/services', icon: <DesignServicesIcon /> },
-    { label: 'Renewals', path: '/renewals', icon: <AutorenewIcon /> },
-    { label: 'CMS', path: '/cms', icon: <WebIcon /> },
+    { label: "Dashboard", path: "/dashboard", icon: <DashboardIcon /> },
+    { label: "Doctors", path: "/doctors", icon: <PeopleIcon /> },
+    { label: "Customers", path: "/customers", icon: <PeopleIcon /> },
+    { label: "Approvals", path: "/approvals", icon: <ApprovalIcon /> },
+    { label: "Services", path: "/services", icon: <DesignServicesIcon /> },
+    { label: "Renewals", path: "/renewals", icon: <AutorenewIcon /> },
+    { label: "CMS", path: "/cms", icon: <WebIcon /> },
   ];
 
   return (

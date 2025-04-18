@@ -27,7 +27,7 @@ const Profile: React.FC = () => {
     <>
       <Tooltip title="Profile">
         <IconButton onClick={handleMenuOpen}>
-          <Avatar alt="User Profile" src="/path-to-avatar.jpg" />
+          <Avatar alt="X" />
         </IconButton>
       </Tooltip>
       <Menu

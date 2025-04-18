@@ -26,6 +26,7 @@ import DeleteCustomer from "./DeleteCustomer";
 const Customers: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [customers, setCustomers] = useState<any[]>([]);
+  const [selectedCustomerIds, setSelectedCustomerIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(false);
   const itemsPerPage = 10;
 
@@ -46,6 +47,21 @@ const Customers: React.FC = () => {
   useEffect(() => {
     fetchCustomers();
   }, []);
+
+  const isAllSelected =
+    customers.length > 0 && selectedCustomerIds.length === customers.length;
+
+  const handleSelectAll = () => {
+    setSelectedCustomerIds((prev) =>
+      prev.length === customers.length ? [] : customers.map((c) => c.id)
+    );
+  };
+
+  const handleCheckboxChange = (id: number) => {
+    setSelectedCustomerIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
 
   const handlePageChange = (
     event: React.ChangeEvent<unknown>,
@@ -100,7 +116,10 @@ const Customers: React.FC = () => {
           }}
         >
           <FilterButton />
-          <SendNotificationModal type="customer" />
+          <SendNotificationModal
+            type="customer"
+            userIds={selectedCustomerIds}
+          />
           <ExportButton
             data={customers?.map((customer) => ({
               name: customer.name,
@@ -144,8 +163,15 @@ const Customers: React.FC = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ fontSize: "14px" }}>
-                    <Checkbox />
+                  <TableCell sx={{ fontSize: "14px" }} padding="checkbox">
+                    <Checkbox
+                      indeterminate={
+                        selectedCustomerIds.length > 0 &&
+                        selectedCustomerIds.length < customers.length
+                      }
+                      checked={isAllSelected}
+                      onChange={handleSelectAll}
+                    />
                   </TableCell>
                   <TableCell sx={{ fontSize: "14px" }}>Name</TableCell>
                   <TableCell sx={{ fontSize: "14px" }}>Mobile</TableCell>
@@ -166,8 +192,11 @@ const Customers: React.FC = () => {
                   );
                   return (
                     <TableRow key={customer.id} hover>
-                      <TableCell>
-                        <Checkbox />
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          checked={selectedCustomerIds.includes(customer.id)}
+                          onChange={() => handleCheckboxChange(customer.id)}
+                        />
                       </TableCell>
                       <TableCell>
                         <Box

@@ -32,6 +32,7 @@ const Doctors: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [doctors, setDoctors] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [selectedDoctorIds, setSelectedDoctorIds] = useState<number[]>([]);
   const itemsPerPage = 10;
   const navigate = useNavigate();
 
@@ -53,9 +54,28 @@ const Doctors: React.FC = () => {
     fetchDoctors();
   }, []);
 
-  const handlePageChange = (e: React.ChangeEvent<unknown>, value: number) =>
+  const isAllSelected =
+    doctors.length > 0 && selectedDoctorIds.length === doctors.length;
+
+  const handleSelectAll = () => {
+    setSelectedDoctorIds((prev) =>
+      prev.length === doctors.length ? [] : doctors.map((doc) => doc.id)
+    );
+  };
+
+  const handleCheckboxChange = (id: number) => {
+    setSelectedDoctorIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
+
+  const handlePageChange = (e: React.ChangeEvent<unknown>, value: number) => {
     setCurrentPage(value);
-  const handleViewDoctor = (id: number) => navigate(`/doctor/${id}`);
+  };
+  const handleViewDoctor = (id: number) => {
+    navigate(`/doctor/${id}`);
+  };
+
   const paginatedDoctors = doctors.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -97,7 +117,7 @@ const Doctors: React.FC = () => {
         </Typography>
         <Box sx={{ display: "flex", gap: "8px" }}>
           <FilterButton />
-          <SendNotificationModal type="doctor" />
+          <SendNotificationModal type="doctor" userIds={selectedDoctorIds} />
           <ExportButton
             data={doctors?.map((doctor) => ({
               name: doctor.name,
@@ -131,27 +151,35 @@ const Doctors: React.FC = () => {
         <Table>
           <TableHead>
             <TableRow>
-              {[
-                "",
-                "Name",
-                "Mobile",
-                "Email",
-                "DOB",
-                "Gender",
-                "Credit",
-                "Actions",
-              ].map((header, i) => (
-                <TableCell key={i} sx={{ fontSize: "14px" }}>
-                  {i === 0 ? <Checkbox /> : header}
-                </TableCell>
-              ))}
+              <TableCell sx={{ fontSize: "14px" }} padding="checkbox">
+                <Checkbox
+                  indeterminate={
+                    selectedDoctorIds.length > 0 &&
+                    selectedDoctorIds.length < doctors.length
+                  }
+                  checked={isAllSelected}
+                  onChange={handleSelectAll}
+                />
+              </TableCell>
+              <TableCell sx={{ fontSize: "14px" }}>Name</TableCell>
+              <TableCell sx={{ fontSize: "14px" }}>Mobile</TableCell>
+              <TableCell sx={{ fontSize: "14px" }}>Email</TableCell>
+              <TableCell sx={{ fontSize: "14px" }}>DOB</TableCell>
+              <TableCell sx={{ fontSize: "14px" }}>Gender</TableCell>
+              <TableCell sx={{ fontSize: "14px" }}>Credit</TableCell>
+              <TableCell align="center" sx={{ fontSize: "14px" }}>
+                Actions
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {paginatedDoctors.map((doctor) => (
               <TableRow key={doctor.id} hover>
-                <TableCell>
-                  <Checkbox />
+                <TableCell padding="checkbox">
+                  <Checkbox
+                    checked={selectedDoctorIds.includes(doctor.id)}
+                    onChange={() => handleCheckboxChange(doctor.id)}
+                  />
                 </TableCell>
                 <TableCell>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>

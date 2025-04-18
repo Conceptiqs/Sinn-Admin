@@ -47,3 +47,39 @@ export async function createNotification(
     data: formData,
   });
 }
+
+export interface SendNotificationPayload {
+  type: "customer" | "doctor";
+  title: string;
+  description: string;
+  userId: { user_id: number }[];
+}
+
+/**
+ * Sends a notification to one or more users.
+ *
+ * @param payload - An object containing:
+ *   - type: "customer" | "doctor"
+ *   - title: notification title
+ *   - description: notification body text
+ *   - userId: array of objects with a numeric `user_id` property
+ * @returns The parsed JSON response from the API.
+ * @throws An error if the response is not OK.
+ */
+export async function sendNotification(
+  payload: SendNotificationPayload
+): Promise<any> {
+  const path = `send-notification`;
+
+  const formData = new FormData();
+  formData.append("type", payload.type);
+  formData.append("title", payload.title);
+  formData.append("description", payload.description);
+  formData.append("userId", JSON.stringify(payload.userId));
+
+  return await callAuthApi({
+    path,
+    method: "POST",
+    data: formData,
+  });
+}
