@@ -18,11 +18,13 @@ export async function getApprovals(id: 1 | 2): Promise<any> {
 
 export async function updateApprovals(
   doctorId: number,
-  id: 1 | 2
+  type: 1 | 2,
+  message: string | number
 ): Promise<any> {
-  const path = `doctors/approve-reject/${doctorId}?type=${id}`; // Adjust the endpoint path as needed.
+  const path = `doctors/approve-reject/${doctorId}?type=${type}&message=${encodeURIComponent(
+    String(message)
+  )}`;
 
-  // Call the API with the GET method. Note: No data is required.
   return await callAuthApi({
     path,
     method: "POST",

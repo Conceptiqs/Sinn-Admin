@@ -9,32 +9,58 @@ import {
   Theme,
   Button,
   CircularProgress,
+  Modal,
+  TextField,
+  IconButton,
 } from "@mui/material";
-import { useLocation, useNavigate, useNavigation } from "react-router-dom";
+import { Close as CloseIcon } from "@mui/icons-material";
+import { useLocation, useNavigate } from "react-router-dom";
 import { updateApprovals } from "../../../../apis/approvals";
 import { toast } from "react-toastify";
 
-const BasicInfo = ({ doctor }: { doctor: any }) => {
+const BasicInfo: React.FC<{ doctor: any }> = ({ doctor }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useMediaQuery((theme: Theme) =>
     theme.breakpoints.down("sm")
   );
 
+  // -- Approval state
   const [pending, setPending] = useState(false);
 
+  // -- Modal state
+  const [openAccept, setOpenAccept] = useState(false);
+  const [openReject, setOpenReject] = useState(false);
+
+  // -- Inputs for modals
+  const [acceptValue, setAcceptValue] = useState<number | "">("");
+  const [rejectValue, setRejectValue] = useState<string>("");
+
+  // -- Media fetchers
   const nationalId = doctor.media?.find(
-    (item: { collection_name: string }) =>
-      item.collection_name === "national_ids"
+    (item: any) => item.collection_name === "national_ids"
   );
   const license = doctor.media?.find(
-    (item: { collection_name: string }) => item.collection_name === "licenses"
+    (item: any) => item.collection_name === "licenses"
   );
 
-  const handleUpdate = async (type: 1 | 2) => {
+  // -- Handlers
+  const handleOpenAccept = () => setOpenAccept(true);
+  const handleCloseAccept = () => {
+    setOpenAccept(false);
+    setAcceptValue("");
+  };
+
+  const handleOpenReject = () => setOpenReject(true);
+  const handleCloseReject = () => {
+    setOpenReject(false);
+    setRejectValue("");
+  };
+
+  const submitApproval = async (type: 1 | 2, message: number | string) => {
     try {
       setPending(true);
-      await updateApprovals(doctor.id, type);
+      await updateApprovals(doctor.id, type, message);
       toast.success(
         `Doctor ${type === 1 ? "accepted" : "rejected"} successfully!`
       );
@@ -45,6 +71,24 @@ const BasicInfo = ({ doctor }: { doctor: any }) => {
     } finally {
       setPending(false);
     }
+  };
+
+  const handleAccept = () => {
+    if (acceptValue === "" || isNaN(Number(acceptValue))) {
+      toast.error("Please enter a valid number.");
+      return;
+    }
+    submitApproval(1, Number(acceptValue));
+    handleCloseAccept();
+  };
+
+  const handleReject = () => {
+    if (!rejectValue.trim()) {
+      toast.error("Please enter a reason for rejection.");
+      return;
+    }
+    submitApproval(2, rejectValue.trim());
+    handleCloseReject();
   };
 
   return (
@@ -233,40 +277,149 @@ const BasicInfo = ({ doctor }: { doctor: any }) => {
         <Box
           sx={{
             display: "flex",
-            alignItems: "center",
+            gap: 2,
             justifyContent: "center",
-            gap: "20px",
-            marginTop: "40px",
+            mt: 4,
           }}
         >
           <Button
-            sx={{ borderRadius: "50px" }}
             variant="contained"
             color="success"
-            onClick={() => handleUpdate(1)}
+            onClick={handleOpenAccept}
             disabled={pending}
           >
-            {pending ? (
-              <CircularProgress size={20} sx={{ color: "#fff" }} />
+            {pending && openAccept ? (
+              <CircularProgress size={20} color="inherit" />
             ) : (
               "Accept"
             )}
           </Button>
+
           <Button
-            sx={{ borderRadius: "50px" }}
             variant="contained"
             color="error"
-            onClick={() => handleUpdate(2)}
+            onClick={handleOpenReject}
             disabled={pending}
           >
-            {pending ? (
-              <CircularProgress size={20} sx={{ color: "#fff" }} />
+            {pending && openReject ? (
+              <CircularProgress size={20} color="inherit" />
             ) : (
               "Reject"
             )}
           </Button>
         </Box>
       )}
+
+      {/* Accept Modal */}
+      <Modal open={openAccept} onClose={handleCloseAccept}>
+        <Box
+          sx={{
+            position: "absolute" as const,
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: isMobile ? "90%" : 400,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            borderRadius: 2,
+            p: 3,
+          }}
+        >
+          <IconButton
+            onClick={handleCloseAccept}
+            sx={{ position: "absolute", top: 8, right: 8 }}
+          >
+            <CloseIcon />
+          </IconButton>
+          <Typography variant="h6" gutterBottom>
+            Accept Doctor — Enter Credit
+          </Typography>
+          <TextField
+            fullWidth
+            label="Credit Amount"
+            type="text"
+            value={acceptValue}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (/^\d*$/.test(val)) {
+                setAcceptValue(Number(val));
+              }
+            }}
+            sx={{ mb: 2 }}
+          />
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <Button
+              variant="contained"
+              fullWidth
+              onClick={handleAccept}
+              disabled={pending}
+            >
+              {pending ? (
+                <CircularProgress size={20} color="inherit" />
+              ) : (
+                "Submit"
+              )}
+            </Button>
+            <Button fullWidth onClick={handleCloseAccept}>
+              Cancel
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
+
+      {/* Reject Modal */}
+      <Modal open={openReject} onClose={handleCloseReject}>
+        <Box
+          sx={{
+            position: "absolute" as const,
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: isMobile ? "90%" : 400,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            borderRadius: 2,
+            p: 3,
+          }}
+        >
+          <IconButton
+            onClick={handleCloseReject}
+            sx={{ position: "absolute", top: 8, right: 8 }}
+          >
+            <CloseIcon />
+          </IconButton>
+          <Typography variant="h6" gutterBottom>
+            Reject Doctor — Reason
+          </Typography>
+          <TextField
+            fullWidth
+            label="Rejection Reason"
+            multiline
+            rows={3}
+            value={rejectValue}
+            onChange={(e) => setRejectValue(e.target.value)}
+            sx={{ mb: 2 }}
+          />
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <Button
+              variant="contained"
+              fullWidth
+              color="error"
+              onClick={handleReject}
+              disabled={pending}
+            >
+              {pending ? (
+                <CircularProgress size={20} color="inherit" />
+              ) : (
+                "Submit"
+              )}
+            </Button>
+            <Button fullWidth onClick={handleCloseReject}>
+              Cancel
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
     </Box>
   );
 };
