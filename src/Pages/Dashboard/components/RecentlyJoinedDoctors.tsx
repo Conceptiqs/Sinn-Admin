@@ -2,36 +2,13 @@ import React from "react";
 import { Box, Typography, Button, Avatar } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
-interface Doctor {
-  id: number;
-  name: string;
-  dateJoined: string;
-  image: string;
-}
-
-const doctors: Doctor[] = [
-  {
-    id: 1,
-    name: "Dr. Riya Thomas",
-    dateJoined: "Joined on Jan 8, 2025",
-    image: "/images/doctor1.jpg",
-  },
-  {
-    id: 2,
-    name: "Dr. Riya Thomas",
-    dateJoined: "Joined on Jan 8, 2025",
-    image: "/images/doctor2.jpg",
-  },
-  {
-    id: 3,
-    name: "Dr. Riya Thomas",
-    dateJoined: "Joined on Jan 8, 2025",
-    image: "/images/doctor3.jpg",
-  },
-];
-
 const RecentlyJoinedDoctors: React.FC<{ doctors: any }> = ({ doctors }) => {
   const navigate = useNavigate();
+  // Get permissions from localStorage
+  const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
+  const permissionNames = permissions.map((p: any) => p.name);
+
+  const hasPermission = (perm: string) => permissionNames.includes(perm);
   return (
     <Box
       sx={{
@@ -71,51 +48,55 @@ const RecentlyJoinedDoctors: React.FC<{ doctors: any }> = ({ doctors }) => {
 
       {/* Doctors List */}
       <Box display="flex" flexDirection="column" gap={2}>
-        {doctors?.map((doctor: any) => {
-          const date = new Date(doctor.created_at);
-          const options: any = {
-            year: "numeric",
-            month: "long",
-            day: "2-digit",
-          };
-          const formatted = new Intl.DateTimeFormat("en-US", options).format(
-            date
-          );
-          return (
-            <Box
-              key={doctor.id}
-              display="flex"
-              alignItems="center"
-              sx={{
-                display: "flex",
-                padding: 1,
-                alignItems: "center",
-                background: "#f5f5f5",
-                borderRadius: 2,
-                boxShadow: "0 1px 4px rgba(0, 0, 0, 0.3)",
-                border: "3px solid white", // white border around each card
-                height: "50px", // Adjusting the height for a rectangular shape
-              }}
-            >
-              {/* Avatar */}
-              <Avatar
-                src={doctor.main_images?.url}
-                alt={doctor.name}
-                sx={{ width: 56, height: 56, marginRight: 2 }}
-              />
+        {hasPermission("doctor-read") ? (
+          doctors?.map((doctor: any) => {
+            const date = new Date(doctor.created_at);
+            const options: any = {
+              year: "numeric",
+              month: "long",
+              day: "2-digit",
+            };
+            const formatted = new Intl.DateTimeFormat("en-US", options).format(
+              date
+            );
+            return (
+              <Box
+                key={doctor.id}
+                display="flex"
+                alignItems="center"
+                sx={{
+                  display: "flex",
+                  padding: 1,
+                  alignItems: "center",
+                  background: "#f5f5f5",
+                  borderRadius: 2,
+                  boxShadow: "0 1px 4px rgba(0, 0, 0, 0.3)",
+                  border: "3px solid white", // white border around each card
+                  height: "50px", // Adjusting the height for a rectangular shape
+                }}
+              >
+                {/* Avatar */}
+                <Avatar
+                  src={doctor.main_images?.url}
+                  alt={doctor.name}
+                  sx={{ width: 56, height: 56, marginRight: 2 }}
+                />
 
-              {/* Text Content */}
-              <Box flex={1}>
-                <Typography variant="subtitle2" fontWeight="bold" noWrap>
-                  {doctor.name}
-                </Typography>
-                <Typography variant="body2" color="textSecondary" noWrap>
-                  Joined on {formatted}
-                </Typography>
+                {/* Text Content */}
+                <Box flex={1}>
+                  <Typography variant="subtitle2" fontWeight="bold" noWrap>
+                    {doctor.name}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary" noWrap>
+                    Joined on {formatted}
+                  </Typography>
+                </Box>
               </Box>
-            </Box>
-          );
-        })}
+            );
+          })
+        ) : (
+          <>No data!</>
+        )}
       </Box>
     </Box>
   );

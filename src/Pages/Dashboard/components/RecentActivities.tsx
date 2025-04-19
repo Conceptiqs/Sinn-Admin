@@ -14,6 +14,11 @@ import { useNavigate } from "react-router-dom";
 
 const RecentActivities: React.FC<{ activities: any }> = ({ activities }) => {
   const navigate = useNavigate();
+  // Get permissions from localStorage
+  const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
+  const permissionNames = permissions.map((p: any) => p.name);
+
+  const hasPermission = (perm: string) => permissionNames.includes(perm);
   return (
     <Box
       sx={{
@@ -61,48 +66,52 @@ const RecentActivities: React.FC<{ activities: any }> = ({ activities }) => {
 
       {/* Activities List */}
       <List sx={{ padding: 0 }}>
-        {activities?.map((activity: any) => (
-          <ListItem
-            key={activity.id}
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              background: "#f9f9f9",
-              borderRadius: "12px",
-              marginBottom: 1.5,
-              padding: "12px 16px",
-              boxShadow: "0 4px 10px rgba(0, 0, 0, 0.05)",
-            }}
-          >
-            <ListItemAvatar>
-              <Avatar
-                sx={{
-                  background: "#eff4fc",
-                  color: "#3a87f1",
-                  boxShadow: "0px 2px 8px rgba(58, 135, 241, 0.3)",
-                }}
-              >
-                <NotificationsActiveIcon fontSize="small" />
-              </Avatar>
-            </ListItemAvatar>
-            <ListItemText
-              primary={
-                <Typography
-                  variant="body2"
+        {hasPermission("notification-read") ? (
+          activities?.map((activity: any) => (
+            <ListItem
+              key={activity.id}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                background: "#f9f9f9",
+                borderRadius: "12px",
+                marginBottom: 1.5,
+                padding: "12px 16px",
+                boxShadow: "0 4px 10px rgba(0, 0, 0, 0.05)",
+              }}
+            >
+              <ListItemAvatar>
+                <Avatar
                   sx={{
-                    fontSize: "14px",
-                    fontWeight: "500",
-                    color: "#333333",
-                    lineHeight: "20px",
+                    background: "#eff4fc",
+                    color: "#3a87f1",
+                    boxShadow: "0px 2px 8px rgba(58, 135, 241, 0.3)",
                   }}
-                  noWrap
                 >
-                  {activity.short_description}
-                </Typography>
-              }
-            />
-          </ListItem>
-        ))}
+                  <NotificationsActiveIcon fontSize="small" />
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText
+                primary={
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      color: "#333333",
+                      lineHeight: "20px",
+                    }}
+                    noWrap
+                  >
+                    {activity.short_description}
+                  </Typography>
+                }
+              />
+            </ListItem>
+          ))
+        ) : (
+          <>No data!</>
+        )}
       </List>
     </Box>
   );

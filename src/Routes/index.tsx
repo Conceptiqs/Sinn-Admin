@@ -1,5 +1,3 @@
-// src/router/index.tsx
-import React from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import PermissionRoute from "../components/PermissionRoute";
 import Layout from "../components/Layout";
