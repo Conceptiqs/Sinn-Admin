@@ -52,10 +52,10 @@ const ExportButton: React.FC<ExportButtonProps> = ({
   return (
     <Button
       startIcon={<DownloadOutlinedIcon />}
-      variant="contained"
+      variant="outlined"
       sx={{
-        backgroundColor: "#1A2338",
-        color: "#fff",
+        borderColor: "#1A2338",
+        color: "#1A2338",
         textTransform: "none",
         fontSize: "14px",
         padding: "8px 16px",

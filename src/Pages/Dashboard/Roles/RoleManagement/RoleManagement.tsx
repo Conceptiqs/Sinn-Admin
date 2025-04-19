@@ -23,6 +23,7 @@ import CreateNewRole from "../../components/CreateNewRole/CreateNewRole";
 import { getRoles } from "../../../../apis/uac";
 import UpdateRole from "../../components/CreateNewRole/UpdateRole";
 import DeleteRole from "../../components/CreateNewRole/DeleteRole";
+import ExportButton from "../../components/ExportButton/ExportButton";
 
 const RoleManagement: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -94,6 +95,20 @@ const RoleManagement: React.FC = () => {
           }}
         >
           {/* <FilterButton /> */}
+          {hasPermission("role-read") && (
+            <ExportButton
+              data={
+                roles?.map((role) => ({
+                  name: role.name,
+                  roles: role.roles
+                    ?.map((item: { name: string }) => item.name)
+                    ?.join(", "),
+                  description: role.description,
+                })) || []
+              }
+              fileName="roles.csv"
+            />
+          )}
           {hasPermission("role-write") && (
             <CreateNewRole fetchRoles={fetchRoles} />
           )}
@@ -122,9 +137,9 @@ const RoleManagement: React.FC = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontSize: "14px" }}>
+              {/* <TableCell sx={{ fontSize: "14px" }}>
                 <Checkbox />
-              </TableCell>
+              </TableCell> */}
               <TableCell sx={{ fontSize: "14px" }}>User</TableCell>
               <TableCell sx={{ fontSize: "14px" }}>Roles</TableCell>
               <TableCell sx={{ fontSize: "14px" }}>description</TableCell>
@@ -136,9 +151,9 @@ const RoleManagement: React.FC = () => {
           <TableBody>
             {paginatedRoles?.map((role) => (
               <TableRow key={role.id} hover>
-                <TableCell>
+                {/* <TableCell>
                   <Checkbox />
-                </TableCell>
+                </TableCell> */}
                 <TableCell>
                   <Box
                     sx={{ display: "flex", alignItems: "center", gap: "8px" }}

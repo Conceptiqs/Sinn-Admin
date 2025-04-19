@@ -71,9 +71,9 @@ const Tabss: React.FC = () => {
     <Table>
       <TableHead>
         <TableRow>
-          <TableCell sx={{ fontSize: "14px" }}>
+          {/* <TableCell sx={{ fontSize: "14px" }}>
             <Checkbox />
-          </TableCell>
+          </TableCell> */}
           <TableCell sx={{ fontSize: "14px" }}>Name</TableCell>
           <TableCell sx={{ fontSize: "14px" }}>Mobile</TableCell>
           <TableCell sx={{ fontSize: "14px" }}>Email</TableCell>
@@ -87,9 +87,9 @@ const Tabss: React.FC = () => {
       <TableBody>
         {data.map((person) => (
           <TableRow key={person.id} hover>
-            <TableCell>
+            {/* <TableCell>
               <Checkbox />
-            </TableCell>
+            </TableCell> */}
             <TableCell>
               <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
                 <Avatar src={person.avatarUrl} alt={person.name} />

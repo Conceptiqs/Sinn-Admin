@@ -78,7 +78,7 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle }) => {
             {/* Icons Section */}
             <Box display="flex" alignItems="center" sx={{ ml: "auto" }}>
               {/* Search Box - Visible only on larger screens */}
-              <Box
+              {/* <Box
                 alignItems="center"
                 sx={{
                   display: { xs: "none", md: "flex" },
@@ -101,7 +101,7 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle }) => {
                     backgroundColor: "transparent",
                   }}
                 />
-              </Box>
+              </Box> */}
 
               {/* Hide on mobile */}
               {!isMobile && (

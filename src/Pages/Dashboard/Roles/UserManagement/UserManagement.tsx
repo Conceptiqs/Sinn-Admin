@@ -26,6 +26,7 @@ import AddUser from "../../components/AddUser/AddUser";
 import { getUsers } from "../../../../apis/uac";
 import DeleteUser from "../../components/AddUser/DeleteUser";
 import EditUser from "../../components/AddUser/EditUser";
+import ExportButton from "../../components/ExportButton/ExportButton";
 
 const UserManagement: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -101,6 +102,18 @@ const UserManagement: React.FC = () => {
           }}
         >
           {/* <FilterButton /> */}
+          {hasPermission("user-read") && (
+            <ExportButton
+              data={
+                users?.map((user) => ({
+                  name: user.name,
+                  mobile: user.mobile_no,
+                  email: user.email,
+                })) || []
+              }
+              fileName="users.csv"
+            />
+          )}
           {hasPermission("user-write") && <AddUser fetchUsers={fetchUsers} />}
         </Box>
       </Box>
@@ -141,9 +154,9 @@ const UserManagement: React.FC = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ fontSize: "14px" }}>
+                  {/* <TableCell sx={{ fontSize: "14px" }}>
                     <Checkbox />
-                  </TableCell>
+                  </TableCell> */}
                   <TableCell sx={{ fontSize: "14px" }}>User</TableCell>
                   <TableCell sx={{ fontSize: "14px" }}>Phone</TableCell>
                   <TableCell sx={{ fontSize: "14px" }}>Email</TableCell>
@@ -155,9 +168,9 @@ const UserManagement: React.FC = () => {
               <TableBody>
                 {paginatedUsers?.map((user) => (
                   <TableRow key={user.id} hover>
-                    <TableCell>
+                    {/* <TableCell>
                       <Checkbox />
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell>
                       <Box
                         sx={{
