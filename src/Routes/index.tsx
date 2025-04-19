@@ -16,6 +16,7 @@ import {
   RoleManagement,
   Notifications,
 } from "../Pages/Exports";
+import { PermissionsProvider } from "../context/permissions";
 
 const router = createBrowserRouter([
   {
@@ -27,7 +28,11 @@ const router = createBrowserRouter([
     element: <Login />,
   },
   {
-    element: <Layout />,
+    element: (
+      <PermissionsProvider>
+        <Layout />
+      </PermissionsProvider>
+    ),
     children: [
       // dashboard is open to everyone once “logged in”
       {

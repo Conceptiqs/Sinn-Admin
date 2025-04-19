@@ -23,6 +23,7 @@ import ExportButton from "../components/ExportButton/ExportButton";
 import SendNotificationModal from "../components/SendNotificationButton/SendNotificationModal";
 import { getCustomers } from "../../../apis/customers";
 import DeleteCustomer from "./DeleteCustomer";
+import { usePermissions } from "../../../context/permissions";
 
 const Customers: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -33,11 +34,7 @@ const Customers: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const itemsPerPage = 10;
 
-  // Get permissions from localStorage
-  const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
-  const permissionNames = permissions.map((p: any) => p.name);
-
-  const hasPermission = (perm: string) => permissionNames.includes(perm);
+  const { hasPermission } = usePermissions();
 
   const fetchCustomers = useCallback(async () => {
     setLoading(true);

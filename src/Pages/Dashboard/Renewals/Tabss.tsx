@@ -12,6 +12,7 @@ import {
 import { getRenewals } from "../../../apis/renewals";
 import AddCredits from "./AddCredits";
 import PaymentReceipt from "./PaymentReceipt";
+import { usePermissions } from "../../../context/permissions";
 
 const Tabss: React.FC = () => {
   const [activeTab, setActiveTab] = useState<1 | 2>(1);
@@ -20,11 +21,7 @@ const Tabss: React.FC = () => {
   const [loading, setLoading] = useState(false); // 🔄 Loading state
   const itemsPerPage = 8;
 
-  // Get permissions from localStorage
-  const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
-  const permissionNames = permissions.map((p: any) => p.name);
-
-  const hasPermission = (perm: string) => permissionNames.includes(perm);
+  const { hasPermission } = usePermissions();
 
   const fetchRenewals = useCallback(async () => {
     try {

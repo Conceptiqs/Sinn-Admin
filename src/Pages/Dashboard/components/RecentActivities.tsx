@@ -11,14 +11,11 @@ import {
 } from "@mui/material";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import { useNavigate } from "react-router-dom";
+import { usePermissions } from "../../../context/permissions";
 
 const RecentActivities: React.FC<{ activities: any }> = ({ activities }) => {
   const navigate = useNavigate();
-  // Get permissions from localStorage
-  const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
-  const permissionNames = permissions.map((p: any) => p.name);
-
-  const hasPermission = (perm: string) => permissionNames.includes(perm);
+  const { hasPermission } = usePermissions();
   return (
     <Box
       sx={{

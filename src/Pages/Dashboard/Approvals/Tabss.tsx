@@ -19,6 +19,7 @@ import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import PaginationComponent from "../components/Pagination/PaginationComponent";
 import { getApprovals } from "../../../apis/approvals";
 import { useNavigate } from "react-router-dom";
+import { usePermissions } from "../../../context/permissions";
 
 const Tabss: React.FC = () => {
   const navigate = useNavigate();
@@ -28,11 +29,7 @@ const Tabss: React.FC = () => {
   const [loading, setLoading] = useState(false); // 🔹 Add loading state
   const itemsPerPage = 10;
 
-  // Get permissions from localStorage
-  const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
-  const permissionNames = permissions.map((p: any) => p.name);
-
-  const hasPermission = (perm: string) => permissionNames.includes(perm);
+  const { hasPermission } = usePermissions();
 
   useEffect(() => {
     const fetchApprovals = async () => {

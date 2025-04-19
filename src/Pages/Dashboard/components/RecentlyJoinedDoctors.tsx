@@ -1,14 +1,11 @@
 import React from "react";
 import { Box, Typography, Button, Avatar } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { usePermissions } from "../../../context/permissions";
 
 const RecentlyJoinedDoctors: React.FC<{ doctors: any }> = ({ doctors }) => {
   const navigate = useNavigate();
-  // Get permissions from localStorage
-  const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
-  const permissionNames = permissions.map((p: any) => p.name);
-
-  const hasPermission = (perm: string) => permissionNames.includes(perm);
+  const { hasPermission } = usePermissions();
   return (
     <Box
       sx={{

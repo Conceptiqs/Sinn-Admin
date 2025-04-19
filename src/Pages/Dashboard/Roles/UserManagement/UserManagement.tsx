@@ -28,6 +28,7 @@ import { getUsers } from "../../../../apis/uac";
 import DeleteUser from "../../components/AddUser/DeleteUser";
 import EditUser from "../../components/AddUser/EditUser";
 import ExportButton from "../../components/ExportButton/ExportButton";
+import { usePermissions } from "../../../../context/permissions";
 
 const UserManagement: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -37,11 +38,7 @@ const UserManagement: React.FC = () => {
 
   const itemsPerPage = 10;
 
-  // Get permissions from localStorage
-  const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
-  const permissionNames = permissions.map((p: any) => p.name);
-
-  const hasPermission = (perm: string) => permissionNames.includes(perm);
+  const { hasPermission } = usePermissions();
 
   const fetchUsers = useCallback(async () => {
     try {

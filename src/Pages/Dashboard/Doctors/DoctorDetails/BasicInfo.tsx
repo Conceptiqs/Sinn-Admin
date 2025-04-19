@@ -17,6 +17,7 @@ import { Close as CloseIcon } from "@mui/icons-material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { updateApprovals } from "../../../../apis/approvals";
 import { toast } from "react-toastify";
+import { usePermissions } from "../../../../context/permissions";
 
 const BasicInfo: React.FC<{ doctor: any }> = ({ doctor }) => {
   const navigate = useNavigate();
@@ -25,11 +26,7 @@ const BasicInfo: React.FC<{ doctor: any }> = ({ doctor }) => {
     theme.breakpoints.down("sm")
   );
 
-  // Get permissions from localStorage
-  const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
-  const permissionNames = permissions.map((p: any) => p.name);
-
-  const hasPermission = (perm: string) => permissionNames.includes(perm);
+  const { hasPermission } = usePermissions();
 
   // -- Approval state
   const [pending, setPending] = useState(false);

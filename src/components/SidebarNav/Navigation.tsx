@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   List,
   ListItemIcon,
@@ -19,6 +19,7 @@ import {
   ExpandMore as ExpandMoreIcon,
 } from "@mui/icons-material";
 import { Link } from "react-router-dom";
+import { usePermissions } from "../../context/permissions";
 
 interface NavigationProps {
   onNavigate: () => void;
@@ -68,29 +69,18 @@ const allLinks: NavLink[] = [
 
 const Navigation: React.FC<NavigationProps> = ({ onNavigate }) => {
   const [openRoles, setOpenRoles] = useState(false);
-  const [perms, setPerms] = useState<Set<string>>(new Set());
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem("permissions");
-      if (!raw) return;
-      const arr: { name: string }[] = JSON.parse(raw);
-      setPerms(new Set(arr.map((p) => p.name)));
-    } catch {
-      // ignore parse errors
-    }
-  }, []);
+  const { hasPermission } = usePermissions();
 
   const visibleLinks = allLinks.filter((link) => {
     if (link.type === "dashboard") return true;
-    return link.type ? perms.has(`${link.type}-read`) : false;
+    return link.type ? hasPermission(`${link.type}-read`) : false;
   });
 
-  const showNotifications = perms.has("notification-read");
+  const showNotifications = hasPermission("notification-read");
 
   // Permissions for Roles & Permissions submenu
-  const canViewUserMgmt = perms.has("user-read");
-  const canViewRoleMgmt = perms.has("role-read");
+  const canViewUserMgmt = hasPermission("user-read");
+  const canViewRoleMgmt = hasPermission("role-read");
   const canViewRolesSection = canViewUserMgmt || canViewRoleMgmt;
 
   const handleRolesToggle = () => setOpenRoles((v) => !v);

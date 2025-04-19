@@ -25,6 +25,7 @@ import { getRoles } from "../../../../apis/uac";
 import UpdateRole from "../../components/CreateNewRole/UpdateRole";
 import DeleteRole from "../../components/CreateNewRole/DeleteRole";
 import ExportButton from "../../components/ExportButton/ExportButton";
+import { usePermissions } from "../../../../context/permissions";
 
 const RoleManagement: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -32,11 +33,7 @@ const RoleManagement: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const itemsPerPage = 10;
-  // Get permissions from localStorage
-  const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
-  const permissionNames = permissions.map((p: any) => p.name);
-
-  const hasPermission = (perm: string) => permissionNames.includes(perm);
+  const { hasPermission } = usePermissions();
 
   const fetchRoles = useCallback(async () => {
     try {

@@ -65,11 +65,6 @@ const Login: React.FC = () => {
       console.log("Login successful", response);
       if (response?.data?.token) {
         Cookies.set("token", response.data.token);
-        localStorage.setItem("name", response.data.name);
-        localStorage.setItem(
-          "permissions",
-          JSON.stringify(response.data?.["roles.permissions"])
-        );
         navigate("/dashboard", { state: response.data });
       } else {
         setError("Login failed: Invalid credentials.");

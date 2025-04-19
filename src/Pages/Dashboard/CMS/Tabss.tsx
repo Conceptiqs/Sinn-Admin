@@ -16,6 +16,7 @@ import EditBanner from "../components/AddBanner/EditBanner";
 import DeleteBanner from "../components/AddBanner/DeleteBanner";
 import EditOnboarding from "../components/AddOnboarding/EditOnboarding";
 import DeleteOnBoarding from "../components/AddOnboarding/DeleteOnBoarding";
+import { usePermissions } from "../../../context/permissions";
 
 interface CmsItem {
   id: number;
@@ -50,11 +51,7 @@ const Tabss: React.FC = () => {
     doctorBanner: false,
   });
 
-  // Get permissions from localStorage
-  const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
-  const permissionNames = permissions.map((p: any) => p.name);
-
-  const hasPermission = (perm: string) => permissionNames.includes(perm);
+  const { hasPermission } = usePermissions();
 
   const data = activeTab === "customer" ? customerData : doctorData;
 

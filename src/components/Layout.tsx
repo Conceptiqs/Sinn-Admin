@@ -24,10 +24,7 @@ const Layout: React.FC = () => {
 
   return (
     <Box sx={{ display: "flex", overflow: "hidden", width: "100%" }}>
-      <Sidebar
-        isOpen={isSidebarOpen}
-        onClose={handleSidebarClose}
-      />
+      <Sidebar isOpen={isSidebarOpen} onClose={handleSidebarClose} />
       <Box
         component="main"
         sx={{

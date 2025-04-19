@@ -18,8 +18,7 @@ const Profile: React.FC = () => {
   const handleLogout = () => {
     handleMenuClose();
     Cookies.remove("token");
-    localStorage.clear()
-    navigate("/login"); // Redirect to the login page
+    navigate("/login");
   };
 
   const isMenuOpen = Boolean(anchorEl);

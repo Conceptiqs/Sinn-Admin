@@ -15,6 +15,7 @@ import AddServiceButton from "../components/AddServiceButton/AddServiceButton";
 import { getServices } from "../../../apis/service";
 import EditServiceButton from "../components/AddServiceButton/EditServiceButton";
 import DeleteServiceButton from "../components/AddServiceButton/DeleteServiceButton";
+import { usePermissions } from "../../../context/permissions";
 
 interface Service {
   id: number;
@@ -27,11 +28,7 @@ const Services: React.FC = () => {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState<boolean>(false); // 🔹 New loading state
 
-  // Get permissions from localStorage
-  const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
-  const permissionNames = permissions.map((p: any) => p.name);
-
-  const hasPermission = (perm: string) => permissionNames.includes(perm);
+  const { hasPermission } = usePermissions();
 
   const fetchServices = useCallback(async () => {
     setLoading(true); // 🔹 Start loading

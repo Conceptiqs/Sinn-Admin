@@ -2,17 +2,14 @@ import React from "react";
 import { Box, Typography, Avatar, Chip, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import AddCredits from "../Renewals/AddCredits";
+import { usePermissions } from "../../../context/permissions";
 
 const RecentRenewals: React.FC<{ renewals: any; fetchDashboard: any }> = ({
   renewals,
   fetchDashboard,
 }) => {
   const navigate = useNavigate();
-  // Get permissions from localStorage
-  const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
-  const permissionNames = permissions.map((p: any) => p.name);
-
-  const hasPermission = (perm: string) => permissionNames.includes(perm);
+  const { hasPermission } = usePermissions();
 
   return (
     <Box

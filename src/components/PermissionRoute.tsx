@@ -1,6 +1,7 @@
 // src/components/PermissionRoute.tsx
 import React from "react";
 import { Navigate, useLocation } from "react-router-dom";
+import { usePermissions } from "../context/permissions";
 
 interface PermissionRouteProps {
   permission: string; // e.g. "doctor-read"
@@ -13,12 +14,10 @@ const PermissionRoute: React.FC<PermissionRouteProps> = ({
 }) => {
   const location = useLocation();
 
-  // load and parse your permissions array from localStorage
-  const raw = localStorage.getItem("permissions");
-  const perms: string[] = raw ? JSON.parse(raw).map((p: any) => p.name) : [];
+  const { hasPermission } = usePermissions();
 
   // if the user has the required read permission → render the page
-  if (perms.includes(permission)) {
+  if (hasPermission(permission)) {
     return <>{children}</>;
   }
 

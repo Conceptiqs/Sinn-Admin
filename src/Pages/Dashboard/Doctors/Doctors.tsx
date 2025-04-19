@@ -28,6 +28,7 @@ import ExportButton from "../components/ExportButton/ExportButton";
 import { getDoctors } from "../../../apis/doctors";
 import SendNotificationModal from "../components/SendNotificationButton/SendNotificationModal";
 import DeleteDoctor from "./DeleteDoctor";
+import { usePermissions } from "../../../context/permissions";
 
 const Doctors: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -39,11 +40,7 @@ const Doctors: React.FC = () => {
   const itemsPerPage = 10;
   const navigate = useNavigate();
 
-  // Get permissions from localStorage
-  const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
-  const permissionNames = permissions.map((p: any) => p.name);
-
-  const hasPermission = (perm: string) => permissionNames.includes(perm);
+  const { hasPermission } = usePermissions();
 
   const fetchDoctors = useCallback(async () => {
     try {
