@@ -22,7 +22,7 @@ import { useNavigate } from "react-router-dom";
 
 const Tabss: React.FC = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<1 | 2>(1);
+  const [activeTab, setActiveTab] = useState<0 | 2>(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [approvals, setApprovals] = useState<any[]>();
   const [loading, setLoading] = useState(false); // 🔹 Add loading state
@@ -50,8 +50,8 @@ const Tabss: React.FC = () => {
     fetchApprovals();
   }, [activeTab]);
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: 1 | 2) => {
-    setCurrentPage(1); // Reset to first page on tab change
+  const handleTabChange = (event: React.SyntheticEvent, newValue: 0 | 2) => {
+    setCurrentPage(0); // Reset to first page on tab change
     setActiveTab(newValue);
   };
 
@@ -127,7 +127,7 @@ const Tabss: React.FC = () => {
         indicatorColor="primary"
         aria-label="tabs"
       >
-        <Tab value={1} label="Approvals" sx={{ fontSize: "14px" }} />
+        <Tab value={0} label="Approvals" sx={{ fontSize: "14px" }} />
         <Tab value={2} label="Rejected" sx={{ fontSize: "14px" }} />
       </Tabs>
 
@@ -147,7 +147,7 @@ const Tabss: React.FC = () => {
             sx={{
               borderRadius: "16px",
               background:
-                activeTab === 1
+                activeTab === 0
                   ? "linear-gradient(160deg, #e0e5ec, #ffffff)"
                   : "linear-gradient(160deg, #ffcccc, #ffe0e0)",
               padding: 1,

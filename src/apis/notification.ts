@@ -71,15 +71,9 @@ export async function sendNotification(
 ): Promise<any> {
   const path = `send-notification`;
 
-  const formData = new FormData();
-  formData.append("type", payload.type);
-  formData.append("title", payload.title);
-  formData.append("description", payload.description);
-  formData.append("userId", JSON.stringify(payload.userId));
-
   return await callAuthApi({
     path,
     method: "POST",
-    data: formData,
+    payload,
   });
 }

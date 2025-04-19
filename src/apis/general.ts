@@ -6,6 +6,7 @@ interface ApiRequestParams {
   method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   headers?: Record<string, string>;
   data?: FormData;
+  payload?: any;
 }
 
 /**
@@ -22,6 +23,7 @@ export async function callAuthApi<T>({
   method,
   headers = {},
   data,
+  payload,
 }: ApiRequestParams): Promise<T> {
   // Retrieve the token from cookies
   const token = Cookies.get("token");
@@ -42,7 +44,7 @@ export async function callAuthApi<T>({
   const options: RequestInit = {
     method,
     headers: finalHeaders,
-    body: data,
+    body: data || JSON.stringify(payload),
   };
 
   const response = await fetch(`${baseUrl}${path}`, options);
