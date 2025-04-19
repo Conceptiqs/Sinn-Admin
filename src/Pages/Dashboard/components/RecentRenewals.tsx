@@ -1,9 +1,19 @@
 import React from "react";
 import { Box, Typography, Avatar, Chip, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import AddCredits from "../Renewals/AddCredits";
 
-const RecentRenewals: React.FC<{ renewals: any }> = ({ renewals }) => {
+const RecentRenewals: React.FC<{ renewals: any; fetchDashboard: any }> = ({
+  renewals,
+  fetchDashboard,
+}) => {
   const navigate = useNavigate();
+  // Get permissions from localStorage
+  const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
+  const permissionNames = permissions.map((p: any) => p.name);
+
+  const hasPermission = (perm: string) => permissionNames.includes(perm);
+
   return (
     <Box
       sx={{
@@ -83,12 +93,23 @@ const RecentRenewals: React.FC<{ renewals: any }> = ({ renewals }) => {
             </Box>
 
             {/* Status */}
-            <Chip
-              label={renewal.status ? "Renew" : "Inactive"}
-              color="error"
-              size="small"
-              sx={{ fontWeight: "bold", marginLeft: "auto" }}
-            />
+            {hasPermission("revewal-edit") &&
+              parseInt(renewal.get_amount) <= 0 && (
+                <AddCredits
+                  id={renewal.id}
+                  fetchRenewals={fetchDashboard}
+                  type="inactive"
+                />
+              )}
+            {hasPermission("revewal-view") &&
+              parseInt(renewal.get_amount) > 0 &&
+              parseInt(renewal.get_amount) <= 200 && (
+                <AddCredits
+                  id={renewal.id}
+                  fetchRenewals={fetchDashboard}
+                  type="renew"
+                />
+              )}
           </Box>
         ))}
       </Box>

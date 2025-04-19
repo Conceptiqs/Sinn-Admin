@@ -67,7 +67,7 @@ const Dashboard: React.FC = () => {
           <Label />
           <StatsCards data={data} />
           <EarningsChart />
-          <RecentRenewals renewals={data?.recentRevewal} />
+          <RecentRenewals renewals={data?.recentRevewal} fetchDashboard={fetchDashboard} />
         </Grid>
 
         {/* Right Column */}
