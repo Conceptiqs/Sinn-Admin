@@ -6,7 +6,6 @@ import {
   Typography,
   Avatar,
   Pagination,
-  Chip,
   CircularProgress,
 } from "@mui/material";
 import { getRenewals } from "../../../apis/renewals";

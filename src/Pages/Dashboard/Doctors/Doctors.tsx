@@ -23,7 +23,7 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 
 import PaginationComponent from "../components/Pagination/PaginationComponent";
-import FilterButton from "../components/FilterButton/FilterButton";
+// import FilterButton from "../components/FilterButton/FilterButton";
 import ExportButton from "../components/ExportButton/ExportButton";
 import { getDoctors } from "../../../apis/doctors";
 import SendNotificationModal from "../components/SendNotificationButton/SendNotificationModal";

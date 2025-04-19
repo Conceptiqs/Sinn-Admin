@@ -7,8 +7,8 @@ import {
   useMediaQuery,
   ThemeProvider,
 } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
-import SettingsIcon from "@mui/icons-material/Settings";
+// import SearchIcon from "@mui/icons-material/Search";
+// import SettingsIcon from "@mui/icons-material/Settings";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import { logoImage, sinnlabel } from "../assets";
 import { MenuIcon } from "../assets";

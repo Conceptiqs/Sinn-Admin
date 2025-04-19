@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography, Avatar, Chip, Button } from "@mui/material";
+import { Box, Typography, Avatar, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import AddCredits from "../Renewals/AddCredits";
 import { usePermissions } from "../../../context/permissions";

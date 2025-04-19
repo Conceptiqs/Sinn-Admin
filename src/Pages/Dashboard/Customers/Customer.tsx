@@ -18,7 +18,7 @@ import SearchIcon from "@mui/icons-material/Search";
 
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import PaginationComponent from "../components/Pagination/PaginationComponent";
-import FilterButton from "../components/FilterButton/FilterButton";
+// import FilterButton from "../components/FilterButton/FilterButton";
 import ExportButton from "../components/ExportButton/ExportButton";
 import SendNotificationModal from "../components/SendNotificationButton/SendNotificationModal";
 import { getCustomers } from "../../../apis/customers";
