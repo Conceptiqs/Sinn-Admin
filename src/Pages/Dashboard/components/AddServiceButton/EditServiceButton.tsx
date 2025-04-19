@@ -205,7 +205,7 @@ const EditServiceButton: React.FC<Props> = ({ service, fetchServices }) => {
                 variant="body2"
                 sx={{ color: "#888", fontWeight: "normal" }}
               >
-                Upload New Image
+                Upload New Image  {`(max 2MB)`}
               </Typography>
               <input
                 ref={fileRef}

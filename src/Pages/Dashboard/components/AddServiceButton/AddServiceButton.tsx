@@ -182,7 +182,7 @@ const AddServiceButton = ({ fetchServices }: Props) => {
                   fontWeight: "normal",
                 }}
               >
-                Upload Image
+                Upload Image {`(max 2MB)`}
               </Typography>
               <input
                 ref={fileRef}
@@ -262,20 +262,7 @@ const AddServiceButton = ({ fetchServices }: Props) => {
               }}
               onClick={handleSubmit}
             >
-              {pending ? (
-                <CircularProgress
-                  size={20}
-                  sx={{
-                    color: "#fff",
-                    position: "absolute",
-                    left: "50%",
-                    top: "50%",
-                    transform: "translate(-50%, -50%)",
-                  }}
-                />
-              ) : (
-                "Submit"
-              )}
+              {pending ? <CircularProgress size={20} /> : "Submit"}
             </Button>
 
             <Button
