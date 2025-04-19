@@ -227,9 +227,11 @@ const Customers: React.FC = () => {
                   <TableCell sx={{ fontSize: "14px" }}>DOB</TableCell>
                   <TableCell sx={{ fontSize: "14px" }}>Gender</TableCell>
                   <TableCell sx={{ fontSize: "14px" }}>Location</TableCell>
-                  <TableCell align="center" sx={{ fontSize: "14px" }}>
-                    Actions
-                  </TableCell>
+                  {hasPermission("customer-edit") && (
+                    <TableCell align="center" sx={{ fontSize: "14px" }}>
+                      Actions
+                    </TableCell>
+                  )}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -278,14 +280,14 @@ const Customers: React.FC = () => {
                       <TableCell sx={{ fontSize: "14px" }}>
                         {customer.location}
                       </TableCell>
-                      <TableCell align="center">
-                        {hasPermission("customer-edit") && (
+                      {hasPermission("customer-edit") && (
+                        <TableCell align="center">
                           <DeleteCustomer
                             customer={customer}
                             fetchCustomers={fetchCustomers}
                           />
-                        )}
-                      </TableCell>
+                        </TableCell>
+                      )}
                     </TableRow>
                   );
                 })}

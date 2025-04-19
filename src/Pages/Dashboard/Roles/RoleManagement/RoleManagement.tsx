@@ -178,10 +178,12 @@ const RoleManagement: React.FC = () => {
               </TableCell> */}
               <TableCell sx={{ fontSize: "14px" }}>User</TableCell>
               <TableCell sx={{ fontSize: "14px" }}>Roles</TableCell>
-              <TableCell sx={{ fontSize: "14px" }}>description</TableCell>
-              <TableCell align="center" sx={{ fontSize: "14px" }}>
-                Actions
-              </TableCell>
+              <TableCell sx={{ fontSize: "14px" }}>Description</TableCell>
+              {hasPermission("role-edit") && (
+                <TableCell align="center" sx={{ fontSize: "14px" }}>
+                  Actions
+                </TableCell>
+              )}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -209,14 +211,12 @@ const RoleManagement: React.FC = () => {
                   {role.description}
                 </TableCell>
 
-                <TableCell width={100} align="center">
-                  {hasPermission("role-edit") && (
+                {hasPermission("role-edit") && (
+                  <TableCell width={100} align="center">
                     <DeleteRole role={role} fetchRoles={fetchRoles} />
-                  )}
-                  {hasPermission("role-edit") && (
                     <UpdateRole roleId={role.id} fetchRoles={fetchRoles} />
-                  )}
-                </TableCell>
+                  </TableCell>
+                )}
               </TableRow>
             ))}
           </TableBody>

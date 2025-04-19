@@ -197,9 +197,12 @@ const UserManagement: React.FC = () => {
                   <TableCell sx={{ fontSize: "14px" }}>User</TableCell>
                   <TableCell sx={{ fontSize: "14px" }}>Phone</TableCell>
                   <TableCell sx={{ fontSize: "14px" }}>Email</TableCell>
-                  <TableCell align="center" sx={{ fontSize: "14px" }}>
-                    Actions
-                  </TableCell>
+                  {(hasPermission("user-edit") ||
+                    hasPermission("user-edit")) && (
+                    <TableCell align="center" sx={{ fontSize: "14px" }}>
+                      Actions
+                    </TableCell>
+                  )}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -228,14 +231,17 @@ const UserManagement: React.FC = () => {
                     <TableCell sx={{ fontSize: "14px" }}>
                       {user.email}
                     </TableCell>
-                    <TableCell align="center">
-                      {hasPermission("user-edit") && (
-                        <DeleteUser user={user} fetchUsers={fetchUsers} />
-                      )}
-                      {hasPermission("user-edit") && (
-                        <EditUser user={user} fetchUsers={fetchUsers} />
-                      )}
-                    </TableCell>
+                    {(hasPermission("user-edit") ||
+                      hasPermission("user-edit")) && (
+                      <TableCell align="center">
+                        {hasPermission("user-edit") && (
+                          <DeleteUser user={user} fetchUsers={fetchUsers} />
+                        )}
+                        {hasPermission("user-edit") && (
+                          <EditUser user={user} fetchUsers={fetchUsers} />
+                        )}
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))}
               </TableBody>

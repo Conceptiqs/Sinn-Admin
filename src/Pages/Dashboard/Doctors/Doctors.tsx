@@ -228,9 +228,12 @@ const Doctors: React.FC = () => {
               <TableCell sx={{ fontSize: "14px" }}>DOB</TableCell>
               <TableCell sx={{ fontSize: "14px" }}>Gender</TableCell>
               <TableCell sx={{ fontSize: "14px" }}>Credit</TableCell>
-              <TableCell align="center" sx={{ fontSize: "14px" }}>
-                Actions
-              </TableCell>
+              {(hasPermission("doctor-view") ||
+                hasPermission("doctor-edit")) && (
+                <TableCell align="center" sx={{ fontSize: "14px" }}>
+                  Actions
+                </TableCell>
+              )}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -274,16 +277,22 @@ const Doctors: React.FC = () => {
                     {`${doctor.get_amount || 0}/${doctor.credit || 0}`}
                   </Typography>
                 </TableCell>
-                <TableCell align="center">
-                  {hasPermission("doctor-view") && (
-                    <IconButton onClick={() => handleViewDoctor(doctor.id)}>
-                      <ViewIcon />
-                    </IconButton>
-                  )}
-                  {hasPermission("doctor-edit") && (
-                    <DeleteDoctor doctor={doctor} fetchDoctors={fetchDoctors} />
-                  )}
-                </TableCell>
+                {(hasPermission("doctor-view") ||
+                  hasPermission("doctor-edit")) && (
+                  <TableCell align="center">
+                    {hasPermission("doctor-view") && (
+                      <IconButton onClick={() => handleViewDoctor(doctor.id)}>
+                        <ViewIcon />
+                      </IconButton>
+                    )}
+                    {hasPermission("doctor-edit") && (
+                      <DeleteDoctor
+                        doctor={doctor}
+                        fetchDoctors={fetchDoctors}
+                      />
+                    )}
+                  </TableCell>
+                )}
               </TableRow>
             ))}
           </TableBody>
