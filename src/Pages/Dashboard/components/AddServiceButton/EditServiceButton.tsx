@@ -211,6 +211,7 @@ const EditServiceButton: React.FC<Props> = ({ service, fetchServices }) => {
                 ref={fileRef}
                 type="file"
                 accept="image/*"
+                hidden
                 style={{
                   position: "absolute",
                   top: 0,
