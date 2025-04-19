@@ -20,7 +20,7 @@ const Approvals: React.FC = () => {
           Approvals
         </Typography>
         <Box sx={{ display: "flex", gap: "8px" }}>
-          <FilterButton />
+          {/* <FilterButton /> */}
           <ExportButton data={[]} />
         </Box>
       </Box>

@@ -121,7 +121,7 @@ const Customers: React.FC = () => {
             },
           }}
         >
-          <FilterButton />
+          {/* <FilterButton /> */}
           {hasPermission("notification-write") && (
             <SendNotificationModal
               type="customer"

@@ -18,9 +18,9 @@ const Cms: React.FC = () => {
         <Typography variant="h5" fontWeight="bold" sx={{ fontSize: "18px" }}>
           CMS
         </Typography>
-        <Box sx={{ display: "flex", gap: "8px" }}>
+        {/* <Box sx={{ display: "flex", gap: "8px" }}>
           <FilterButton />
-        </Box>
+        </Box> */}
       </Box>
 
       <Breadcrumbs sx={{ fontSize: "0.9rem", marginBottom: "16px" }}>

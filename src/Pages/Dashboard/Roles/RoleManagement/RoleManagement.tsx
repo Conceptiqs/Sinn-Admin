@@ -93,7 +93,7 @@ const RoleManagement: React.FC = () => {
             },
           }}
         >
-          <FilterButton />
+          {/* <FilterButton /> */}
           {hasPermission("role-write") && (
             <CreateNewRole fetchRoles={fetchRoles} />
           )}

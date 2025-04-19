@@ -137,7 +137,7 @@ const Doctors: React.FC = () => {
           Doctors
         </Typography>
         <Box sx={{ display: "flex", gap: "8px" }}>
-          <FilterButton />
+          {/* <FilterButton /> */}
           {hasPermission("notification-write") && (
             <SendNotificationModal type="doctor" userIds={selectedDoctorIds} />
           )}

@@ -100,7 +100,7 @@ const UserManagement: React.FC = () => {
             },
           }}
         >
-          <FilterButton />
+          {/* <FilterButton /> */}
           {hasPermission("user-write") && <AddUser fetchUsers={fetchUsers} />}
         </Box>
       </Box>

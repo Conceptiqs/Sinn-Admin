@@ -23,9 +23,9 @@ const Renewals: React.FC = () => {
         <Typography variant="h5" fontWeight="bold" sx={{ fontSize: "18px" }}>
           Renewals
         </Typography>
-        <Box sx={{ display: "flex", gap: "8px" }}>
+        {/* <Box sx={{ display: "flex", gap: "8px" }}>
           <FilterButton />
-        </Box>
+        </Box> */}
       </Box>
 
       {/* Breadcrumbs Section */}
