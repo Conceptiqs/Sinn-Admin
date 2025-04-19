@@ -28,9 +28,6 @@ interface NavLink {
   label: string;
   path: string;
   icon: React.ReactNode;
-  // type here corresponds to your permission `type` field:
-  // e.g. "dashboard" (if you had one), "doctors", "customers", etc.
-  // We'll derive the permission key as `${type}-read`
   type?: string;
 }
 
@@ -64,7 +61,7 @@ const allLinks: NavLink[] = [
     label: "Renewals",
     path: "/renewals",
     icon: <AutorenewIcon />,
-    type: "revewal",
+    type: "renewal",
   },
   { label: "CMS", path: "/cms", icon: <WebIcon />, type: "cms" },
 ];
@@ -73,7 +70,6 @@ const Navigation: React.FC<NavigationProps> = ({ onNavigate }) => {
   const [openRoles, setOpenRoles] = useState(false);
   const [perms, setPerms] = useState<Set<string>>(new Set());
 
-  // Load permissions from localStorage once on mount
   useEffect(() => {
     try {
       const raw = localStorage.getItem("permissions");
@@ -81,24 +77,23 @@ const Navigation: React.FC<NavigationProps> = ({ onNavigate }) => {
       const arr: { name: string }[] = JSON.parse(raw);
       setPerms(new Set(arr.map((p) => p.name)));
     } catch {
-      // malformed or missing → leave perms empty
+      // ignore parse errors
     }
   }, []);
 
-  const handleRolesToggle = () => setOpenRoles((v) => !v);
-
-  // Only show links for which user has `<type>-read`
-  // After: Dashboard is unconditionally visible
   const visibleLinks = allLinks.filter((link) => {
-    // Always include Dashboard
-    if (link.type === "dashboard") {
-      return true;
-    }
-    // For all others, require "<type>-read"
+    if (link.type === "dashboard") return true;
     return link.type ? perms.has(`${link.type}-read`) : false;
   });
 
   const showNotifications = perms.has("notification-read");
+
+  // Permissions for Roles & Permissions submenu
+  const canViewUserMgmt = perms.has("user-read");
+  const canViewRoleMgmt = perms.has("role-read");
+  const canViewRolesSection = canViewUserMgmt || canViewRoleMgmt;
+
+  const handleRolesToggle = () => setOpenRoles((v) => !v);
 
   return (
     <List>
@@ -114,36 +109,42 @@ const Navigation: React.FC<NavigationProps> = ({ onNavigate }) => {
         </ListItemButton>
       ))}
 
-      {/* Roles & Permissions always visible */}
-      <ListItemButton onClick={handleRolesToggle}>
-        <ListItemIcon>
-          <SecurityIcon />
-        </ListItemIcon>
-        <ListItemText primary="Roles & Permissions" />
-        {openRoles ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-      </ListItemButton>
-      <Collapse in={openRoles} timeout="auto" unmountOnExit>
-        <List component="div" disablePadding>
-          <ListItemButton
-            sx={{ pl: 4 }}
-            component={Link}
-            to="/roles/user-management"
-            onClick={onNavigate}
-          >
-            <ListItemText primary="User Management" />
+      {canViewRolesSection && (
+        <>
+          <ListItemButton onClick={handleRolesToggle}>
+            <ListItemIcon>
+              <SecurityIcon />
+            </ListItemIcon>
+            <ListItemText primary="Roles & Permissions" />
+            {openRoles ? <ExpandLessIcon /> : <ExpandMoreIcon />}
           </ListItemButton>
-          <ListItemButton
-            sx={{ pl: 4 }}
-            component={Link}
-            to="/roles/role-management"
-            onClick={onNavigate}
-          >
-            <ListItemText primary="Role Management" />
-          </ListItemButton>
-        </List>
-      </Collapse>
+          <Collapse in={openRoles} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding>
+              {canViewUserMgmt && (
+                <ListItemButton
+                  sx={{ pl: 4 }}
+                  component={Link}
+                  to="/roles/user-management"
+                  onClick={onNavigate}
+                >
+                  <ListItemText primary="User Management" />
+                </ListItemButton>
+              )}
+              {canViewRoleMgmt && (
+                <ListItemButton
+                  sx={{ pl: 4 }}
+                  component={Link}
+                  to="/roles/role-management"
+                  onClick={onNavigate}
+                >
+                  <ListItemText primary="Role Management" />
+                </ListItemButton>
+              )}
+            </List>
+          </Collapse>
+        </>
+      )}
 
-      {/* Notifications only if `notification-read` */}
       {showNotifications && (
         <ListItemButton
           component={Link}

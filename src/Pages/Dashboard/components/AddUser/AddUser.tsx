@@ -25,7 +25,8 @@ const AddUser: React.FC<Props> = ({ fetchUsers }) => {
   const [name, setName] = useState("");
   const [mobileNo, setMobileNo] = useState("");
   const [email, setEmail] = useState("");
-  const [pending, setPending] = useState(false); // Loading state
+  const [pending, setPending] = useState(false);
+  const [password, setPassword] = useState("");
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -43,6 +44,7 @@ const AddUser: React.FC<Props> = ({ fetchUsers }) => {
     setName("");
     setMobileNo("");
     setEmail("");
+    setPassword("");
   };
 
   const handleClose = () => {
@@ -51,7 +53,7 @@ const AddUser: React.FC<Props> = ({ fetchUsers }) => {
   };
 
   const handleSubmit = async () => {
-    if (!name || !mobileNo || !email || !imageFile) {
+    if (!name || !mobileNo || !email || !password || !imageFile) {
       toast.error("Please fill in all required fields and select a photo.");
       return;
     }
@@ -62,6 +64,7 @@ const AddUser: React.FC<Props> = ({ fetchUsers }) => {
         name,
         email,
         mobile_no: mobileNo,
+        password,
         user_image: imageFile,
       });
       toast.success("User added successfully!");
@@ -207,6 +210,25 @@ const AddUser: React.FC<Props> = ({ fetchUsers }) => {
               </Box>
             );
           })}
+
+          <Box sx={{ mb: 2 }}>
+            <Typography
+              variant="body2"
+              sx={{ textAlign: "left", fontWeight: "bold" }}
+            >
+              Password <span style={{ color: "red" }}>*</span>
+            </Typography>
+            <TextField
+              fullWidth
+              placeholder="Enter Password"
+              variant="outlined"
+              size="small"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              type="password"
+              required
+            />
+          </Box>
 
           {/* Buttons */}
           <Box

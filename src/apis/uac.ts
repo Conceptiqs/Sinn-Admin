@@ -20,6 +20,7 @@ interface CreateUserPayload {
   name: string;
   email: string;
   mobile_no: string;
+  password: string;
   user_image: File;
 }
 
@@ -38,6 +39,7 @@ export async function createUser(payload: CreateUserPayload): Promise<any> {
   formData.append("name", payload.name);
   formData.append("email", payload.email);
   formData.append("mobile_no", payload.mobile_no);
+  formData.append("password", payload.password);
   formData.append("user_image", payload.user_image);
 
   // Call the API without setting Content-Type header manually.

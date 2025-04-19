@@ -22,7 +22,8 @@ interface Props {
 
 const EditUser: React.FC<Props> = ({ user, fetchUsers }) => {
   const [open, setOpen] = useState(false);
-  const [pending, setPending] = useState(false); // Pending state
+  const [pending, setPending] = useState(false);
+
   const [profilePic, setProfilePic] = useState<string | null>(
     user.user_images?.url || null
   );
@@ -30,6 +31,7 @@ const EditUser: React.FC<Props> = ({ user, fetchUsers }) => {
   const [name, setName] = useState(user.name || "");
   const [mobileNo, setMobileNo] = useState(user.mobile_no || "");
   const [email, setEmail] = useState(user.email || "");
+  const [password, setPassword] = useState("");
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -47,6 +49,7 @@ const EditUser: React.FC<Props> = ({ user, fetchUsers }) => {
     setName(user.name || "");
     setMobileNo(user.mobile_no || "");
     setEmail(user.email || "");
+    setPassword("");
   };
 
   const handleClose = () => {
@@ -64,12 +67,15 @@ const EditUser: React.FC<Props> = ({ user, fetchUsers }) => {
 
     setPending(true);
     try {
-      await updateUser(user.id, {
+      const payload: any = {
         name,
         email,
         mobile_no: mobileNo,
-        user_image: imageFile as File, // may be null (not changed)
-      });
+      };
+      if (imageFile) payload.user_image = imageFile;
+      if (password) payload.password = password;
+
+      await updateUser(user.id, payload);
       toast.success("User updated successfully!");
       await fetchUsers();
       handleClose();
@@ -172,13 +178,11 @@ const EditUser: React.FC<Props> = ({ user, fetchUsers }) => {
                 : label === "Mobile No"
                   ? mobileNo
                   : email;
-
             const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
               if (label === "Name") setName(e.target.value);
               else if (label === "Mobile No") setMobileNo(e.target.value);
               else setEmail(e.target.value);
             };
-
             const type =
               label === "Mobile No"
                 ? "tel"
@@ -208,6 +212,26 @@ const EditUser: React.FC<Props> = ({ user, fetchUsers }) => {
               </Box>
             );
           })}
+
+          {/* Optional Password Field */}
+          <Box sx={{ mb: 2 }}>
+            <Typography
+              variant="body2"
+              sx={{ textAlign: "left", fontWeight: "bold" }}
+            >
+              Password (leave blank to keep unchanged)
+            </Typography>
+            <TextField
+              fullWidth
+              placeholder="Enter Password"
+              variant="outlined"
+              size="small"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              type="password"
+              disabled={pending}
+            />
+          </Box>
 
           {/* Buttons */}
           <Box
