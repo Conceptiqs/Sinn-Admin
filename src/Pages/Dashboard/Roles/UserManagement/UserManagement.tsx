@@ -20,6 +20,7 @@ import {
   DeleteOutlineOutlined as DeleteIcon,
   Dashboard as DashboardIcon,
 } from "@mui/icons-material";
+import SearchIcon from "@mui/icons-material/Search";
 import PaginationComponent from "../../components/Pagination/PaginationComponent";
 import FilterButton from "../../components/FilterButton/FilterButton";
 import AddUser from "../../components/AddUser/AddUser";
@@ -32,6 +33,8 @@ const UserManagement: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [users, setUsers] = useState<any[]>();
   const [loading, setLoading] = useState<boolean>(true);
+  const [searchTerm, setSearchTerm] = useState("");
+
   const itemsPerPage = 10;
 
   // Get permissions from localStorage
@@ -58,10 +61,22 @@ const UserManagement: React.FC = () => {
     fetchUsers();
   }, []);
 
-  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) =>
+  const handlePageChange = (
+    event: React.ChangeEvent<unknown>,
+    value: number
+  ) => {
     setCurrentPage(value);
+  };
 
-  const paginatedUsers = users?.slice(
+  // Only keep users whose names include the search term
+  const filteredUsers = users?.filter(
+    (u) =>
+      u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      u.mobile_no?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      u.email?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const paginatedUsers = filteredUsers?.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -101,6 +116,31 @@ const UserManagement: React.FC = () => {
             },
           }}
         >
+          <Box
+            alignItems="center"
+            sx={{
+              display: { xs: "none", md: "flex" },
+              borderRadius: "20px",
+              padding: "5px 10px",
+              backgroundColor: "#f9f9f9",
+              mr: 2,
+            }}
+          >
+            <SearchIcon sx={{ color: "#888" }} />
+            <input
+              type="text"
+              placeholder="Search here..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{
+                border: "none",
+                outline: "none",
+                width: "100%",
+                marginLeft: "8px",
+                backgroundColor: "transparent",
+              }}
+            />
+          </Box>
           {/* <FilterButton /> */}
           {hasPermission("user-read") && (
             <ExportButton
@@ -216,7 +256,7 @@ const UserManagement: React.FC = () => {
             }}
           >
             <PaginationComponent
-              totalCount={users?.length || 0}
+              totalCount={filteredUsers?.length || 0}
               page={currentPage}
               onPageChange={handlePageChange}
             />

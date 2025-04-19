@@ -61,7 +61,7 @@ const allLinks: NavLink[] = [
     label: "Renewals",
     path: "/renewals",
     icon: <AutorenewIcon />,
-    type: "renewal",
+    type: "revewal",
   },
   { label: "CMS", path: "/cms", icon: <WebIcon />, type: "cms" },
 ];

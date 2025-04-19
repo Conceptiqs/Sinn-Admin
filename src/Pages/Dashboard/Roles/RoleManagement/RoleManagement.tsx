@@ -14,6 +14,7 @@ import {
   Breadcrumbs,
   Link,
 } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined"; // Import Edit Icon
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import DashboardIcon from "@mui/icons-material/Dashboard";
@@ -28,6 +29,8 @@ import ExportButton from "../../components/ExportButton/ExportButton";
 const RoleManagement: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [roles, setRoles] = useState<any[]>();
+  const [searchTerm, setSearchTerm] = useState("");
+
   const itemsPerPage = 10;
   // Get permissions from localStorage
   const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
@@ -57,7 +60,18 @@ const RoleManagement: React.FC = () => {
     setCurrentPage(value);
   };
 
-  const paginatedRoles = roles?.slice(
+  const filteredRoles = roles?.filter(
+    (u) =>
+      u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      u.role?.roles
+        ?.map((item: { name: string }) => item.name)
+        ?.join(", ")
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      u.description?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const paginatedRoles = filteredRoles?.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -94,6 +108,31 @@ const RoleManagement: React.FC = () => {
             },
           }}
         >
+          <Box
+            alignItems="center"
+            sx={{
+              display: { xs: "none", md: "flex" },
+              borderRadius: "20px",
+              padding: "5px 10px",
+              backgroundColor: "#f9f9f9",
+              mr: 2,
+            }}
+          >
+            <SearchIcon sx={{ color: "#888" }} />
+            <input
+              type="text"
+              placeholder="Search here..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{
+                border: "none",
+                outline: "none",
+                width: "100%",
+                marginLeft: "8px",
+                backgroundColor: "transparent",
+              }}
+            />
+          </Box>
           {/* <FilterButton /> */}
           {hasPermission("role-read") && (
             <ExportButton
@@ -198,7 +237,7 @@ const RoleManagement: React.FC = () => {
         }}
       >
         <PaginationComponent
-          totalCount={roles?.length || 0}
+          totalCount={filteredRoles?.length || 0}
           page={currentPage}
           onPageChange={handlePageChange}
         />

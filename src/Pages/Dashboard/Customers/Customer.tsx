@@ -14,6 +14,7 @@ import {
   Link,
   CircularProgress,
 } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import PaginationComponent from "../components/Pagination/PaginationComponent";
@@ -27,6 +28,8 @@ const Customers: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [customers, setCustomers] = useState<any[]>([]);
   const [selectedCustomerIds, setSelectedCustomerIds] = useState<number[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+
   const [loading, setLoading] = useState(false);
   const itemsPerPage = 10;
 
@@ -76,7 +79,18 @@ const Customers: React.FC = () => {
     setCurrentPage(value);
   };
 
-  const paginatedCustomers = customers.slice(
+  // Filter customers by name
+  const filteredCustomers = customers.filter(
+    (c) =>
+      c.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.mobile?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.dob?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.gender?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.location?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const paginatedCustomers = filteredCustomers.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -121,6 +135,33 @@ const Customers: React.FC = () => {
             },
           }}
         >
+          <Box
+            alignItems="center"
+            sx={{
+              display: { xs: "none", md: "flex" },
+              border: "none",
+              borderRadius: "20px",
+              padding: "5px 10px",
+              backgroundColor: "#f9f9f9",
+              mr: 2,
+            }}
+          >
+            <SearchIcon sx={{ color: "#888" }} />
+            <input
+              type="text"
+              placeholder="Search here..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{
+                border: "none",
+                outline: "none",
+                width: "100%",
+                marginLeft: "8px",
+                backgroundColor: "transparent",
+              }}
+            />
+          </Box>
+
           {/* <FilterButton /> */}
           {hasPermission("notification-write") && (
             <SendNotificationModal
@@ -270,7 +311,7 @@ const Customers: React.FC = () => {
             }}
           >
             <PaginationComponent
-              totalCount={customers.length}
+              totalCount={filteredCustomers.length}
               page={currentPage}
               onPageChange={handlePageChange}
             />

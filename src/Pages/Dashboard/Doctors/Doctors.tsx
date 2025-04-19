@@ -20,6 +20,7 @@ import {
   VisibilityOutlined as ViewIcon,
   Dashboard as DashboardIcon,
 } from "@mui/icons-material";
+import SearchIcon from "@mui/icons-material/Search";
 
 import PaginationComponent from "../components/Pagination/PaginationComponent";
 import FilterButton from "../components/FilterButton/FilterButton";
@@ -33,6 +34,8 @@ const Doctors: React.FC = () => {
   const [doctors, setDoctors] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedDoctorIds, setSelectedDoctorIds] = useState<number[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+
   const itemsPerPage = 10;
   const navigate = useNavigate();
 
@@ -87,7 +90,16 @@ const Doctors: React.FC = () => {
     navigate(`/doctor/${id}`);
   };
 
-  const paginatedDoctors = doctors.slice(
+  const filteredDoctors = doctors.filter(
+    (doctor) =>
+      doctor.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      doctor.mobile?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      doctor.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      doctor.dob?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      doctor.gender?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const paginatedDoctors = filteredDoctors.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -137,6 +149,32 @@ const Doctors: React.FC = () => {
           Doctors
         </Typography>
         <Box sx={{ display: "flex", gap: "8px" }}>
+          <Box
+            alignItems="center"
+            sx={{
+              display: { xs: "none", md: "flex" },
+              border: "none",
+              borderRadius: "20px",
+              padding: "5px 10px",
+              backgroundColor: "#f9f9f9",
+              mr: 2,
+            }}
+          >
+            <SearchIcon sx={{ color: "#888" }} />
+            <input
+              type="text"
+              placeholder="Search here..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{
+                border: "none",
+                outline: "none",
+                width: "100%",
+                marginLeft: "8px",
+                backgroundColor: "transparent",
+              }}
+            />
+          </Box>
           {/* <FilterButton /> */}
           {hasPermission("notification-write") && (
             <SendNotificationModal type="doctor" userIds={selectedDoctorIds} />
@@ -145,6 +183,7 @@ const Doctors: React.FC = () => {
             <ExportButton
               data={doctors?.map((doctor) => ({
                 name: doctor.name,
+                mobile: doctor.mobile,
                 email: doctor.email,
                 dob: doctor.dob,
                 gender: doctor.gender,
@@ -257,7 +296,7 @@ const Doctors: React.FC = () => {
       {/* Pagination */}
       <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
         <PaginationComponent
-          totalCount={doctors.length}
+          totalCount={filteredDoctors.length}
           page={currentPage}
           onPageChange={handlePageChange}
         />
