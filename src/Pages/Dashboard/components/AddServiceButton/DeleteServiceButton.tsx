@@ -36,8 +36,12 @@ const DeleteServiceButton: React.FC<Props> = ({ service, fetchServices }) => {
   const handleDelete = async () => {
     setPending(true);
     try {
-      await deleteService(service.id);
-      toast.success("Service deleted successfully!");
+      const res = await deleteService(service.id);
+      if (res.success) {
+        toast.success(res.message);
+      } else {
+        toast.error(res.message);
+      }
       fetchServices();
       handleClose();
     } catch (error) {

@@ -89,7 +89,7 @@ const Tabss: React.FC = () => {
             </TableCell> */}
             <TableCell>
               <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <Avatar src={person.avatarUrl} alt={person.name} />
+                <Avatar src={person.main_images?.url} alt={person.name} />
                 <Typography sx={{ fontSize: "14px" }}>{person.name}</Typography>
               </Box>
             </TableCell>
