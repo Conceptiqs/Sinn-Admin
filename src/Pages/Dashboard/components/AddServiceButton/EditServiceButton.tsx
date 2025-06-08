@@ -17,6 +17,7 @@ import { Edit } from "@mui/icons-material";
 interface Service {
   id: number;
   name: string;
+  nameAr: string;
   short_description: string;
   icon?: string;
 }
@@ -30,6 +31,7 @@ const EditServiceButton: React.FC<Props> = ({ service, fetchServices }) => {
   const fileRef = useRef<HTMLInputElement | null>(null);
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState(service.name);
+  const [titleAr, setTitleAr] = useState(service.nameAr);
   const [shortDescription, setShortDescription] = useState(
     service.short_description
   );
@@ -39,6 +41,7 @@ const EditServiceButton: React.FC<Props> = ({ service, fetchServices }) => {
 
   useEffect(() => {
     setTitle(service.name);
+    setTitleAr(service.nameAr);
     setShortDescription(service.short_description);
     setImagePreview(service.icon || "");
   }, [service]);
@@ -60,7 +63,7 @@ const EditServiceButton: React.FC<Props> = ({ service, fetchServices }) => {
   };
 
   const handleSubmit = async () => {
-    if (!title || !shortDescription) {
+    if (!title || !titleAr || !shortDescription) {
       toast.error("Please fill in all required fields.");
       return;
     }
@@ -69,6 +72,7 @@ const EditServiceButton: React.FC<Props> = ({ service, fetchServices }) => {
     try {
       const response = await updateService(service.id, {
         title,
+        titleAr,
         short_description: shortDescription,
         service_image: imageFile,
       });
@@ -205,7 +209,7 @@ const EditServiceButton: React.FC<Props> = ({ service, fetchServices }) => {
                 variant="body2"
                 sx={{ color: "#888", fontWeight: "normal" }}
               >
-                Upload New Image  {`(max 2MB)`}
+                Upload New Image {`(max 2MB)`}
               </Typography>
               <input
                 ref={fileRef}
@@ -249,6 +253,30 @@ const EditServiceButton: React.FC<Props> = ({ service, fetchServices }) => {
             sx={{ marginBottom: "16px" }}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+          />
+
+          <Box sx={{ textAlign: "left", marginBottom: "8px" }}>
+            <Typography
+              variant="body2"
+              sx={{ display: "inline", fontWeight: "normal" }}
+            >
+              Enter Service Title (Arabic){" "}
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{ display: "inline", color: "red", fontWeight: "bold" }}
+            >
+              *
+            </Typography>
+          </Box>
+          <TextField
+            fullWidth
+            placeholder="Enter here"
+            variant="outlined"
+            size="small"
+            sx={{ marginBottom: "16px" }}
+            value={titleAr}
+            onChange={(e) => setTitleAr(e.target.value)}
           />
 
           {/* Input for Short Description */}

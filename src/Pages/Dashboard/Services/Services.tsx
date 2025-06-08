@@ -20,6 +20,7 @@ import { usePermissions } from "../../../context/permissions";
 interface Service {
   id: number;
   name: string;
+  nameAr: string;
   short_description: string;
   icon: string;
 }
@@ -39,6 +40,7 @@ const Services: React.FC = () => {
           (service: any) => ({
             id: service.id,
             name: service.title,
+            nameAr: service.title_ar,
             short_description: service.short_description,
             icon:
               service.media.length > 0
@@ -157,6 +159,9 @@ const Services: React.FC = () => {
                 <CardContent>
                   <Typography variant="body2" sx={{ fontSize: "14px" }}>
                     {service.name}
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontSize: "14px" }}>
+                    {service.nameAr}
                   </Typography>
                 </CardContent>
               </Card>

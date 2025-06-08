@@ -2,6 +2,7 @@ import { callAuthApi } from "./general";
 
 interface CreateServicePayload {
   title: string;
+  titleAr: string;
   short_description: string;
   service_image: File;
 }
@@ -21,6 +22,7 @@ export async function createService(
   // Convert payload into FormData
   const formData = new FormData();
   formData.append("title", payload.title);
+  formData.append("title_ar", payload.titleAr);
   formData.append("short_description", payload.short_description);
   formData.append("service_image", payload.service_image);
 
@@ -50,6 +52,7 @@ export async function getServices(): Promise<any> {
 
 interface UpdateServicePayload {
   title: string;
+  titleAr: string;
   short_description: string;
   service_image: File | null;
 }
@@ -71,6 +74,7 @@ export async function updateService(
   // Convert payload into FormData
   const formData = new FormData();
   formData.append("title", payload.title);
+  formData.append("title_ar", payload.titleAr);
   formData.append("short_description", payload.short_description);
   if (payload.service_image) {
     formData.append("service_image", payload.service_image);

@@ -21,6 +21,7 @@ const AddServiceButton = ({ fetchServices }: Props) => {
   const fileRef = useRef<any | null>(null);
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
+  const [titleAr, setTitleAr] = useState("");
   const [shortDescription, setShortDescription] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState("");
@@ -43,7 +44,7 @@ const AddServiceButton = ({ fetchServices }: Props) => {
   };
 
   const handleSubmit = async () => {
-    if (!title || !shortDescription || !imageFile) {
+    if (!title || !titleAr || !shortDescription || !imageFile) {
       toast.error("Please fill in all required fields, including an image.");
       return;
     }
@@ -52,6 +53,7 @@ const AddServiceButton = ({ fetchServices }: Props) => {
     try {
       const response = await createService({
         title,
+        titleAr,
         short_description: shortDescription,
         service_image: imageFile,
       });
@@ -223,6 +225,26 @@ const AddServiceButton = ({ fetchServices }: Props) => {
             sx={{ marginBottom: "16px" }}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+          />
+          <Box sx={{ textAlign: "left", marginBottom: "8px" }}>
+            <Typography variant="body2" sx={{ display: "inline" }}>
+              Enter Service Title (Arabic){" "}
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{ display: "inline", color: "red", fontWeight: "bold" }}
+            >
+              *
+            </Typography>
+          </Box>
+          <TextField
+            fullWidth
+            placeholder="Enter here"
+            variant="outlined"
+            size="small"
+            sx={{ marginBottom: "16px" }}
+            value={titleAr}
+            onChange={(e) => setTitleAr(e.target.value)}
           />
 
           {/* Description */}
