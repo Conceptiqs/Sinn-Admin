@@ -52,12 +52,10 @@ export async function callAuthApi<T>({
   if (response.status === 401) {
     Cookies.remove("token");
     window.location.href = "/login";
-    throw new Error("Unauthorized");
   }
 
   if (!response.ok) {
     console.error("API error:", response);
-    throw new Error(`HTTP error! status: ${response.status}`);
   }
 
   return await response.json();
