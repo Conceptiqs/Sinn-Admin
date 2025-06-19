@@ -116,7 +116,8 @@ const BasicInfo: React.FC<{ doctor: any }> = ({ doctor }) => {
           </span>
         </Typography>
         <Typography variant="h6" sx={{ mt: 1 }}>
-          Credit: <span style={{ color: "green" }}>{doctor.credit}</span>
+          Credit:{" "}
+          <span style={{ color: "green" }}>{doctor.get_amount || 0}</span>
         </Typography>
         <Box
           sx={{

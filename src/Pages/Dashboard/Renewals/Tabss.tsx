@@ -57,6 +57,10 @@ const Tabss: React.FC = () => {
     currentPage * itemsPerPage
   );
 
+  const checkDiff = (credit: string | null, amount: string | null) => {
+    return parseInt(credit ?? "0") - parseInt(amount ?? "0");
+  };
+
   return (
     <Box sx={{ width: "100%", marginBottom: "16px" }}>
       {/* Tabs Section */}
@@ -125,7 +129,7 @@ const Tabss: React.FC = () => {
                   {/* Status */}
                   {hasPermission("revewal-edit") &&
                     activeTab === 1 &&
-                    parseInt(item.get_amount) <= 0 && (
+                    checkDiff(item.credit, item.get_amount) <= 0 && (
                       <AddCredits
                         id={item.id}
                         fetchRenewals={fetchRenewals}
@@ -134,8 +138,8 @@ const Tabss: React.FC = () => {
                     )}
                   {hasPermission("revewal-view") &&
                     activeTab === 1 &&
-                    parseInt(item.get_amount) > 0 &&
-                    parseInt(item.get_amount) <= 200 && (
+                    checkDiff(item.credit, item.get_amount) > 0 &&
+                    checkDiff(item.credit, item.get_amount) <= 200 && (
                       <AddCredits
                         id={item.id}
                         fetchRenewals={fetchRenewals}
