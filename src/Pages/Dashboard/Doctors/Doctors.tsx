@@ -274,7 +274,15 @@ const Doctors: React.FC = () => {
                       fontSize: "14px",
                     }}
                   >
-                    {`${doctor.get_amount || 0}/${doctor.credit || 0}`}
+                    {(() => {
+                      const c = parseFloat(doctor.credit),
+                        a = parseFloat(doctor.get_amount);
+                      return isNaN(c) || isNaN(a)
+                        ? 0
+                        : Number.isInteger(c - a)
+                          ? c - a
+                          : (c - a).toFixed(2);
+                    })()}
                   </Typography>
                 </TableCell>
                 {(hasPermission("doctor-view") ||
