@@ -11,6 +11,10 @@ const RecentRenewals: React.FC<{ renewals: any; fetchDashboard: any }> = ({
   const navigate = useNavigate();
   const { hasPermission } = usePermissions();
 
+  const checkDiff = (credit: string | null, amount: string | null) => {
+    return parseInt(credit ?? "0") - parseInt(amount ?? "0");
+  };
+
   return (
     <Box
       sx={{
@@ -92,7 +96,7 @@ const RecentRenewals: React.FC<{ renewals: any; fetchDashboard: any }> = ({
 
               {/* Status */}
               {hasPermission("revewal-edit") &&
-                parseInt(renewal.get_amount) <= 0 && (
+                checkDiff(renewal.credit, renewal.get_amount) <= 0 && (
                   <AddCredits
                     id={renewal.id}
                     fetchRenewals={fetchDashboard}
@@ -100,8 +104,8 @@ const RecentRenewals: React.FC<{ renewals: any; fetchDashboard: any }> = ({
                   />
                 )}
               {hasPermission("revewal-view") &&
-                parseInt(renewal.get_amount) > 0 &&
-                parseInt(renewal.get_amount) <= 200 && (
+                checkDiff(renewal.credit, renewal.get_amount) > 0 &&
+                checkDiff(renewal.credit, renewal.get_amount) <= 200 && (
                   <AddCredits
                     id={renewal.id}
                     fetchRenewals={fetchDashboard}

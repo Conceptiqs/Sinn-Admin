@@ -117,7 +117,17 @@ const BasicInfo: React.FC<{ doctor: any }> = ({ doctor }) => {
         </Typography>
         <Typography variant="h6" sx={{ mt: 1 }}>
           Credit:{" "}
-          <span style={{ color: "green" }}>{doctor.get_amount || 0}</span>
+          <span style={{ color: "green" }}>
+            {(() => {
+              const c = parseFloat(doctor.credit),
+                a = parseFloat(doctor.get_amount);
+              return isNaN(c) || isNaN(a)
+                ? 0
+                : Number.isInteger(c - a)
+                  ? c - a
+                  : (c - a).toFixed(2);
+            })()}
+          </span>
         </Typography>
         <Box
           sx={{
