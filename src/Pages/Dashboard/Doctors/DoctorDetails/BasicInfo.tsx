@@ -94,6 +94,21 @@ const BasicInfo: React.FC<{ doctor: any }> = ({ doctor }) => {
     handleCloseReject();
   };
 
+  const calculateCredit = (doctor: {
+    credit: string;
+    get_amount: string;
+  }): number => {
+    const c = parseFloat(doctor.credit),
+      a = parseFloat(doctor.get_amount);
+
+    if (isNaN(c) || isNaN(a)) {
+      return 0;
+    }
+
+    const result = c - a;
+    return Number.isInteger(result) ? result : parseFloat(result.toFixed(2));
+  };
+
   return (
     <Box sx={{ padding: 4 }}>
       {/* Profile Section */}
@@ -117,17 +132,7 @@ const BasicInfo: React.FC<{ doctor: any }> = ({ doctor }) => {
         </Typography>
         <Typography variant="h6" sx={{ mt: 1 }}>
           Credit:{" "}
-          <span style={{ color: "green" }}>
-            {(() => {
-              const c = parseFloat(doctor.credit),
-                a = parseFloat(doctor.get_amount);
-              return isNaN(c) || isNaN(a)
-                ? 0
-                : Number.isInteger(c - a)
-                  ? c - a
-                  : (c - a).toFixed(2);
-            })()}
-          </span>
+          <span style={{ color: "green" }}>{calculateCredit(doctor)}</span>
         </Typography>
         <Box
           sx={{
@@ -139,8 +144,8 @@ const BasicInfo: React.FC<{ doctor: any }> = ({ doctor }) => {
             mt: 1,
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            {doctor.status && (
+          {calculateCredit(doctor) > 200 && (
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <Box
                 sx={{
                   width: 20,
@@ -149,11 +154,11 @@ const BasicInfo: React.FC<{ doctor: any }> = ({ doctor }) => {
                   backgroundColor: "green",
                 }}
               />
-            )}
-            <Typography>Active</Typography>
-          </Box>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            {!doctor.status && (
+              <Typography>Active</Typography>
+            </Box>
+          )}
+          {calculateCredit(doctor) <= 200 && (
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <Box
                 sx={{
                   width: 20,
@@ -162,9 +167,9 @@ const BasicInfo: React.FC<{ doctor: any }> = ({ doctor }) => {
                   backgroundColor: "red",
                 }}
               />
-            )}
-            <Typography>Inactive</Typography>
-          </Box>
+              <Typography>Inactive</Typography>
+            </Box>
+          )}
         </Box>
       </Box>
 
