@@ -25,6 +25,9 @@ const BasicInfo: React.FC<{ doctor: any }> = ({ doctor }) => {
   const isMobile = useMediaQuery((theme: Theme) =>
     theme.breakpoints.down("sm")
   );
+  const address = doctor?.addresses?.find(
+    (item: { status: number }) => item.status === 0
+  )?.address;
 
   const { hasPermission } = usePermissions();
 
@@ -230,7 +233,7 @@ const BasicInfo: React.FC<{ doctor: any }> = ({ doctor }) => {
               Location
             </Typography>
             <Typography sx={{ fontWeight: 50, textAlign: "center" }}>
-              {doctor.city || "N/A"}
+              {address || "N/A"}
             </Typography>
           </Grid>
 

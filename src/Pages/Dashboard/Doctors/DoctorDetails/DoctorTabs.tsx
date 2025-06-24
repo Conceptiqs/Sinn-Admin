@@ -5,6 +5,8 @@ import Gallery from "./Gallery";
 import Offers from "./Offers";
 import Reviews from "./Reviews";
 import Assistants from "./Assistants";
+import Transactions from "./Transactions";
+import Locations from "./Locations";
 
 const DoctorTabs = ({ doctor }: { doctor: any }) => {
   const [tabIndex, setTabIndex] = useState(0);
@@ -27,6 +29,8 @@ const DoctorTabs = ({ doctor }: { doctor: any }) => {
         <Tab label="Offers" />
         <Tab label="Reviews" />
         <Tab label="Assistant" />
+        <Tab label="Transactions" />
+        <Tab label="Locations" />
       </Tabs>
 
       <Box sx={{ padding: 2 }}>
@@ -35,6 +39,8 @@ const DoctorTabs = ({ doctor }: { doctor: any }) => {
         {tabIndex === 2 && <Offers doctor={doctor} />}
         {tabIndex === 3 && <Reviews doctor={doctor} />}
         {tabIndex === 4 && <Assistants doctor={doctor} />}
+        {tabIndex === 5 && <Transactions doctor={doctor} />}
+        {tabIndex === 6 && <Locations doctor={doctor} />}
       </Box>
     </Box>
   );

@@ -37,6 +37,7 @@ const Tabss: React.FC = () => {
       try {
         const response = await getApprovals(activeTab);
         if (response.success) {
+          console.log(response.data)
           setApprovals(response.data);
         }
       } catch (error) {
@@ -59,10 +60,10 @@ const Tabss: React.FC = () => {
     setCurrentPage(value);
   };
 
-  const paginatedData = approvals?.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  // const paginatedData = approvals?.slice(
+  //   (currentPage - 1) * itemsPerPage,
+  //   currentPage * itemsPerPage
+  // );
 
   const renderTable = (data: any[]) => (
     <Table>
@@ -152,7 +153,7 @@ const Tabss: React.FC = () => {
               border: "3px solid white",
             }}
           >
-            {renderTable(paginatedData || [])}
+            {renderTable(approvals || [])}
           </TableContainer>
 
           <Box
