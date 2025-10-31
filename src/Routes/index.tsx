@@ -7,6 +7,8 @@ import {
   Login,
   Doctors,
   DoctorDetails,
+  Clinics,
+  ClinicDetails,
   Customers,
   Approvals,
   Services,
@@ -15,6 +17,8 @@ import {
   UserManagement,
   RoleManagement,
   Notifications,
+  SubscriptionPlans,
+  Transactions,
 } from "../Pages/Exports";
 import { PermissionsProvider } from "../context/permissions";
 
@@ -55,6 +59,23 @@ const router = createBrowserRouter([
           <PermissionRoute permission="doctor-view">
             <DoctorDetails />
           </PermissionRoute>
+        ),
+      },
+      {
+        path: "/clinics",
+        // element: (
+        //   <PermissionRoute permission="clinic-read">
+        //     <Clinics />
+        //   </PermissionRoute>
+        // ),
+        element: <Clinics />,
+      },
+      {
+        path: "/clinic/:id",
+        element: (
+          // <PermissionRoute permission="clinic-view">
+            <ClinicDetails />
+          // </PermissionRoute>
         ),
       },
       {
@@ -120,6 +141,19 @@ const router = createBrowserRouter([
             <Notifications />
           </PermissionRoute>
         ),
+      },
+      {
+        path: "/transactions",
+        element: <Transactions />,
+      },
+      {
+        path: "/subscription-plans",
+        // element: (
+        //   <PermissionRoute permission="subscription-read">
+        //     <SubscriptionPlans />
+        //   </PermissionRoute>
+        // ),
+        element: <SubscriptionPlans />,
       },
     ],
   },

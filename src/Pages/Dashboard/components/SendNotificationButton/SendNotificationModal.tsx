@@ -1,5 +1,5 @@
 // SendNotificationModal.tsx
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import {
   Button,
   Modal,
@@ -19,7 +19,7 @@ import {
 import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
 
 interface Props {
-  type: "customer" | "doctor";
+  type: "customer" | "doctor" | "clinic";
   userIds: number[];
 }
 

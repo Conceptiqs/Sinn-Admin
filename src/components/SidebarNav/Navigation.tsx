@@ -9,6 +9,7 @@ import {
 import {
   Dashboard as DashboardIcon,
   People as PeopleIcon,
+  LocalHospital as ClinicIcon,
   HowToReg as ApprovalIcon,
   DesignServices as DesignServicesIcon,
   Autorenew as AutorenewIcon,
@@ -17,6 +18,8 @@ import {
   Notifications as NotificationsIcon,
   ExpandLess as ExpandLessIcon,
   ExpandMore as ExpandMoreIcon,
+  CreditCard as SubscriptionIcon,
+  ReceiptLong as TransactionsIcon,
 } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 import { usePermissions } from "../../context/permissions";
@@ -40,6 +43,7 @@ const allLinks: NavLink[] = [
     type: "dashboard",
   },
   { label: "Doctors", path: "/doctors", icon: <PeopleIcon />, type: "doctor" },
+  { label: "Clinics", path: "/clinics", icon: <ClinicIcon />, type: "clinic" },
   {
     label: "Customers",
     path: "/customers",
@@ -65,6 +69,18 @@ const allLinks: NavLink[] = [
     type: "revewal",
   },
   { label: "CMS", path: "/cms", icon: <WebIcon />, type: "cms" },
+  {
+    label: "Subscription Plans",
+    path: "/subscription-plans",
+    icon: <SubscriptionIcon />,
+    type: "subscription",
+  },
+  {
+    label: "Transactions",
+    path: "/transactions",
+    icon: <TransactionsIcon />,
+    type: "transaction",
+  },
 ];
 
 const Navigation: React.FC<NavigationProps> = ({ onNavigate }) => {
@@ -73,6 +89,9 @@ const Navigation: React.FC<NavigationProps> = ({ onNavigate }) => {
 
   const visibleLinks = allLinks.filter((link) => {
     if (link.type === "dashboard") return true;
+    if (link.type === "clinic") return true; // Skip permission check for clinics
+    if (link.type === "subscription") return true; // Skip permission check for subscription plans
+    if (link.type === "transaction") return true; // Skip permission check for transactions
     return link.type ? hasPermission(`${link.type}-read`) : false;
   });
 

@@ -37,7 +37,9 @@ export async function callAuthApi<T>({
   const finalHeaders: Record<string, string> = { ...headers, ...authHeader };
 
   // Let the browser set Content-Type for FormData
-  if (finalHeaders["Content-Type"]) {
+  // Only delete Content-Type if FormData is being used (when data is provided)
+  // For JSON payloads, we need to keep Content-Type
+  if (data && finalHeaders["Content-Type"]) {
     delete finalHeaders["Content-Type"];
   }
 

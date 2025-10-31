@@ -49,7 +49,7 @@ export async function createNotification(
 }
 
 export interface SendNotificationPayload {
-  type: "customer" | "doctor";
+  type: "customer" | "doctor" | "clinic";
   title: string;
   description: string;
   userId: { user_id: number }[];

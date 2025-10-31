@@ -17,6 +17,8 @@ export {default as Dashboard} from '../Dashboard';
 export {default as Login} from '../Login/Login';
 export {default as Doctors} from '../Dashboard/Doctors/Doctors';
 export {default as DoctorDetails} from '../Dashboard/Doctors/DoctorDetails/DoctorDetails';
+export {default as Clinics} from '../Dashboard/Clinics/Clinics';
+export {default as ClinicDetails} from '../Dashboard/Clinics/ClinicDetails/ClinicDetails';
 export {default as Customers} from '../Dashboard/Customers/Customer';
 export {default as Approvals} from '../Dashboard/Approvals/Approvals';
 export {default as Services} from '../Dashboard/Services/Services';
@@ -25,6 +27,8 @@ export {default as Cms} from '../Dashboard/CMS/Cms';
 export {default as UserManagement} from '../Dashboard/Roles/UserManagement/UserManagement';
 export {default as RoleManagement} from '../Dashboard/Roles/RoleManagement/RoleManagement';
 export {default as Notifications} from '../Dashboard/Notification/Notification';
+export {default as SubscriptionPlans} from '../Dashboard/SubscriptionPlans/SubscriptionPlans';
+export {default as Transactions} from '../Dashboard/Transactions/Transactions';
 
 
 
