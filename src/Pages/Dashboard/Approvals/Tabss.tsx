@@ -125,8 +125,8 @@ const Tabss: React.FC = () => {
         indicatorColor="primary"
         aria-label="tabs"
       >
-        <Tab value={0} label="Approvals" sx={{ fontSize: "14px" }} />
-        <Tab value={2} label="Rejected" sx={{ fontSize: "14px" }} />
+        <Tab value={0} label="Doctor Approvals" sx={{ fontSize: "14px" }} />
+        <Tab value={2} label="Doctor Rejected" sx={{ fontSize: "14px" }} />
       </Tabs>
 
       {loading ? (

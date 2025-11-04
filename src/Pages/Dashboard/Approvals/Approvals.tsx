@@ -1,11 +1,38 @@
-import React from "react";
-import { Box, Typography, Breadcrumbs, Link } from "@mui/material";
+import React, { useState } from "react";
+import { Box, Typography, Breadcrumbs, Link, Tabs, Tab } from "@mui/material";
 import DashboardIcon from "@mui/icons-material/Dashboard"; // Importing Dashboard Icon
-import TabsComponent from "./Tabss"; // Import the TabsComponent
+import DoctorApprovals from "./DoctorApprovals";
+import DoctorRejected from "./DoctorRejected";
+import ClinicApprovals from "./ClinicApprovals";
+import ClinicRejected from "./ClinicRejected";
 // import FilterButton from "../components/FilterButton/FilterButton";
 // import ExportButton from "../components/ExportButton/ExportButton";
 
 const Approvals: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<"doctor-approvals" | "doctor-rejected" | "clinic-approvals" | "clinic-rejected">("clinic-approvals");
+
+  const handleTabChange = (
+    event: React.SyntheticEvent,
+    newValue: "doctor-approvals" | "doctor-rejected" | "clinic-approvals" | "clinic-rejected"
+  ) => {
+    setActiveTab(newValue);
+  };
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case "clinic-approvals":
+        return <ClinicApprovals />;
+      case "clinic-rejected":
+        return <ClinicRejected />;
+      case "doctor-approvals":
+        return <DoctorApprovals />;
+      case "doctor-rejected":
+        return <DoctorRejected />;
+      default:
+        return <ClinicApprovals />;
+    }
+  };
+
   return (
     <Box sx={{ padding: "24px", fontSize: "14px" }}>
       <Box
@@ -34,7 +61,22 @@ const Approvals: React.FC = () => {
       </Breadcrumbs>
 
       {/* Tabs Section */}
-      <TabsComponent />
+      <Box sx={{ marginBottom: "16px" }}>
+        <Tabs
+          value={activeTab}
+          onChange={handleTabChange}
+          indicatorColor="primary"
+          aria-label="approval tabs"
+        >
+          <Tab value="clinic-approvals" label="Clinic Approvals" sx={{ fontSize: "14px" }} />
+          <Tab value="clinic-rejected" label="Clinic Rejected" sx={{ fontSize: "14px" }} />
+          <Tab value="doctor-approvals" label="Doctor Approvals" sx={{ fontSize: "14px" }} />
+          <Tab value="doctor-rejected" label="Doctor Rejected" sx={{ fontSize: "14px" }} />
+        </Tabs>
+      </Box>
+
+      {/* Content Section */}
+      {renderContent()}
     </Box>
   );
 };

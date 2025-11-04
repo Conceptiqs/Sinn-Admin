@@ -3,11 +3,12 @@ import { callAuthApi } from "./general";
 /**
  * Retrieves a list of clinics from the API.
  *
+ * @param status - Optional status filter (e.g., "approved", "rejected", "pending")
  * @returns The parsed JSON response from the API.
  * @throws An error if the response is not ok.
  */
-export async function getClinics(): Promise<any> {
-  const path = `clinics`;
+export async function getClinics(status?: string): Promise<any> {
+  const path = status ? `clinics?status=${status}` : `clinics`;
 
   return await callAuthApi({
     path,

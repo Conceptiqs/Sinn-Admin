@@ -35,11 +35,9 @@ const BasicInfo: React.FC<{ doctor: any }> = ({ doctor }) => {
   const [pending, setPending] = useState(false);
 
   // -- Modal state
-  const [openAccept, setOpenAccept] = useState(false);
   const [openReject, setOpenReject] = useState(false);
 
   // -- Inputs for modals
-  const [acceptValue, setAcceptValue] = useState<number | "">("");
   const [rejectValue, setRejectValue] = useState<string>("");
 
   // -- Media fetchers
@@ -51,12 +49,6 @@ const BasicInfo: React.FC<{ doctor: any }> = ({ doctor }) => {
   );
 
   // -- Handlers
-  const handleOpenAccept = () => setOpenAccept(true);
-  const handleCloseAccept = () => {
-    setOpenAccept(false);
-    setAcceptValue("");
-  };
-
   const handleOpenReject = () => setOpenReject(true);
   const handleCloseReject = () => {
     setOpenReject(false);
@@ -80,12 +72,7 @@ const BasicInfo: React.FC<{ doctor: any }> = ({ doctor }) => {
   };
 
   const handleAccept = () => {
-    if (acceptValue === "" || isNaN(Number(acceptValue))) {
-      toast.error("Please enter a valid number.");
-      return;
-    }
-    submitApproval(1, Number(acceptValue));
-    handleCloseAccept();
+    submitApproval(1, "");
   };
 
   const handleReject = () => {
@@ -307,10 +294,10 @@ const BasicInfo: React.FC<{ doctor: any }> = ({ doctor }) => {
           <Button
             variant="contained"
             color="success"
-            onClick={handleOpenAccept}
+            onClick={handleAccept}
             disabled={pending}
           >
-            {pending && openAccept ? (
+            {pending ? (
               <CircularProgress size={20} color="inherit" />
             ) : (
               "Accept"
@@ -323,7 +310,7 @@ const BasicInfo: React.FC<{ doctor: any }> = ({ doctor }) => {
             onClick={handleOpenReject}
             disabled={pending}
           >
-            {pending && openReject ? (
+            {pending ? (
               <CircularProgress size={20} color="inherit" />
             ) : (
               "Reject"
@@ -331,63 +318,6 @@ const BasicInfo: React.FC<{ doctor: any }> = ({ doctor }) => {
           </Button>
         </Box>
       )}
-
-      {/* Accept Modal */}
-      <Modal open={openAccept} onClose={handleCloseAccept}>
-        <Box
-          sx={{
-            position: "absolute" as const,
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: isMobile ? "90%" : 400,
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            borderRadius: 2,
-            p: 3,
-          }}
-        >
-          <IconButton
-            onClick={handleCloseAccept}
-            sx={{ position: "absolute", top: 8, right: 8 }}
-          >
-            <CloseIcon />
-          </IconButton>
-          <Typography variant="h6" gutterBottom>
-            Accept Doctor — Enter Credit
-          </Typography>
-          <TextField
-            fullWidth
-            label="Credit Amount"
-            type="text"
-            value={acceptValue}
-            onChange={(e) => {
-              const val = e.target.value;
-              if (/^\d*$/.test(val)) {
-                setAcceptValue(Number(val));
-              }
-            }}
-            sx={{ mb: 2 }}
-          />
-          <Box sx={{ display: "flex", gap: 2 }}>
-            <Button
-              variant="contained"
-              fullWidth
-              onClick={handleAccept}
-              disabled={pending}
-            >
-              {pending ? (
-                <CircularProgress size={20} color="inherit" />
-              ) : (
-                "Submit"
-              )}
-            </Button>
-            <Button fullWidth onClick={handleCloseAccept}>
-              Cancel
-            </Button>
-          </Box>
-        </Box>
-      </Modal>
 
       {/* Reject Modal */}
       <Modal open={openReject} onClose={handleCloseReject}>
