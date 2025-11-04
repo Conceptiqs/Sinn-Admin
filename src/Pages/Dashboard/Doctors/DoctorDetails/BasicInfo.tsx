@@ -84,21 +84,6 @@ const BasicInfo: React.FC<{ doctor: any }> = ({ doctor }) => {
     handleCloseReject();
   };
 
-  const calculateCredit = (doctor: {
-    credit: string;
-    get_amount: string;
-  }): number => {
-    const c = parseFloat(doctor.credit),
-      a = parseFloat(doctor.get_amount);
-
-    if (isNaN(c) || isNaN(a)) {
-      return 0;
-    }
-
-    const result = c - a;
-    return Number.isInteger(result) ? result : parseFloat(result.toFixed(2));
-  };
-
   return (
     <Box sx={{ padding: 4 }}>
       {/* Profile Section */}
@@ -120,47 +105,6 @@ const BasicInfo: React.FC<{ doctor: any }> = ({ doctor }) => {
             {doctor.assistants?.length || 0}
           </span>
         </Typography>
-        <Typography variant="h6" sx={{ mt: 1 }}>
-          Credit:{" "}
-          <span style={{ color: "green" }}>{calculateCredit(doctor)}</span>
-        </Typography>
-        <Box
-          sx={{
-            padding: 2,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 2,
-            mt: 1,
-          }}
-        >
-          {calculateCredit(doctor) > 200 && (
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <Box
-                sx={{
-                  width: 20,
-                  height: 20,
-                  borderRadius: "50%",
-                  backgroundColor: "green",
-                }}
-              />
-              <Typography>Active</Typography>
-            </Box>
-          )}
-          {calculateCredit(doctor) <= 200 && (
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <Box
-                sx={{
-                  width: 20,
-                  height: 20,
-                  borderRadius: "50%",
-                  backgroundColor: "red",
-                }}
-              />
-              <Typography>Inactive</Typography>
-            </Box>
-          )}
-        </Box>
       </Box>
 
       {/* Details Section */}

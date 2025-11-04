@@ -37,11 +37,11 @@ const PaymentReceipt: React.FC<Props> = ({ id }) => {
     try {
       const response = await getReceipt(id);
       if (response.success) {
-        const credit_receipts = response.data?.media?.find(
+        const receipts = response.data?.media?.find(
           (item: { collection_name: string }) =>
-            item.collection_name === "credit_receipts"
+            item.collection_name === "receipts"
         );
-        setImagePreview(credit_receipts?.original_url || "");
+        setImagePreview(receipts?.original_url || "");
       }
     } catch (error) {
       console.error("Failed to fetch receipt:", error);

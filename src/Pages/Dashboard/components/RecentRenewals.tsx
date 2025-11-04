@@ -1,7 +1,6 @@
 import React from "react";
 import { Box, Typography, Avatar, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import AddCredits from "../Renewals/AddCredits";
 import { usePermissions } from "../../../context/permissions";
 
 const RecentRenewals: React.FC<{ renewals: any; fetchDashboard: any }> = ({
@@ -10,10 +9,6 @@ const RecentRenewals: React.FC<{ renewals: any; fetchDashboard: any }> = ({
 }) => {
   const navigate = useNavigate();
   const { hasPermission } = usePermissions();
-
-  const checkDiff = (credit: string | null, amount: string | null) => {
-    return parseInt(credit ?? "0") - parseInt(amount ?? "0");
-  };
 
   return (
     <Box
@@ -94,24 +89,6 @@ const RecentRenewals: React.FC<{ renewals: any; fetchDashboard: any }> = ({
                 </Typography>
               </Box>
 
-              {/* Status */}
-              {hasPermission("revewal-edit") &&
-                checkDiff(renewal.credit, renewal.get_amount) <= 0 && (
-                  <AddCredits
-                    id={renewal.id}
-                    fetchRenewals={fetchDashboard}
-                    type="inactive"
-                  />
-                )}
-              {hasPermission("revewal-view") &&
-                checkDiff(renewal.credit, renewal.get_amount) > 0 &&
-                checkDiff(renewal.credit, renewal.get_amount) <= 200 && (
-                  <AddCredits
-                    id={renewal.id}
-                    fetchRenewals={fetchDashboard}
-                    type="renew"
-                  />
-                )}
             </Box>
           ))
         ) : (

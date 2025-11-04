@@ -9,7 +9,6 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { getRenewals } from "../../../apis/renewals";
-import AddCredits from "./AddCredits";
 import PaymentReceipt from "./PaymentReceipt";
 import { usePermissions } from "../../../context/permissions";
 
@@ -56,10 +55,6 @@ const Tabss: React.FC = () => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-
-  const checkDiff = (credit: string | null, amount: string | null) => {
-    return parseInt(credit ?? "0") - parseInt(amount ?? "0");
-  };
 
   return (
     <Box sx={{ width: "100%", marginBottom: "16px" }}>
@@ -127,25 +122,6 @@ const Tabss: React.FC = () => {
                   </Box>
 
                   {/* Status */}
-                  {hasPermission("revewal-edit") &&
-                    activeTab === 1 &&
-                    checkDiff(item.credit, item.get_amount) <= 0 && (
-                      <AddCredits
-                        id={item.id}
-                        fetchRenewals={fetchRenewals}
-                        type="inactive"
-                      />
-                    )}
-                  {hasPermission("revewal-view") &&
-                    activeTab === 1 &&
-                    checkDiff(item.credit, item.get_amount) > 0 &&
-                    checkDiff(item.credit, item.get_amount) <= 200 && (
-                      <AddCredits
-                        id={item.id}
-                        fetchRenewals={fetchRenewals}
-                        type="renew"
-                      />
-                    )}
                   {hasPermission("revewal-edit") && activeTab === 2 && (
                     <PaymentReceipt id={item.id} />
                   )}

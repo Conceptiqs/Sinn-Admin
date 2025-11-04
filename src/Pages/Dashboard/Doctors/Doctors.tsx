@@ -227,7 +227,6 @@ const Doctors: React.FC = () => {
               <TableCell sx={{ fontSize: "14px" }}>Email</TableCell>
               <TableCell sx={{ fontSize: "14px" }}>DOB</TableCell>
               <TableCell sx={{ fontSize: "14px" }}>Gender</TableCell>
-              <TableCell sx={{ fontSize: "14px" }}>Credit</TableCell>
               {(hasPermission("doctor-view") ||
                 hasPermission("doctor-edit")) && (
                 <TableCell align="center" sx={{ fontSize: "14px" }}>
@@ -265,25 +264,6 @@ const Doctors: React.FC = () => {
                 </TableCell>
                 <TableCell sx={{ fontSize: "14px" }}>
                   {doctor.gender || "N/A"}
-                </TableCell>
-                <TableCell>
-                  <Typography
-                    sx={{
-                      color: "green",
-                      fontWeight: "bold",
-                      fontSize: "14px",
-                    }}
-                  >
-                    {(() => {
-                      const c = parseFloat(doctor.credit),
-                        a = parseFloat(doctor.get_amount);
-                      return isNaN(c) || isNaN(a)
-                        ? 0
-                        : Number.isInteger(c - a)
-                          ? c - a
-                          : (c - a).toFixed(2);
-                    })()}
-                  </Typography>
                 </TableCell>
                 {(hasPermission("doctor-view") ||
                   hasPermission("doctor-edit")) && (
