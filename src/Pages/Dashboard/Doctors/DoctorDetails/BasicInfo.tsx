@@ -14,7 +14,7 @@ import {
   IconButton,
 } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, Link as RouterLink } from "react-router-dom";
 import { updateApprovals } from "../../../../apis/approvals";
 import { toast } from "react-toastify";
 import { usePermissions } from "../../../../context/permissions";
@@ -167,6 +167,31 @@ const BasicInfo: React.FC<{ doctor: any }> = ({ doctor }) => {
               {address || "N/A"}
             </Typography>
           </Grid>
+
+          {/* Clinic */}
+          {doctor.clinic && (
+            <Grid item sx={{ flex: 1 }}>
+              <Typography sx={{ fontWeight: 500, textAlign: "center" }}>
+                Clinic
+              </Typography>
+              <Typography
+                component={RouterLink}
+                to={`/clinic/${doctor.clinic.id}`}
+                sx={{
+                  fontWeight: 50,
+                  textAlign: "center",
+                  color: "primary.main",
+                  textDecoration: "none",
+                  cursor: "pointer",
+                  "&:hover": {
+                    textDecoration: "underline",
+                  },
+                }}
+              >
+                {doctor.clinic.name || "N/A"}
+              </Typography>
+            </Grid>
+          )}
 
           {/* National ID */}
           <Grid item sx={{ flex: 1 }}>
