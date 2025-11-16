@@ -11,13 +11,13 @@ import {
 import { DashboardIcons } from "../../../assets";
 import {
   getDashboardDurationSummary,
-  EarningsDataResponse,
+  EarningsData,
 } from "../../../apis/dashboard";
 
 // Generate dummy data based on duration
 const getDummyData = (
   duration: "week" | "month" | "year"
-): EarningsDataResponse => {
+): EarningsData => {
     if (duration === "week") {
       return {
         summary: {
@@ -128,7 +128,7 @@ const getDummyData = (
 const EarningsChart: React.FC = () => {
   const [view, setView] = useState<"week" | "month" | "year">("week");
   const [loading, setLoading] = useState<boolean>(true);
-  const [earningsData, setEarningsData] = useState<EarningsDataResponse | null>(
+  const [earningsData, setEarningsData] = useState<EarningsData | null>(
     null
   );
   const [totalEarnings, setTotalEarnings] = useState<number>(0);
@@ -142,9 +142,13 @@ const EarningsChart: React.FC = () => {
       setLoading(true);
       try {
         const response = await getDashboardDurationSummary(view);
-        setEarningsData(response);
-        setTotalEarnings(response.summary.total_earnings);
-        setPeriodLabel(response.summary.period_label);
+        if (response.success && response.data) {
+          setEarningsData(response.data);
+          setTotalEarnings(response.data.summary.total_earnings);
+          setPeriodLabel(response.data.summary.period_label);
+        } else {
+          throw new Error("Invalid response structure");
+        }
       } catch (error) {
         console.error("Error fetching earnings data:", error);
         // Use dummy data on error

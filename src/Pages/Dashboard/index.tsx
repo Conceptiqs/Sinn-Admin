@@ -4,7 +4,6 @@ import Label from "./components/Label";
 import StatsCards from "./components/StatsCards";
 import EarningsChart from "./components/EarningsChart";
 import RecentlyJoinedDoctors from "./components/RecentlyJoinedDoctors";
-import RecentRenewals from "./components/RecentRenewals";
 import RecentActivities from "./components/RecentActivities";
 import { getDashboard } from "../../apis/dashboard";
 
@@ -16,11 +15,13 @@ const Dashboard: React.FC = () => {
     try {
       setLoading(true);
       const res = await getDashboard();
+      console.log("Dashboard API Response in component:", res);
       if (res.success) {
         setData(res.data);
+        console.log("Dashboard data set:", res.data);
       }
     } catch (err) {
-      console.error("Error fetching customer banners:", err);
+      console.error("Error fetching dashboard:", err);
     } finally {
       setLoading(false);
     }
@@ -67,7 +68,6 @@ const Dashboard: React.FC = () => {
           <Label />
           <StatsCards data={data} />
           <EarningsChart />
-          <RecentRenewals renewals={data?.recentRevewal} fetchDashboard={fetchDashboard} />
         </Grid>
 
         {/* Right Column */}

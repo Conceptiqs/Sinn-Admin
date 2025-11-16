@@ -48,6 +48,21 @@ const Clinics: React.FC = () => {
       if (response.success && response.data) {
         // Handle paginated response
         if (response.data.data && Array.isArray(response.data.data)) {
+          // Debug: Log first clinic to see ALL fields
+          if (response.data.data.length > 0) {
+            const firstClinic = response.data.data[0];
+            console.log("Sample clinic data (full object):", firstClinic);
+            console.log("All clinic keys:", Object.keys(firstClinic));
+            console.log("Approval-related fields:", {
+              approval: firstClinic.approval,
+              approval_type: firstClinic.approval_type,
+              approvalType: firstClinic.approvalType,
+              approval_status: firstClinic.approval_status,
+              status: firstClinic.status,
+              is_approved: firstClinic.is_approved,
+              approved: firstClinic.approved
+            });
+          }
           setClinics(response.data.data);
         } else {
           setClinics([]);
@@ -101,6 +116,34 @@ const Clinics: React.FC = () => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  // Helper function to get clinic status based on is_approved field
+  // is_approved === 1 → approved
+  // Otherwise → pending or rejected
+  const getClinicStatus = (clinic: any): string => {
+    // Check is_approved field first (1 = approved)
+    if (clinic.is_approved === 1) {
+      return 'approved';
+    }
+    
+    // Check if rejected (might be stored as is_approved === 2 or is_rejected === 1)
+    if (clinic.is_approved === 2 || clinic.is_rejected === 1) {
+      return 'rejected';
+    }
+    
+    // Check approval object with type property as fallback
+    if (clinic.approval && typeof clinic.approval === 'object') {
+      if (clinic.approval.type === 1) return 'approved';
+      if (clinic.approval.type === 2) return 'rejected';
+    }
+    
+    // Check approval_type field as fallback
+    if (clinic.approval_type === 1) return 'approved';
+    if (clinic.approval_type === 2) return 'rejected';
+    
+    // Default: pending (is_approved === 0, null, undefined, or false)
+    return 'pending';
+  };
 
   if (loading) {
     return (
@@ -183,7 +226,7 @@ const Clinics: React.FC = () => {
                 mobile: clinic.mobile,
                 email: clinic.email,
                 city: clinic.city || clinic.addresses?.[0]?.city || "N/A",
-                status: clinic.status,
+                status: getClinicStatus(clinic),
               }))}
               fileName="clinics.csv"
             />
@@ -263,21 +306,26 @@ const Clinics: React.FC = () => {
                   {clinic.city || clinic.addresses?.[0]?.address || "N/A"}
                 </TableCell>
                 <TableCell>
-                  <Typography
-                    sx={{
-                      color:
-                        clinic.status === "approved"
-                          ? "green"
-                          : clinic.status === "pending"
-                          ? "orange"
-                          : "red",
-                      fontWeight: "bold",
-                      fontSize: "14px",
-                      textTransform: "capitalize",
-                    }}
-                  >
-                    {clinic.status || "N/A"}
-                  </Typography>
+                  {(() => {
+                    const status = getClinicStatus(clinic);
+                    return (
+                      <Typography
+                        sx={{
+                          color:
+                            status === "approved"
+                              ? "green"
+                              : status === "pending"
+                              ? "orange"
+                              : "red",
+                          fontWeight: "bold",
+                          fontSize: "14px",
+                          textTransform: "capitalize",
+                        }}
+                      >
+                        {status || "N/A"}
+                      </Typography>
+                    );
+                  })()}
                 </TableCell>
                 {/* {(hasPermission("clinic-view") ||
                   hasPermission("clinic-edit")) && ( */}

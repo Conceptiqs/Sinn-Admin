@@ -25,6 +25,46 @@ const BasicInfo: React.FC<{ clinic: any }> = ({ clinic }) => {
 
   const { hasPermission } = usePermissions();
 
+  // Helper function to get clinic status from various possible field names
+  const getClinicStatus = (clinic: any): string => {
+    // Check approval type first (this is what determines Accept/Reject buttons)
+    // approval.type: 1 = approved, 2 = rejected, null/undefined/0 = pending
+    const approvalType = 
+      clinic.approval?.type !== undefined ? clinic.approval.type :
+      clinic.approval_type !== undefined ? clinic.approval_type :
+      clinic.approval?.approval_type !== undefined ? clinic.approval.approval_type :
+      null;
+    
+    if (approvalType === 1) return 'approved';
+    if (approvalType === 2) return 'rejected';
+    
+    // Fallback to other status fields
+    const status = 
+      clinic.status || 
+      clinic.approval_status || 
+      clinic.approval?.status ||
+      clinic.approvalStatus;
+    
+    // If status is a number, convert to string
+    if (typeof status === 'number') {
+      if (status === 0) return 'pending';
+      if (status === 1) return 'approved';
+      if (status === 2) return 'rejected';
+      return 'pending'; // default
+    }
+    
+    // If status is a string, normalize it
+    if (typeof status === 'string') {
+      const normalized = status.toLowerCase();
+      if (normalized === 'approved' || normalized === 'approve') return 'approved';
+      if (normalized === 'rejected' || normalized === 'reject') return 'rejected';
+      if (normalized === 'pending') return 'pending';
+    }
+    
+    // Default: if no approval exists, it's pending
+    return 'pending';
+  };
+
   // -- Approval state
   const [pending, setPending] = useState(false);
 
@@ -102,17 +142,22 @@ const BasicInfo: React.FC<{ clinic: any }> = ({ clinic }) => {
             mt: 2,
           }}
         >
-          <Chip
-            label={clinic.status || "N/A"}
-            color={
-              clinic.status === "approved"
-                ? "success"
-                : clinic.status === "pending"
-                ? "warning"
-                : "error"
-            }
-            sx={{ textTransform: "capitalize" }}
-          />
+          {(() => {
+            const status = getClinicStatus(clinic);
+            return (
+              <Chip
+                label={status || "N/A"}
+                color={
+                  status === "approved"
+                    ? "success"
+                    : status === "pending"
+                    ? "warning"
+                    : "error"
+                }
+                sx={{ textTransform: "capitalize" }}
+              />
+            );
+          })()}
         </Box>
       </Box>
 

@@ -17,7 +17,7 @@ const stats = [
     bgColor: "#E0F7FA",
   },
   {
-    title: "Inactive",
+    title: "Total Clinics",
     count: 12,
     iconPath: DashboardIcons.Inactiveicon, // Path to custom inactive icon
     bgColor: "#FCE4EC",
@@ -57,7 +57,7 @@ const StatsCards: React.FC<{ data: any }> = ({ data }) => {
                 ? data?.doctor
                 : index === 1
                   ? data?.customer
-                  : data?.innactive}
+                  : data?.clinic}
             </Typography>
             <Typography variant="body1">{stat.title}</Typography>
           </Box>

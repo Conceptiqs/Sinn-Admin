@@ -1,14 +1,22 @@
 import { callAuthApi } from "./general";
+import { baseUrl } from "../contants/general";
 
 export async function getDashboard(): Promise<{
   success: boolean;
   data: any[];
 }> {
   const path = `dashboard`;
-  return await callAuthApi({ path, method: "GET" });
+  const endpoint = `${baseUrl}${path}`;
+  console.log("Dashboard API Endpoint:", endpoint);
+  const response = await callAuthApi<{
+    success: boolean;
+    data: any[];
+  }>({ path, method: "GET" });
+  console.log("Dashboard API Response:", response);
+  return response;
 }
 
-export interface EarningsDataResponse {
+export interface EarningsData {
   summary: {
     total_earnings: number;
     period_label: string;
@@ -20,6 +28,12 @@ export interface EarningsDataResponse {
       value: number;
     }>;
   }>;
+}
+
+export interface EarningsDataResponse {
+  success: boolean;
+  data: EarningsData;
+  message: string;
 }
 
 export async function getDashboardDurationSummary(
