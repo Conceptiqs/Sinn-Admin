@@ -48,6 +48,33 @@ const BasicInfo: React.FC<{ doctor: any }> = ({ doctor }) => {
     (item: any) => item.collection_name === "licenses"
   );
 
+  // Get the actual image URLs - check multiple possible property names
+  const nationalIdUrl =
+    nationalId?.original_url ||
+    nationalId?.url ||
+    nationalId?.main_images?.url ||
+    (Array.isArray(nationalId?.media) && nationalId?.media[0]?.original_url) ||
+    (Array.isArray(nationalId?.media) && nationalId?.media[0]?.url);
+  
+  const licenseUrl =
+    license?.original_url ||
+    license?.url ||
+    license?.main_images?.url ||
+    (Array.isArray(license?.media) && license?.media[0]?.original_url) ||
+    (Array.isArray(license?.media) && license?.media[0]?.url);
+
+  // Debug logging (remove in production if needed)
+  if (process.env.NODE_ENV === "development") {
+    if (!nationalIdUrl && doctor.media) {
+      console.log("National ID media not found. Available media:", doctor.media);
+      console.log("Found nationalId object:", nationalId);
+    }
+    if (!licenseUrl && doctor.media) {
+      console.log("License media not found. Available media:", doctor.media);
+      console.log("Found license object:", license);
+    }
+  }
+
   // -- Handlers
   const handleOpenReject = () => setOpenReject(true);
   const handleCloseReject = () => {
@@ -198,15 +225,35 @@ const BasicInfo: React.FC<{ doctor: any }> = ({ doctor }) => {
             <Typography sx={{ fontWeight: 500, textAlign: "center" }}>
               National ID
             </Typography>
-            <img
-              src={
-                nationalId?.original_url ||
-                "https://admin.expatica.com/sa/wp-content/uploads/sites/14/2023/11/saudi-id-card.jpg"
-              }
-              alt="National ID"
-              width="100%"
-              style={{ borderRadius: 8 }}
-            />
+            {nationalIdUrl ? (
+              <img
+                src={nationalIdUrl}
+                alt="National ID"
+                width="100%"
+                style={{ borderRadius: 8 }}
+                onError={(e) => {
+                  console.error("Failed to load National ID image:", nationalIdUrl);
+                  (e.target as HTMLImageElement).style.display = "none";
+                }}
+              />
+            ) : (
+              <Box
+                sx={{
+                  width: "100%",
+                  height: 200,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  border: "1px dashed #ccc",
+                  borderRadius: 8,
+                  bgcolor: "#f5f5f5",
+                }}
+              >
+                <Typography variant="body2" color="text.secondary">
+                  No National ID image available
+                </Typography>
+              </Box>
+            )}
           </Grid>
 
           {/* License */}
@@ -214,15 +261,35 @@ const BasicInfo: React.FC<{ doctor: any }> = ({ doctor }) => {
             <Typography sx={{ fontWeight: 500, textAlign: "center" }}>
               License
             </Typography>
-            <img
-              src={
-                license?.original_url ||
-                "https://admin.expatica.com/sa/wp-content/uploads/sites/14/2023/11/saudi-id-card.jpg"
-              }
-              alt="License"
-              width="100%"
-              style={{ borderRadius: 8 }}
-            />
+            {licenseUrl ? (
+              <img
+                src={licenseUrl}
+                alt="License"
+                width="100%"
+                style={{ borderRadius: 8 }}
+                onError={(e) => {
+                  console.error("Failed to load License image:", licenseUrl);
+                  (e.target as HTMLImageElement).style.display = "none";
+                }}
+              />
+            ) : (
+              <Box
+                sx={{
+                  width: "100%",
+                  height: 200,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  border: "1px dashed #ccc",
+                  borderRadius: 8,
+                  bgcolor: "#f5f5f5",
+                }}
+              >
+                <Typography variant="body2" color="text.secondary">
+                  No License image available
+                </Typography>
+              </Box>
+            )}
           </Grid>
         </Grid>
       </Box>

@@ -11,6 +11,7 @@ import {
   Modal,
   TextField,
   IconButton,
+  Grid,
 } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -24,6 +25,57 @@ const BasicInfo: React.FC<{ clinic: any }> = ({ clinic }) => {
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
 
   const { hasPermission } = usePermissions();
+
+  // Get email and mobile from clinic or fallback to first doctor
+  const clinicEmail = clinic?.email || clinic?.email_address || clinic?.doctors?.[0]?.email || null;
+  const clinicMobile = clinic?.mobile || clinic?.phone || clinic?.phone_number || clinic?.mobile_no || clinic?.doctors?.[0]?.mobile || null;
+
+  // Debug: Log clinic data to see available fields
+  React.useEffect(() => {
+    if (clinic) {
+      console.log("Clinic data in BasicInfo:", clinic);
+      console.log("Available clinic fields:", Object.keys(clinic));
+      console.log("Clinic email:", clinic.email);
+      console.log("Clinic mobile:", clinic.mobile);
+      console.log("First doctor email:", clinic?.doctors?.[0]?.email);
+      console.log("First doctor mobile:", clinic?.doctors?.[0]?.mobile);
+    }
+  }, [clinic]);
+
+  // Helper function to extract image URL from media item
+  const getMediaUrl = (mediaItem: any): string | null => {
+    return (
+      mediaItem?.original_url ||
+      mediaItem?.url ||
+      mediaItem?.main_images?.url ||
+      (Array.isArray(mediaItem?.media) && mediaItem?.media[0]?.original_url) ||
+      (Array.isArray(mediaItem?.media) && mediaItem?.media[0]?.url) ||
+      null
+    );
+  };
+
+  // Get all available documents from clinic media
+  const documents = clinic?.media?.filter((item: any) => {
+    const url = getMediaUrl(item);
+    return url !== null;
+  }) || [];
+
+  // Get Commercial Registration and Clinic License documents
+  const commercialRegistrationDoc = clinic?.commercial_registration_doc;
+  const clinicLicenseDoc = clinic?.clinic_license_doc;
+
+  // Get URLs for commercial registration and clinic license
+  const commercialRegistrationUrl =
+    commercialRegistrationDoc?.original_url ||
+    commercialRegistrationDoc?.url ||
+    commercialRegistrationDoc?.preview_url ||
+    null;
+
+  const clinicLicenseUrl =
+    clinicLicenseDoc?.original_url ||
+    clinicLicenseDoc?.url ||
+    clinicLicenseDoc?.preview_url ||
+    null;
 
   // Helper function to get clinic status from various possible field names
   const getClinicStatus = (clinic: any): string => {
@@ -163,15 +215,19 @@ const BasicInfo: React.FC<{ clinic: any }> = ({ clinic }) => {
 
       {/* Details Section */}
       <Box sx={{ padding: 2, marginTop: 3 }}>
-        <Box
+        <Grid
+          container
+          spacing={2}
           sx={{
             display: "flex",
             flexDirection: isMobile ? "column" : "row",
+            flexWrap: "nowrap",
+            alignItems: "center",
             gap: 3,
           }}
         >
           {/* Name & Mobile */}
-          <Box sx={{ flex: 1 }}>
+          <Grid item sx={{ flex: 1 }}>
             <Typography sx={{ fontWeight: 500, textAlign: "center" }}>
               Name
             </Typography>
@@ -182,17 +238,17 @@ const BasicInfo: React.FC<{ clinic: any }> = ({ clinic }) => {
               Mobile
             </Typography>
             <Typography sx={{ fontWeight: 50, textAlign: "center" }}>
-              {clinic.mobile || "N/A"}
+              {clinicMobile || "N/A"}
             </Typography>
-          </Box>
+          </Grid>
 
           {/* Email & City */}
-          <Box sx={{ flex: 1 }}>
+          <Grid item sx={{ flex: 1 }}>
             <Typography sx={{ fontWeight: 500, textAlign: "center" }}>
               Email
             </Typography>
             <Typography sx={{ fontWeight: 50, textAlign: "center" }}>
-              {clinic.email || "N/A"}
+              {clinicEmail || "N/A"}
             </Typography>
             <Typography sx={{ fontWeight: 500, textAlign: "center", mt: 2 }}>
               City
@@ -200,19 +256,145 @@ const BasicInfo: React.FC<{ clinic: any }> = ({ clinic }) => {
             <Typography sx={{ fontWeight: 50, textAlign: "center" }}>
               {clinic.city || clinic.addresses?.[0]?.title || "N/A"}
             </Typography>
-          </Box>
+          </Grid>
 
           {/* Address */}
-          <Box sx={{ flex: 1 }}>
+          <Grid item sx={{ flex: 1 }}>
             <Typography sx={{ fontWeight: 500, textAlign: "center" }}>
               Address
             </Typography>
             <Typography sx={{ fontWeight: 50, textAlign: "center" }}>
               {clinic.addresses?.[0]?.address || "N/A"}
             </Typography>
-          </Box>
-        </Box>
+          </Grid>
+
+          {/* Commercial Registration */}
+          <Grid item sx={{ flex: 1 }}>
+            <Typography sx={{ fontWeight: 500, textAlign: "center" }}>
+              Commercial Registration
+            </Typography>
+            {commercialRegistrationUrl ? (
+              <img
+                src={commercialRegistrationUrl}
+                alt="Commercial Registration"
+                width="100%"
+                style={{ borderRadius: 8 }}
+                onError={(e) => {
+                  console.error("Failed to load Commercial Registration image:", commercialRegistrationUrl);
+                  (e.target as HTMLImageElement).style.display = "none";
+                }}
+              />
+            ) : (
+              <Box
+                sx={{
+                  width: "100%",
+                  height: 200,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  border: "1px dashed #ccc",
+                  borderRadius: 8,
+                  bgcolor: "#f5f5f5",
+                }}
+              >
+                <Typography variant="body2" color="text.secondary">
+                  No Commercial Registration image available
+                </Typography>
+              </Box>
+            )}
+          </Grid>
+
+          {/* Clinic License */}
+          <Grid item sx={{ flex: 1 }}>
+            <Typography sx={{ fontWeight: 500, textAlign: "center" }}>
+              Clinic License
+            </Typography>
+            {clinicLicenseUrl ? (
+              <img
+                src={clinicLicenseUrl}
+                alt="Clinic License"
+                width="100%"
+                style={{ borderRadius: 8 }}
+                onError={(e) => {
+                  console.error("Failed to load Clinic License image:", clinicLicenseUrl);
+                  (e.target as HTMLImageElement).style.display = "none";
+                }}
+              />
+            ) : (
+              <Box
+                sx={{
+                  width: "100%",
+                  height: 200,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  border: "1px dashed #ccc",
+                  borderRadius: 8,
+                  bgcolor: "#f5f5f5",
+                }}
+              >
+                <Typography variant="body2" color="text.secondary">
+                  No Clinic License image available
+                </Typography>
+              </Box>
+            )}
+          </Grid>
+        </Grid>
       </Box>
+
+      {/* Documents Section */}
+      {documents.length > 0 && (
+        <Box sx={{ padding: 2, marginTop: 3 }}>
+          <Typography variant="h6" sx={{ marginBottom: 2, fontWeight: 500 }}>
+            Documents
+          </Typography>
+          <Grid container spacing={2}>
+            {documents.map((doc: any, index: number) => {
+              const docUrl = getMediaUrl(doc);
+              const docName =
+                doc.collection_name?.replace(/_/g, " ").replace(/\b\w/g, (l: string) => l.toUpperCase()) ||
+                `Document ${index + 1}`;
+
+              return (
+                <Grid item xs={12} sm={6} md={4} key={index}>
+                  <Typography sx={{ fontWeight: 500, textAlign: "center", mb: 1 }}>
+                    {docName}
+                  </Typography>
+                  {docUrl ? (
+                    <img
+                      src={docUrl}
+                      alt={docName}
+                      width="100%"
+                      style={{ borderRadius: 8 }}
+                      onError={(e) => {
+                        console.error(`Failed to load ${docName} image:`, docUrl);
+                        (e.target as HTMLImageElement).style.display = "none";
+                      }}
+                    />
+                  ) : (
+                    <Box
+                      sx={{
+                        width: "100%",
+                        height: 200,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        border: "1px dashed #ccc",
+                        borderRadius: 8,
+                        bgcolor: "#f5f5f5",
+                      }}
+                    >
+                      <Typography variant="body2" color="text.secondary">
+                        No image available
+                      </Typography>
+                    </Box>
+                  )}
+                </Grid>
+              );
+            })}
+          </Grid>
+        </Box>
+      )}
 
       {location.state?.isApproval && hasPermission("approval-edit") && (
         <Box

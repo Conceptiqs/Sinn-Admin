@@ -22,8 +22,12 @@ const ClinicDetails: React.FC = () => {
     try {
       setLoading(true);
       const response = await getClinicById(id);
-      if (response.success) {
+      console.log("Clinic API Response:", response);
+      
+      if (response.success && response.data) {
         setData(response.data);
+      } else {
+        console.error("API response not successful or missing data:", response);
       }
     } catch (error) {
       console.error("Failed to fetch clinic:", error);
