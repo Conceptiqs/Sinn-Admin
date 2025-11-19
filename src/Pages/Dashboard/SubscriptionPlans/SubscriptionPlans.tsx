@@ -34,7 +34,7 @@ const SubscriptionPlans: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const itemsPerPage = 10;
-  
+
 
   const fetchPlans = useCallback(async () => {
     try {
@@ -51,7 +51,6 @@ const SubscriptionPlans: React.FC = () => {
     } finally {
       setLoading(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -229,10 +228,10 @@ const SubscriptionPlans: React.FC = () => {
                   {plan.billing_period || "N/A"}
                 </TableCell>
                 <TableCell sx={{ fontSize: "14px", fontWeight: "bold" }}>
-                  ${plan.amount || "0.00"}
+                  {plan.amount ? `SAR ${Number(plan.amount).toFixed(2)}` : "SAR 0.00"}
                 </TableCell>
                 <TableCell sx={{ fontSize: "14px", fontWeight: "bold", color: "primary.main" }}>
-                  ${plan.discounted_amount || "0.00"}
+                  {plan.discounted_amount ? `SAR ${Number(plan.discounted_amount).toFixed(2)}` : "SAR 0.00"}
                   {plan.discount_percentage && (
                     <Chip
                       label={`${plan.discount_percentage}% OFF`}

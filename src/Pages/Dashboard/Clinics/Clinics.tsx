@@ -82,7 +82,6 @@ const Clinics: React.FC = () => {
     //   setLoading(false);
     // }
     fetchClinics();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchClinics]);
 
   const isAllSelected =
@@ -125,22 +124,22 @@ const Clinics: React.FC = () => {
     if (clinic.is_approved === 1) {
       return 'approved';
     }
-    
+
     // Check if rejected (might be stored as is_approved === 2 or is_rejected === 1)
     if (clinic.is_approved === 2 || clinic.is_rejected === 1) {
       return 'rejected';
     }
-    
+
     // Check approval object with type property as fallback
     if (clinic.approval && typeof clinic.approval === 'object') {
       if (clinic.approval.type === 1) return 'approved';
       if (clinic.approval.type === 2) return 'rejected';
     }
-    
+
     // Check approval_type field as fallback
     if (clinic.approval_type === 1) return 'approved';
     if (clinic.approval_type === 2) return 'rejected';
-    
+
     // Default: pending (is_approved === 0, null, undefined, or false)
     return 'pending';
   };
@@ -217,19 +216,19 @@ const Clinics: React.FC = () => {
             />
           </Box>
           {/* {hasPermission("notification-write") && ( */}
-            <SendNotificationModal type="clinic" userIds={selectedClinicIds} />
+          <SendNotificationModal type="clinic" userIds={selectedClinicIds} />
           {/* )} */}
           {/* {hasPermission("clinic-read") && ( */}
-            <ExportButton
-              data={clinics?.map((clinic) => ({
-                name: clinic.name,
-                mobile: clinic.mobile,
-                email: clinic.email,
-                city: clinic.city || clinic.addresses?.[0]?.city || "N/A",
-                status: getClinicStatus(clinic),
-              }))}
-              fileName="clinics.csv"
-            />
+          <ExportButton
+            data={clinics?.map((clinic) => ({
+              name: clinic.name,
+              mobile: clinic.mobile,
+              email: clinic.email,
+              city: clinic.city || clinic.addresses?.[0]?.city || "N/A",
+              status: getClinicStatus(clinic),
+            }))}
+            fileName="clinics.csv"
+          />
           {/* )} */}
         </Box>
       </Box>
@@ -272,9 +271,9 @@ const Clinics: React.FC = () => {
               <TableCell sx={{ fontSize: "14px" }}>Status</TableCell>
               {/* {(hasPermission("clinic-view") ||
                 hasPermission("clinic-edit")) && ( */}
-                <TableCell align="center" sx={{ fontSize: "14px" }}>
-                  Actions
-                </TableCell>
+              <TableCell align="center" sx={{ fontSize: "14px" }}>
+                Actions
+              </TableCell>
               {/* )} */}
             </TableRow>
           </TableHead>
@@ -315,8 +314,8 @@ const Clinics: React.FC = () => {
                             status === "approved"
                               ? "green"
                               : status === "pending"
-                              ? "orange"
-                              : "red",
+                                ? "orange"
+                                : "red",
                           fontWeight: "bold",
                           fontSize: "14px",
                           textTransform: "capitalize",
@@ -329,21 +328,21 @@ const Clinics: React.FC = () => {
                 </TableCell>
                 {/* {(hasPermission("clinic-view") ||
                   hasPermission("clinic-edit")) && ( */}
-                  <TableCell align="center">
-                    <IconButton
-                      onClick={() => navigate(`/clinic/${clinic.id}`)}
-                      color="primary"
-                      size="small"
-                    >
-                      <VisibilityIcon />
-                    </IconButton>
-                    {/* {hasPermission("clinic-edit") && ( */}
-                      <DeleteClinic
-                        clinic={clinic}
-                        fetchClinics={fetchClinics}
-                      />
-                    {/* )} */}
-                  </TableCell>
+                <TableCell align="center">
+                  <IconButton
+                    onClick={() => navigate(`/clinic/${clinic.id}`)}
+                    color="primary"
+                    size="small"
+                  >
+                    <VisibilityIcon />
+                  </IconButton>
+                  {/* {hasPermission("clinic-edit") && ( */}
+                  <DeleteClinic
+                    clinic={clinic}
+                    fetchClinics={fetchClinics}
+                  />
+                  {/* )} */}
+                </TableCell>
                 {/* )} */}
               </TableRow>
             ))}
