@@ -18,6 +18,7 @@ import { useLocation, useNavigate, Link as RouterLink } from "react-router-dom";
 import { updateApprovals } from "../../../../apis/approvals";
 import { toast } from "react-toastify";
 import { usePermissions } from "../../../../context/permissions";
+import DocumentViewer from "../../../../components/DocumentViewer";
 
 const BasicInfo: React.FC<{ doctor: any }> = ({ doctor }) => {
   const navigate = useNavigate();
@@ -55,7 +56,7 @@ const BasicInfo: React.FC<{ doctor: any }> = ({ doctor }) => {
     nationalId?.main_images?.url ||
     (Array.isArray(nationalId?.media) && nationalId?.media[0]?.original_url) ||
     (Array.isArray(nationalId?.media) && nationalId?.media[0]?.url);
-  
+
   const licenseUrl =
     license?.original_url ||
     license?.url ||
@@ -222,19 +223,15 @@ const BasicInfo: React.FC<{ doctor: any }> = ({ doctor }) => {
 
           {/* National ID */}
           <Grid item sx={{ flex: 1 }}>
-            <Typography sx={{ fontWeight: 500, textAlign: "center" }}>
+            <Typography sx={{ fontWeight: 500, textAlign: "center", mb: 1 }}>
               National ID
             </Typography>
             {nationalIdUrl ? (
-              <img
-                src={nationalIdUrl}
+              <DocumentViewer
+                imageUrl={nationalIdUrl}
                 alt="National ID"
-                width="100%"
-                style={{ borderRadius: 8 }}
-                onError={(e) => {
-                  console.error("Failed to load National ID image:", nationalIdUrl);
-                  (e.target as HTMLImageElement).style.display = "none";
-                }}
+                title="National ID"
+                showDownload={true}
               />
             ) : (
               <Box
@@ -258,19 +255,15 @@ const BasicInfo: React.FC<{ doctor: any }> = ({ doctor }) => {
 
           {/* License */}
           <Grid item sx={{ flex: 1 }}>
-            <Typography sx={{ fontWeight: 500, textAlign: "center" }}>
+            <Typography sx={{ fontWeight: 500, textAlign: "center", mb: 1 }}>
               License
             </Typography>
             {licenseUrl ? (
-              <img
-                src={licenseUrl}
+              <DocumentViewer
+                imageUrl={licenseUrl}
                 alt="License"
-                width="100%"
-                style={{ borderRadius: 8 }}
-                onError={(e) => {
-                  console.error("Failed to load License image:", licenseUrl);
-                  (e.target as HTMLImageElement).style.display = "none";
-                }}
+                title="License"
+                showDownload={true}
               />
             ) : (
               <Box

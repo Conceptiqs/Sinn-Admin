@@ -18,6 +18,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { updateApprovals } from "../../../../apis/approvals";
 import { toast } from "react-toastify";
 import { usePermissions } from "../../../../context/permissions";
+import DocumentViewer from "../../../../components/DocumentViewer";
 
 const BasicInfo: React.FC<{ clinic: any }> = ({ clinic }) => {
   const navigate = useNavigate();
@@ -81,22 +82,22 @@ const BasicInfo: React.FC<{ clinic: any }> = ({ clinic }) => {
   const getClinicStatus = (clinic: any): string => {
     // Check approval type first (this is what determines Accept/Reject buttons)
     // approval.type: 1 = approved, 2 = rejected, null/undefined/0 = pending
-    const approvalType = 
+    const approvalType =
       clinic.approval?.type !== undefined ? clinic.approval.type :
-      clinic.approval_type !== undefined ? clinic.approval_type :
-      clinic.approval?.approval_type !== undefined ? clinic.approval.approval_type :
-      null;
-    
+        clinic.approval_type !== undefined ? clinic.approval_type :
+          clinic.approval?.approval_type !== undefined ? clinic.approval.approval_type :
+            null;
+
     if (approvalType === 1) return 'approved';
     if (approvalType === 2) return 'rejected';
-    
+
     // Fallback to other status fields
-    const status = 
-      clinic.status || 
-      clinic.approval_status || 
+    const status =
+      clinic.status ||
+      clinic.approval_status ||
       clinic.approval?.status ||
       clinic.approvalStatus;
-    
+
     // If status is a number, convert to string
     if (typeof status === 'number') {
       if (status === 0) return 'pending';
@@ -104,7 +105,7 @@ const BasicInfo: React.FC<{ clinic: any }> = ({ clinic }) => {
       if (status === 2) return 'rejected';
       return 'pending'; // default
     }
-    
+
     // If status is a string, normalize it
     if (typeof status === 'string') {
       const normalized = status.toLowerCase();
@@ -112,7 +113,7 @@ const BasicInfo: React.FC<{ clinic: any }> = ({ clinic }) => {
       if (normalized === 'rejected' || normalized === 'reject') return 'rejected';
       if (normalized === 'pending') return 'pending';
     }
-    
+
     // Default: if no approval exists, it's pending
     return 'pending';
   };
@@ -203,8 +204,8 @@ const BasicInfo: React.FC<{ clinic: any }> = ({ clinic }) => {
                   status === "approved"
                     ? "success"
                     : status === "pending"
-                    ? "warning"
-                    : "error"
+                      ? "warning"
+                      : "error"
                 }
                 sx={{ textTransform: "capitalize" }}
               />
@@ -270,19 +271,15 @@ const BasicInfo: React.FC<{ clinic: any }> = ({ clinic }) => {
 
           {/* Commercial Registration */}
           <Grid item sx={{ flex: 1 }}>
-            <Typography sx={{ fontWeight: 500, textAlign: "center" }}>
+            <Typography sx={{ fontWeight: 500, textAlign: "center", mb: 1 }}>
               Commercial Registration
             </Typography>
             {commercialRegistrationUrl ? (
-              <img
-                src={commercialRegistrationUrl}
+              <DocumentViewer
+                imageUrl={commercialRegistrationUrl}
                 alt="Commercial Registration"
-                width="100%"
-                style={{ borderRadius: 8 }}
-                onError={(e) => {
-                  console.error("Failed to load Commercial Registration image:", commercialRegistrationUrl);
-                  (e.target as HTMLImageElement).style.display = "none";
-                }}
+                title="Commercial Registration"
+                showDownload={true}
               />
             ) : (
               <Box
@@ -306,19 +303,15 @@ const BasicInfo: React.FC<{ clinic: any }> = ({ clinic }) => {
 
           {/* Clinic License */}
           <Grid item sx={{ flex: 1 }}>
-            <Typography sx={{ fontWeight: 500, textAlign: "center" }}>
+            <Typography sx={{ fontWeight: 500, textAlign: "center", mb: 1 }}>
               Clinic License
             </Typography>
             {clinicLicenseUrl ? (
-              <img
-                src={clinicLicenseUrl}
+              <DocumentViewer
+                imageUrl={clinicLicenseUrl}
                 alt="Clinic License"
-                width="100%"
-                style={{ borderRadius: 8 }}
-                onError={(e) => {
-                  console.error("Failed to load Clinic License image:", clinicLicenseUrl);
-                  (e.target as HTMLImageElement).style.display = "none";
-                }}
+                title="Clinic License"
+                showDownload={true}
               />
             ) : (
               <Box
@@ -361,15 +354,11 @@ const BasicInfo: React.FC<{ clinic: any }> = ({ clinic }) => {
                     {docName}
                   </Typography>
                   {docUrl ? (
-                    <img
-                      src={docUrl}
+                    <DocumentViewer
+                      imageUrl={docUrl}
                       alt={docName}
-                      width="100%"
-                      style={{ borderRadius: 8 }}
-                      onError={(e) => {
-                        console.error(`Failed to load ${docName} image:`, docUrl);
-                        (e.target as HTMLImageElement).style.display = "none";
-                      }}
+                      title={docName}
+                      showDownload={true}
                     />
                   ) : (
                     <Box
